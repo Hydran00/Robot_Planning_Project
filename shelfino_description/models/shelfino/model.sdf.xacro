@@ -1,10 +1,15 @@
 <?xml version='1.0'?>
-<sdf version='1.4'>
+<sdf version='1.4' xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:arg name="robot_id" default="X" />
+
+  <xacro:macro name="shelfino" params="robot_id">
+
 
 <!--
                                                       SHELFINO MODEL 
 -->
-  <model name="shelfino">
+  <model name="shelfino${robot_id}">
 
 <!--
                                                       BODY OF SHELFINO 
@@ -236,11 +241,11 @@
         <plugin name="laser" filename="libgazebo_ros_ray_sensor.so">
           <ros>
             <!-- Set namespace -->
-            <!-- <namespace>${robot_name}</namespace> -->
+            <!-- <namespace>${robot_id}</namespace> -->
             <remapping>~/out:=scan</remapping>
           </ros>
           <output_type>sensor_msgs/LaserScan</output_type>
-          <frame_name>base_laser</frame_name>
+          <frame_name>shelfino${robot_id}/base_laser</frame_name>
         </plugin>
       </sensor>
     </link>
@@ -250,11 +255,11 @@
 -->
     <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
 
-      <ros>
+      <!-- <ros> -->
         <!-- Set namespace -->
-        <!-- <namespace>${robot_name}</namespace> -->
-        <remapping>/tf:=tf</remapping>
-      </ros>
+        <!-- <namespace>${robot_id}</namespace> -->
+        <!-- <remapping>/tf:=tf</remapping> -->
+      <!-- </ros> -->
 
       <!-- <alwaysOn>true</alwaysOn> -->
 
@@ -280,8 +285,8 @@
       <publish_odom_tf>true</publish_odom_tf>
       <publish_wheel_tf>false</publish_wheel_tf>
 
-      <odometry_frame>odom</odometry_frame>
-      <robot_base_frame>base_link</robot_base_frame>
+      <odometry_frame>shelfino${robot_id}/odom</odometry_frame>
+      <robot_base_frame>shelfino${robot_id}/base_link</robot_base_frame>
 
       <!-- <odometrySource>ENCODER</odometrySource> -->
       <!-- <odometrySource>WORLD</odometrySource> -->
@@ -300,5 +305,9 @@
     </plugin>   
 
   </model>
+
+  </xacro:macro>
+
+  <xacro:shelfino robot_id="$(arg robot_id)" />
 
 </sdf>

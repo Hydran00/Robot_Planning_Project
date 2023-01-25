@@ -5,27 +5,22 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-from launch.substitutions import LaunchConfiguration, Command
+from launch.substitutions import LaunchConfiguration, Command, PythonExpression
 from launch.actions import DeclareLaunchArgument
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
-
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     robot_id = LaunchConfiguration('robot_id', default='')
-    urdf_file_name = 'model.urdf'
+    robot_name = PythonExpression(["'", 'shelfino', robot_id, "'"])
 
-    print('urdf_file_name : {}'.format(urdf_file_name))
-
-    urdf = os.path.join(
+    xacro_model = os.path.join(
         get_package_share_directory('shelfino_description'),
-        'models','shelfino',urdf_file_name)
+        'models','shelfino','model.urdf.xacro')
     
-    robot_desc = Command(["xacro", " ", urdf])
-
-    remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
+    robot_desc = Command(['xacro ', xacro_model, ' robot_id:=', robot_id])
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -42,10 +37,9 @@ def generate_launch_description():
             package='robot_state_publisher',
             executable='robot_state_publisher',
             name='robot_state_publisher',
-            namespace=robot_id,
+            namespace=robot_name,
             output='screen',
             parameters=[{'use_sim_time': use_sim_time},
                         {'robot_description': robot_desc}],
-            remappings=remappings
         )
     ])
