@@ -100,7 +100,7 @@ def generate_launch_description():
                             '-entity', 'shelfino'+str(i+1),
                             '-robot_namespace', 'shelfino'+str(i+1),
                             '-x', '0',
-                            '-y', str(i-1)]
+                            '-y', str(i-(int(int(nr)/2)))]
                 ),
 
 

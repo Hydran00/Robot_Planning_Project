@@ -6,12 +6,11 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch_ros.actions import Node
-from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
@@ -38,13 +37,13 @@ def generate_launch_description():
 
     return LaunchDescription([
         DeclareLaunchArgument(name='gui', default_value='true', choices=['true', 'false'],
-                                description='Flag to enable gazebo visualization'),
+                        description='Flag to enable gazebo visualization'),
         DeclareLaunchArgument(name='rviz', default_value='true', choices=['true', 'false'],
-                                description='Flag to enable rviz visualization'),
+                        description='Flag to enable rviz visualization'),
         DeclareLaunchArgument(name='robot_id', default_value='G',
-                                description='ID of the robot'),
+                        description='ID of the robot'),
         DeclareLaunchArgument(name='world', default_value='empty', choices=['empty', 'povo', 'hexagon'],
-                                description='World used in the gazebo simulation'),
+                        description='World used in the gazebo simulation'),
 
         ExecuteProcess(
             cmd=[[
