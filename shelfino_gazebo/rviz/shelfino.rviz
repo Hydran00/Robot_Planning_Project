@@ -47,15 +47,15 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        shelfino3/base_laser:
+        shelfinoX/base_laser:
           Value: true
-        shelfino3/base_link:
+        shelfinoX/base_link:
           Value: true
-        shelfino3/left_wheel:
+        shelfinoX/left_wheel:
           Value: true
-        shelfino3/odom:
+        shelfinoX/odom:
           Value: true
-        shelfino3/right_wheel:
+        shelfinoX/right_wheel:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -63,13 +63,13 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
-        shelfino3/odom:
-          shelfino3/base_link:
-            shelfino3/base_laser:
+        shelfinoX/odom:
+          shelfinoX/base_link:
+            shelfinoX/base_laser:
               {}
-            shelfino3/left_wheel:
+            shelfinoX/left_wheel:
               {}
-            shelfino3/right_wheel:
+            shelfinoX/right_wheel:
               {}
       Update Interval: 0
       Value: true
@@ -83,7 +83,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /shelfino3/robot_description
+        Value: /shelfinoX/robot_description
       Enabled: true
       Links:
         All Links Enabled: true
@@ -91,22 +91,22 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        shelfino3/base_laser:
+        shelfinoX/base_laser:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        shelfino3/base_link:
+        shelfinoX/base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        shelfino3/left_wheel:
+        shelfinoX/left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        shelfino3/right_wheel:
+        shelfinoX/right_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -145,14 +145,14 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Best Effort
-        Value: /shelfino3/scan
+        Value: /shelfinoX/scan
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: shelfino3/odom
+    Fixed Frame: shelfinoX/odom
     Frame Rate: 30
   Name: root
   Tools:

@@ -5,16 +5,16 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /TF1/Frames1
         - /TF1/Tree1
-        - /Global Planner1/Global Costmap1
-        - /Controller1/Local Costmap1
-      Splitter Ratio: 0.2711370289325714
-    Tree Height: 546
+        - /Map1/Topic1
+        - /Controller1
+      Splitter Ratio: 0.3360465168952942
+    Tree Height: 366
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
-    Expanded:
-      - /Publish Point1
+    Expanded: ~
     Name: Tool Properties
     Splitter Ratio: 0.5886790156364441
   - Class: rviz_common/Views
@@ -55,7 +55,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /gazebo/robot_description
+        Value: /shelfinoX/robot_description
       Enabled: true
       Links:
         All Links Enabled: true
@@ -63,22 +63,22 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        gazebo/base_laser:
+        shelfinoX/base_laser:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        gazebo/base_link:
+        shelfinoX/base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        gazebo/left_wheel:
+        shelfinoX/left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        gazebo/right_wheel:
+        shelfinoX/right_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -96,17 +96,17 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        gazebo/base_laser:
-          Value: true
-        gazebo/base_link:
-          Value: true
-        gazebo/left_wheel:
-          Value: true
-        gazebo/odom:
-          Value: true
-        gazebo/right_wheel:
-          Value: true
         map:
+          Value: true
+        shelfinoX/base_laser:
+          Value: true
+        shelfinoX/base_link:
+          Value: true
+        shelfinoX/left_wheel:
+          Value: true
+        shelfinoX/odom:
+          Value: true
+        shelfinoX/right_wheel:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -115,13 +115,13 @@ Visualization Manager:
       Show Names: false
       Tree:
         map:
-          gazebo/odom:
-            gazebo/base_link:
-              gazebo/base_laser:
+          shelfinoX/odom:
+            shelfinoX/base_link:
+              shelfinoX/base_laser:
                 {}
-              gazebo/left_wheel:
+              shelfinoX/left_wheel:
                 {}
-              gazebo/right_wheel:
+              shelfinoX/right_wheel:
                 {}
       Update Interval: 0
       Value: true
@@ -134,8 +134,8 @@ Visualization Manager:
       Axis: Z
       Channel Name: intensity
       Class: rviz_default_plugins/LaserScan
-      Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color: 237; 51; 59
+      Color Transformer: FlatColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -155,41 +155,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Best Effort
-        Value: /gazebo/scan
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: true
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz_default_plugins/PointCloud2
-      Color: 255; 255; 255
-      Color Transformer: ""
-      Decay Time: 0
-      Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Max Intensity: 4096
-      Min Color: 0; 0; 0
-      Min Intensity: 0
-      Name: Bumper Hit
-      Position Transformer: ""
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.07999999821186066
-      Style: Spheres
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Best Effort
-        Value: /mobile_base/sensors/bumper_pointcloud
+        Value: /shelfinoX/scan
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -215,17 +181,12 @@ Visualization Manager:
       Use Timestamp: false
       Value: true
     - Alpha: 1
-      Arrow Length: 0.019999999552965164
-      Axes Length: 0.30000001192092896
-      Axes Radius: 0.009999999776482582
-      Class: rviz_default_plugins/PoseArray
+      Class: nav2_rviz_plugins/ParticleCloud
       Color: 0; 180; 0
       Enabled: true
-      Head Length: 0.07000000029802322
-      Head Radius: 0.029999999329447746
+      Max Arrow Length: 0.30000001192092896
+      Min Arrow Length: 0.019999999552965164
       Name: Amcl Particle Swarm
-      Shaft Length: 0.23000000417232513
-      Shaft Radius: 0.009999999776482582
       Shape: Arrow (Flat)
       Topic:
         Depth: 5
@@ -233,7 +194,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Best Effort
-        Value: /particlecloud
+        Value: /shelfinoX/particle_cloud
       Value: true
     - Class: rviz_common/Group
       Displays:
@@ -249,20 +210,20 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /global_costmap/costmap
+            Value: /shelfinoX/global_costmap/costmap
           Update Topic:
             Depth: 5
             Durability Policy: Volatile
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /global_costmap/costmap_updates
+            Value: /shelfinoX/global_costmap/costmap_updates
           Use Timestamp: false
           Value: true
         - Alpha: 0.30000001192092896
           Class: rviz_default_plugins/Map
           Color Scheme: costmap
           Draw Behind: false
-          Enabled: true
+          Enabled: false
           Name: Downsampled Costmap
           Topic:
             Depth: 1
@@ -278,7 +239,7 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /downsampled_costmap_updates
           Use Timestamp: false
-          Value: true
+          Value: false
         - Alpha: 1
           Buffer Length: 1
           Class: rviz_default_plugins/Path
@@ -305,7 +266,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /plan
+            Value: /shelfinoX/plan
           Value: true
         - Alpha: 1
           Autocompute Intensity Bounds: true
@@ -315,11 +276,11 @@ Visualization Manager:
             Value: true
           Axis: Z
           Channel Name: intensity
-          Class: rviz_default_plugins/PointCloud
+          Class: rviz_default_plugins/PointCloud2
           Color: 125; 125; 125
           Color Transformer: FlatColor
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Max Intensity: 4096
@@ -340,7 +301,7 @@ Visualization Manager:
             Value: /global_costmap/voxel_marked_cloud
           Use Fixed Frame: true
           Use rainbow: true
-          Value: true
+          Value: false
         - Alpha: 1
           Class: rviz_default_plugins/Polygon
           Color: 25; 255; 0
@@ -370,13 +331,13 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /local_costmap/costmap
+            Value: /shelfinoX/local_costmap/costmap
           Update Topic:
             Depth: 5
             Durability Policy: Volatile
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /local_costmap/costmap_updates
+            Value: /shelfinoX/local_costmap/costmap_updates
           Use Timestamp: false
           Value: true
         - Alpha: 1
@@ -405,7 +366,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /local_plan
+            Value: /shelfinoX/lookahead_collision_arc
           Value: true
         - Class: rviz_default_plugins/MarkerArray
           Enabled: false
@@ -430,7 +391,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /local_costmap/published_footprint
+            Value: /shelfinoX/local_costmap/published_footprint
           Value: true
         - Alpha: 1
           Autocompute Intensity Bounds: true
@@ -440,11 +401,11 @@ Visualization Manager:
             Value: true
           Axis: Z
           Channel Name: intensity
-          Class: rviz_default_plugins/PointCloud
+          Class: rviz_default_plugins/PointCloud2
           Color: 255; 255; 255
           Color Transformer: RGB8
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Max Intensity: 4096
@@ -465,7 +426,7 @@ Visualization Manager:
             Value: /local_costmap/voxel_marked_cloud
           Use Fixed Frame: true
           Use rainbow: true
-          Value: true
+          Value: false
       Enabled: true
       Name: Controller
     - Class: rviz_common/Group
@@ -530,7 +491,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /waypoints
+        Value: /shelfinoX/waypoints
       Value: true
   Enabled: true
   Global Options:
@@ -553,7 +514,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /initialpose
+        Value: /shelfinoX/initialpose
     - Class: rviz_default_plugins/PublishPoint
       Single click: true
       Topic:
@@ -561,7 +522,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /clicked_point
+        Value: /shelfinoX/clicked_point
     - Class: nav2_rviz_plugins/GoalTool
   Transformation:
     Current:
@@ -569,7 +530,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -1.5750013589859009
+      Angle: -1.5700002908706665
       Class: rviz_default_plugins/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -579,21 +540,21 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 47.038597106933594
+      Scale: 42.774227142333984
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 0.1249687597155571
-      Y: 0.021760815754532814
+      X: 0.15463730692863464
+      Y: -0.16448192298412323
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1016
+  Height: 836
   Hide Left Dock: false
   Hide Right Dock: true
   Navigation 2:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002b00000039efc020000000afb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d0000025f000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb00000018004e0061007600690067006100740069006f006e0020003201000002a2000001390000013900fffffffb0000001e005200650061006c00730065006e0073006500430061006d00650072006100000002c6000000c10000002800ffffff000000010000010f0000034afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000034a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004420000003efc0100000002fb0000000800540069006d00650100000000000004420000000000000000fb0000000800540069006d00650100000000000004500000000000000000000004800000039e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000040000000000000156000002eafc020000000afb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df0000027600000157fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000001ab000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001e005200650061006c00730065006e0073006500430061006d00650072006100000002c6000000c10000002800fffffffb00000018004e0061007600690067006100740069006f006e0020003201000001ee000001390000012600ffffff000000010000010f0000034afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000034a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004420000003efc0100000002fb0000000800540069006d00650100000000000004420000000000000000fb0000000800540069006d00650100000000000004500000000000000000000003fa000002ea00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RealsenseCamera:
     collapsed: false
   Selection:
@@ -602,6 +563,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: true
-  Width: 1846
+  Width: 1366
   X: 74
   Y: 27

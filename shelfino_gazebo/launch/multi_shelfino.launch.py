@@ -26,8 +26,6 @@ def generate_launch_description():
                             description='Flag to enable gazebo visualization')
     declare_rviz = DeclareLaunchArgument(name='rviz', default_value='true', choices=['true', 'false'],
                             description='Flag to enable rviz visualization')
-    declare_robot_id = DeclareLaunchArgument(name='robot_id', default_value='G',
-                            description='ID of the robot')
     declare_world = DeclareLaunchArgument(name='world', default_value='empty', choices=['empty', 'povo', 'hexagon'],
                             description='World used in the gazebo simulation')
     declare_n_robots = DeclareLaunchArgument(name='n_robots', default_value='3',
@@ -78,7 +76,19 @@ def generate_launch_description():
         nav_instances_cmds = []
         for i in range(int(nr)):
             model = os.path.join(gazebo_models_path,'shelfino','shelfino') + str(i+1) + '.sdf'
+            rn = 'shelfino' + str(i+1)
+            rviz_path = os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino.rviz')
             rviz_config = os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino' + str(i+1) + '.rviz')
+            
+            f = open(rviz_path,'r')
+            filedata = f.read()
+            f.close()
+
+            newdata = filedata.replace("shelfinoX",rn)
+
+            f = open(rviz_config,'w')
+            f.write(newdata)
+            f.close()
 
             group = GroupAction([
                 ExecuteProcess(
@@ -137,7 +147,6 @@ def generate_launch_description():
     # Declare the launch options
     ld.add_action(declare_gui)
     ld.add_action(declare_rviz)
-    ld.add_action(declare_robot_id)
     ld.add_action(declare_world)
     ld.add_action(declare_n_robots)
 

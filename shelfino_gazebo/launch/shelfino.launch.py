@@ -6,7 +6,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess, OpaqueFunction
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -32,8 +32,27 @@ def generate_launch_description():
 
     model = PythonExpression(["'", os.path.join(gazebo_models_path,'shelfino','shelfino'), robot_id, '.sdf', "'"])
 
-    rviz_config = os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfinoG.rviz')
     rviz_config = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino'), robot_id, '.rviz', "'"])
+
+    def evaluate_rviz(context, *args, **kwargs):
+        rn = 'shelfino' + LaunchConfiguration('robot_id').perform(context)
+        rviz_path = os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino.rviz')
+        cr_path = os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino') + LaunchConfiguration('robot_id').perform(context) + '.rviz'
+        
+        print(rn)
+        print(rviz_path)
+        print(cr_path)
+
+        f = open(rviz_path,'r')
+        filedata = f.read()
+        f.close()
+
+        newdata = filedata.replace("shelfinoX",rn)
+
+        f = open(cr_path,'w')
+        f.write(newdata)
+        f.close()
+        return
 
     return LaunchDescription([
         DeclareLaunchArgument(name='gui', default_value='true', choices=['true', 'false'],
@@ -44,6 +63,8 @@ def generate_launch_description():
                         description='ID of the robot'),
         DeclareLaunchArgument(name='world', default_value='empty', choices=['empty', 'povo', 'hexagon'],
                         description='World used in the gazebo simulation'),
+
+        OpaqueFunction(function=evaluate_rviz),
 
         ExecuteProcess(
             cmd=[[
