@@ -88,7 +88,6 @@ def generate_launch_description():
         Node(
             package='rviz2',
             executable='rviz2',
-            namespace=robot_name,
             arguments=['-d', rviz_config],
             condition=IfCondition(rviz),
         ),

@@ -6,9 +6,10 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.conditions import UnlessCondition
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, LogInfo, OpaqueFunction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
+from nav2_common.launch import RewrittenYaml
 from launch_ros.actions import Node
 
 
@@ -20,15 +21,59 @@ def generate_launch_description():
     robot_id = LaunchConfiguration('robot_id', default='G')
     robot_name = PythonExpression(["'", 'shelfino', robot_id, "'"])
     
-    map = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'),'map', ''), map, '.yaml', "'"])
-    params = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'),'config', 'shelfino'), robot_id, '.yaml', "'"])
-    
-    nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
-    rviz_config = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'), 'rviz', 'shelfino'), robot_id, '.rviz', "'"])
-    
-    remappings = [('/goal_pose', 'goal_pose'),
-                  ('/clicked_point', 'clicked_point'),
-                  ('/initialpose', 'initialpose')]
+    map_path = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'),'map', ''), map, '.yaml', "'"])
+    params = os.path.join(get_package_share_directory('shelfino_navigation'),'config', 'shelfino.yaml')
+    rviz_config = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'), 'rviz', 'shelfino'), robot_id, '_nav.rviz', "'"])
+
+    amcl_node = PythonExpression(["'", robot_name, '/amcl', "'"])
+    bt_navigator_node = PythonExpression(["'", robot_name, '/bt_navigator', "'"])
+    controller_node = PythonExpression(["'", robot_name, '/controller_server', "'"])
+    planner_node = PythonExpression(["'", robot_name, '/planner_server', "'"])
+    waypoint_follower_node = PythonExpression(["'", robot_name, '/waypoint_follower', "'"])
+    behavior_node = PythonExpression(["'", robot_name, '/behavior_server', "'"])
+    smoother_node = PythonExpression(["'", robot_name, '/smoother_server', "'"])
+    velocity_smoother_node = PythonExpression(["'", robot_name, '/velocity_smoother', "'"])
+
+    lifecycle_nodes = ['map_server',
+                       [amcl_node], 
+                       [bt_navigator_node], 
+                       [controller_node], 
+                       [planner_node], 
+                       [waypoint_follower_node], 
+                       [behavior_node], 
+                       [smoother_node], 
+                       [velocity_smoother_node]]
+
+    # Create our own temporary YAML files that include substitutions
+    param_substitutions = { 'use_sim_time': use_sim_time,
+                            'base_frame_id': PythonExpression(["'", robot_name, '/base_link', "'"]),
+                            'odom_frame_id': PythonExpression(["'", robot_name, '/odom', "'"]),
+                            'robot_base_frame': PythonExpression(["'", robot_name, '/base_link', "'"]),
+                            'global_frame': PythonExpression(["'", robot_name, '/odom', "'"]),
+                            'topic': PythonExpression(["'/", robot_name, '/scan', "'"]),
+                          }
+
+    configured_params = RewrittenYaml(
+        source_file=params,
+        root_key=robot_name,
+        param_rewrites=param_substitutions,
+        convert_types=True)
+
+    def evaluate_rviz(context, *args, **kwargs):
+        rn = 'shelfino' + LaunchConfiguration('robot_id').perform(context)
+        rviz_path = os.path.join(get_package_share_directory('shelfino_navigation'), 'rviz', 'shelfino') + LaunchConfiguration('robot_id').perform(context) + '_nav.rviz'
+
+        cr_path = os.path.join(get_package_share_directory('shelfino_navigation'), 'rviz', 'shelfino') + LaunchConfiguration('robot_id').perform(context) + '_nav_NEW.rviz'
+        print(rn)
+        print(rviz_path)
+        with open(rviz_path, 'r') as file :
+            filedata = file.read()
+        filedata = filedata.replace('ShelfinoG', rn)
+        with open(cr_path, 'w') as file:
+            file.write(filedata)
+        return LogInfo(
+            msg=['configured_rviz: ', cr_path]
+        )
 
     return LaunchDescription([
         DeclareLaunchArgument(name='map', default_value='empty', choices=['empty', 'povo', 'hexagon'],
@@ -42,29 +87,142 @@ def generate_launch_description():
         DeclareLaunchArgument(name='robot_id', default_value='G',
                         description='ID of the robot'),
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([nav2_launch_file_dir, '/bringup_launch.py']),
-            launch_arguments={
-                'map': map,
-                'use_sim_time': use_sim_time,
-                'namespace': robot_name,
-                'use_namespace': 'True',
-                'use_composition': 'False',
-                'autostart': 'False',
-                'use_respawn': 'True',
-                'params_file': params}.items(),
-            condition=UnlessCondition(remote),
+        OpaqueFunction(function=evaluate_rviz),
+
+        LogInfo(
+            msg=['params: ', params]
         ),
 
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            namespace=robot_name,
-            arguments=['-d', rviz_config],
-            parameters=[{'use_sim_time': use_sim_time}],
-            condition=UnlessCondition(headless),
-            remappings=remappings,
-            output='screen'),
+        # Node(
+        #     package='nav2_map_server',
+        #     executable='map_server',
+        #     name='map_server',
+        #     output='screen',
+        #     respawn=True,
+        #     respawn_delay=2.0,
+        #     parameters=[{'use_sim_time': use_sim_time},
+        #                 {'topic_name': "map"},
+        #                 {'frame_id': "map"},
+        #                 {'yaml_filename': map_path}],
+        # ),
+
+        # Node(
+        #     package='nav2_amcl',
+        #     executable='amcl',
+        #     name='amcl',
+        #     output='screen',
+        #     namespace= robot_name,
+        #     respawn=True,
+        #     respawn_delay=2.0,
+        #     arguments=['--ros-args', '--log-level', 'info'],
+        #     parameters=[configured_params],
+        # ),
+
+        # Node(
+        #     package='nav2_bt_navigator',
+        #     executable='bt_navigator',
+        #     name='bt_navigator',
+        #     output='screen',
+        #     namespace= robot_name,
+        #     respawn=True,
+        #     respawn_delay=2.0,
+        #     parameters=[configured_params],
+        #     arguments=['--ros-args', '--log-level', 'info'],
+        # ),
+
+        # Node(
+        #     package='nav2_controller',
+        #     executable='controller_server',
+        #     output='screen',
+        #     namespace= robot_name,
+        #     respawn=True,
+        #     respawn_delay=2.0,
+        #     parameters=[configured_params],
+        #     arguments=['--ros-args', '--log-level', 'info'],
+        #     remappings=[('cmd_vel', 'cmd_vel_nav')]
+        # ),
+
+        # Node(
+        #     package='nav2_planner',
+        #     executable='planner_server',
+        #     name='planner_server',
+        #     output='screen',
+        #     namespace= robot_name,
+        #     respawn=True,
+        #     respawn_delay=2.0,
+        #     parameters=[configured_params],
+        #     arguments=['--ros-args', '--log-level', 'info']
+        # ),
+
+        # Node(
+        #     package='nav2_waypoint_follower',
+        #     executable='waypoint_follower',
+        #     name='waypoint_follower',
+        #     namespace= robot_name,
+        #     output='screen',
+        #     respawn=True,
+        #     respawn_delay=2.0,
+        #     parameters=[configured_params],
+        #     arguments=['--ros-args', '--log-level', 'info'],
+        # ),
+
+        # Node(
+        #     package='nav2_behaviors',
+        #     executable='behavior_server',
+        #     name='behavior_server',
+        #     output='screen',
+        #     namespace= robot_name,
+        #     respawn=True,
+        #     respawn_delay=2.0,
+        #     parameters=[configured_params],
+        #     arguments=['--ros-args', '--log-level', 'info'],
+        # ),
+
+        # Node(
+        #     package='nav2_smoother',
+        #     executable='smoother_server',
+        #     name='smoother_server',
+        #     output='screen',
+        #     namespace= robot_name,
+        #     respawn=True,
+        #     respawn_delay=2.0,
+        #     parameters=[configured_params],
+        #     arguments=['--ros-args', '--log-level', 'info'],
+        # ),
+
+        # Node(
+        #     package='nav2_velocity_smoother',
+        #     executable='velocity_smoother',
+        #     name='velocity_smoother',
+        #     output='screen',
+        #     namespace= robot_name,
+        #     respawn=True,
+        #     respawn_delay=2.0,
+        #     parameters=[configured_params],
+        #     arguments=['--ros-args', '--log-level', 'info'],
+        #     remappings = [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel')]
+        # ),
+
+        # Node(
+        #     package='nav2_lifecycle_manager',
+        #     executable='lifecycle_manager',
+        #     name='lifecycle_manager_localization',
+        #     output='screen',
+        #     parameters=[{'use_sim_time': use_sim_time},
+        #                 {'autostart': True},
+        #                 {'bond_timeout': 0.0},
+        #                 {'node_names': lifecycle_nodes}]
+        # ),
+
+        # Node(
+        #     package='rviz2',
+        #     executable='rviz2',
+        #     namespace= robot_name,
+        #     arguments=['-d', configured_rviz],
+        #     parameters=[{'use_sim_time': use_sim_time}],
+        #     condition=UnlessCondition(headless),
+        #     output='screen'
+        # ),
     ])
 
     
