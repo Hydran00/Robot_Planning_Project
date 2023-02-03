@@ -20,29 +20,31 @@ def generate_launch_description():
     headless = LaunchConfiguration('headless', default='false')
     robot_id = LaunchConfiguration('robot_id', default='G')
     robot_name = PythonExpression(["'", 'shelfino', robot_id, "'"])
+    multi = LaunchConfiguration('multi', default='false')
     
     map_path = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'),'map', ''), map, '.yaml', "'"])
     params = os.path.join(get_package_share_directory('shelfino_navigation'),'config', 'shelfino.yaml')
     rviz_config = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'), 'rviz', 'shelfino'), robot_id, '_nav.rviz', "'"])
 
-    amcl_node = PythonExpression(["'", robot_name, '/amcl', "'"])
-    bt_navigator_node = PythonExpression(["'", robot_name, '/bt_navigator', "'"])
-    controller_node = PythonExpression(["'", robot_name, '/controller_server', "'"])
-    planner_node = PythonExpression(["'", robot_name, '/planner_server', "'"])
-    waypoint_follower_node = PythonExpression(["'", robot_name, '/waypoint_follower', "'"])
-    behavior_node = PythonExpression(["'", robot_name, '/behavior_server', "'"])
-    smoother_node = PythonExpression(["'", robot_name, '/smoother_server', "'"])
-    velocity_smoother_node = PythonExpression(["'", robot_name, '/velocity_smoother', "'"])
+    amcl_node = PythonExpression(["'/", robot_name, '/amcl', "'"])
+    bt_navigator_node = PythonExpression(["'/", robot_name, '/bt_navigator', "'"])
+    controller_node = PythonExpression(["'/", robot_name, '/controller_server', "'"])
+    planner_node = PythonExpression(["'/", robot_name, '/planner_server', "'"])
+    waypoint_follower_node = PythonExpression(["'/", robot_name, '/waypoint_follower', "'"])
+    behavior_node = PythonExpression(["'/", robot_name, '/behavior_server', "'"])
+    smoother_node = PythonExpression(["'/", robot_name, '/smoother_server', "'"])
+    velocity_smoother_node = PythonExpression(["'/", robot_name, '/velocity_smoother', "'"])
 
-    lifecycle_nodes = ['map_server',
-                       [amcl_node], 
-                       [bt_navigator_node], 
-                       [controller_node], 
-                       [planner_node], 
-                       [waypoint_follower_node], 
-                       [behavior_node], 
-                       [smoother_node], 
-                       [velocity_smoother_node]]
+    lifecycle_nodes_loc = ['/map_server',
+                          [amcl_node]]
+
+    lifecycle_nodes_nav = [[bt_navigator_node], 
+                          [controller_node], 
+                          [planner_node], 
+                          [waypoint_follower_node], 
+                          [behavior_node], 
+                          [smoother_node], 
+                          [velocity_smoother_node]]
 
     # Create our own temporary YAML files that include substitutions
     param_substitutions = { 'use_sim_time': use_sim_time,
@@ -101,9 +103,10 @@ def generate_launch_description():
             respawn=True,
             respawn_delay=2.0,
             parameters=[{'use_sim_time': use_sim_time},
-                        {'topic_name': "map"},
+                        {'topic_name': "/map"},
                         {'frame_id': "map"},
                         {'yaml_filename': map_path}],
+            condition=UnlessCondition(multi),
         ),
 
         Node(
@@ -208,10 +211,23 @@ def generate_launch_description():
             executable='lifecycle_manager',
             name='lifecycle_manager_localization',
             output='screen',
+            namespace= robot_name,
             parameters=[{'use_sim_time': use_sim_time},
-                        {'autostart': True},
+                        {'autostart': False},
                         {'bond_timeout': 0.0},
-                        {'node_names': lifecycle_nodes}]
+                        {'node_names': lifecycle_nodes_loc}]
+        ),
+
+        Node(
+            package='nav2_lifecycle_manager',
+            executable='lifecycle_manager',
+            name='lifecycle_manager_navigation',
+            output='screen',
+            namespace= robot_name,
+            parameters=[{'use_sim_time': use_sim_time},
+                        {'autostart': False},
+                        {'bond_timeout': 0.0},
+                        {'node_names': lifecycle_nodes_nav}]
         ),
 
         Node(
