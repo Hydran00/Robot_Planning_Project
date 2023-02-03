@@ -6,8 +6,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.conditions import UnlessCondition
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, LogInfo, OpaqueFunction
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.actions import DeclareLaunchArgument, LogInfo, OpaqueFunction
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from nav2_common.launch import RewrittenYaml
 from launch_ros.actions import Node
@@ -91,9 +90,9 @@ def generate_launch_description():
 
         OpaqueFunction(function=evaluate_rviz),
 
-        LogInfo(
-            msg=['params: ', params]
-        ),
+        # LogInfo(
+        #     msg=['params: ', params]
+        # ),
 
         Node(
             package='nav2_map_server',
