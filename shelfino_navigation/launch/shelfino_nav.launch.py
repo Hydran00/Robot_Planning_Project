@@ -212,7 +212,7 @@ def generate_launch_description():
             output='screen',
             namespace= robot_name,
             parameters=[{'use_sim_time': use_sim_time},
-                        {'autostart': False},
+                        {'autostart': True},
                         {'bond_timeout': 0.0},
                         {'node_names': lifecycle_nodes_loc}]
         ),
@@ -235,7 +235,7 @@ def generate_launch_description():
             namespace= robot_name,
             arguments=['-d', rviz_config],
             parameters=[{'use_sim_time': use_sim_time}],
-            condition=UnlessCondition(headless),
+            # condition=UnlessCondition(multi), # headless
             output='screen'
         ),
     ])
