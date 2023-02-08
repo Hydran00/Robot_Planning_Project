@@ -14,7 +14,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    map = LaunchConfiguration('map', default='empty')
+    map = LaunchConfiguration('map', default='lab1')
     remote = LaunchConfiguration('remote', default='false')
     headless = LaunchConfiguration('headless', default='false')
     robot_id = LaunchConfiguration('robot_id', default='G')
@@ -77,7 +77,7 @@ def generate_launch_description():
         return
 
     return LaunchDescription([
-        DeclareLaunchArgument(name='map', default_value='empty', choices=['empty', 'povo', 'hexagon'],
+        DeclareLaunchArgument(name='map', default_value='lab1', choices=['lab1', 'povo', 'hexagon'],
                         description='World used in the gazebo simulation'),
         DeclareLaunchArgument(name='use_sim_time', default_value='false', choices=['true', 'false'],
                         description='Flag to toggle between real robot and simulation'),
