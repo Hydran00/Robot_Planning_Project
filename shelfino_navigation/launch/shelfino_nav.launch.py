@@ -4,11 +4,11 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
-from launch.conditions import UnlessCondition
-from launch.actions import DeclareLaunchArgument, LogInfo, OpaqueFunction
 from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.conditions import UnlessCondition
 from nav2_common.launch import RewrittenYaml
+from launch import LaunchDescription
 from launch_ros.actions import Node
 
 

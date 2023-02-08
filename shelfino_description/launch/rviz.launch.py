@@ -6,13 +6,12 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch.actions import OpaqueFunction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    launch_file_dir = os.path.join(get_package_share_directory('shelfino_description'), 'launch')
     robot_id = LaunchConfiguration('robot_id', default='G')
     robot_name = PythonExpression(["'", 'shelfino', robot_id, "'"])
 
@@ -31,6 +30,7 @@ def generate_launch_description():
         f.write(newdata)
         f.close()
 
+        instances_cmds = []
         rviz_node = Node(
             package='rviz2',
             executable='rviz2',
@@ -39,10 +39,15 @@ def generate_launch_description():
             output='screen',
             arguments=['-d', cr_path]
         )
+        instances_cmds.append(rviz_node)
 
-        return rviz_node
+        return instances_cmds
 
     return LaunchDescription([
+        DeclareLaunchArgument(name='use_sim_time', default_value='false', choices=['true', 'false'],
+                        description='Flag to toggle between real robot and simulation'),
+        DeclareLaunchArgument(name='robot_id', default_value='G',
+                        description='ID of the robot'),
 
         OpaqueFunction(function=evaluate_rviz),
 

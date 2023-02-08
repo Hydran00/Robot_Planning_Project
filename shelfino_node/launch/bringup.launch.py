@@ -14,9 +14,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    map = LaunchConfiguration('map', default='empty')
     nav = LaunchConfiguration('nav', default='true')
-    remote = LaunchConfiguration('remote', default='false')
     headless = LaunchConfiguration('headless', default='false')
     robot_id = LaunchConfiguration('robot_id', default='404')
     robot_name = PythonExpression(["'", 'shelfino', robot_id, "'"])
@@ -26,14 +24,10 @@ def generate_launch_description():
     nav2_launch_file_dir = os.path.join(get_package_share_directory('shelfino_navigation'), 'launch')
 
     return LaunchDescription([
-        DeclareLaunchArgument(name='map', default_value='empty', choices=['empty', 'povo', 'hexagon'],
-                        description='World used in the gazebo simulation'),
         DeclareLaunchArgument(name='use_sim_time', default_value='false', choices=['true', 'false'],
                         description='Flag to toggle between real robot and simulation'),
         DeclareLaunchArgument(name='nav', default_value='true', choices=['true', 'false'],
                         description='Flag to start the navigation stack'),
-        DeclareLaunchArgument(name='remote', default_value='false', choices=['true', 'false'],
-                        description='Flag to toggle between navigation stack running on robot or locally'),
         DeclareLaunchArgument(name='headless', default_value='false', choices=['true', 'false'],
                         description='Flag to toggle between navigation stack running on robot or locally'),
         DeclareLaunchArgument(name='robot_id', default_value='G',
@@ -55,7 +49,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(os.path.join(nav2_launch_file_dir, 'shelfino_nav.launch.py')),
             launch_arguments={'use_sim_time':use_sim_time,
                             'map': map,
-                            'remote':remote,
+                            'remote':'False',
                             'headless':headless,
                             'robot_id':robot_id,
                             'robot_name':robot_name}.items(),

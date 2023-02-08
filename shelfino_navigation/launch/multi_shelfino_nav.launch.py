@@ -5,12 +5,10 @@ import os
 import subprocess
 
 from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
-from launch.conditions import IfCondition, UnlessCondition
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, IncludeLaunchDescription
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.substitutions import LaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.actions import Node
+from launch import LaunchDescription
 
 
 def generate_launch_description():
@@ -20,7 +18,6 @@ def generate_launch_description():
     headless = LaunchConfiguration('headless', default='false')
     
     pkg_shelfino_nav = get_package_share_directory('shelfino_navigation')
-    map_path = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'),'map', ''), map, '.yaml', "'"])
 
     def get_namespaces(context, *args, **kwargs):
         ps = subprocess.Popen(("ros2", "node", "list"), 
