@@ -77,8 +77,8 @@ def generate_launch_description():
         for i in range(int(nr)):
             model = os.path.join(gazebo_models_path,'shelfino','shelfino') + str(i+1) + '.sdf'
             rn = 'shelfino' + str(i+1)
-            rviz_path = os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino.rviz')
-            rviz_config = os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino' + str(i+1) + '.rviz')
+            rviz_path = os.path.join(get_package_share_directory('shelfino_description'), 'rviz', 'shelfino.rviz')
+            rviz_config = os.path.join(get_package_share_directory('shelfino_description'), 'rviz', 'shelfino' + str(i+1) + '.rviz')
             
             f = open(rviz_path,'r')
             filedata = f.read()
@@ -124,6 +124,7 @@ def generate_launch_description():
                     package='rviz2',
                     executable='rviz2',
                     namespace='shelfino'+str(i+1),
+                    parameters=[{'use_sim_time': use_sim_time}],
                     arguments=['-d', rviz_config],
                     condition=IfCondition(rviz),
                 ),

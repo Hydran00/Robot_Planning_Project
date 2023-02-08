@@ -32,12 +32,12 @@ def generate_launch_description():
 
     model = PythonExpression(["'", os.path.join(gazebo_models_path,'shelfino','shelfino'), robot_id, '.sdf', "'"])
 
-    rviz_config = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino'), robot_id, '.rviz', "'"])
+    rviz_config = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_description'), 'rviz', 'shelfino'), robot_id, '.rviz', "'"])
 
     def evaluate_rviz(context, *args, **kwargs):
         rn = 'shelfino' + LaunchConfiguration('robot_id').perform(context)
-        rviz_path = os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino.rviz')
-        cr_path = os.path.join(get_package_share_directory('shelfino_gazebo'), 'rviz', 'shelfino') + LaunchConfiguration('robot_id').perform(context) + '.rviz'
+        rviz_path = os.path.join(get_package_share_directory('shelfino_description'), 'rviz', 'shelfino.rviz')
+        cr_path = os.path.join(get_package_share_directory('shelfino_description'), 'rviz', 'shelfino') + LaunchConfiguration('robot_id').perform(context) + '.rviz'
         
         print(rn)
         print(rviz_path)

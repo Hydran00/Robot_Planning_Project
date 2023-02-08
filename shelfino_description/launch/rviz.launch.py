@@ -15,6 +15,8 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
 
     def get_namespaces_for_rviz(context, *args, **kwargs):
+        rviz_path = os.path.join(get_package_share_directory('shelfino_description'), 'rviz', 'shelfino.rviz')
+        
         ps = subprocess.Popen(("ros2", "node", "list"), 
                                     stdout=subprocess.PIPE)
         output = subprocess.check_output(('grep', 'robot_state_publisher'), 
@@ -26,7 +28,7 @@ def generate_launch_description():
 
         instances_cmds = []
         for robot in namespaces:
-            rviz_path = os.path.join(get_package_share_directory('shelfino_description'), 'rviz', 'shelfino.rviz')
+            print(robot)
             cr_path = os.path.join(get_package_share_directory('shelfino_description'), 'rviz', '') + robot + '.rviz'
             
             f = open(rviz_path,'r')
@@ -38,14 +40,12 @@ def generate_launch_description():
             f = open(cr_path,'w')
             f.write(newdata)
             f.close()
-
-            instances_cmds = []
+            
             rviz_node = Node(
                 package='rviz2',
                 executable='rviz2',
                 namespace=robot,
                 parameters=[{'use_sim_time': use_sim_time}],
-                output='screen',
                 arguments=['-d', cr_path]
             )
             instances_cmds.append(rviz_node)
