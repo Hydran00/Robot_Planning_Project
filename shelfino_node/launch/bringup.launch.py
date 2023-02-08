@@ -48,19 +48,19 @@ def generate_launch_description():
                               'robot_id': robot_id}.items()
         ),
 
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource(os.path.join(nav2_launch_file_dir, 'shelfino_nav.launch.py')),
-        #     launch_arguments={'use_sim_time':use_sim_time,
-        #                     'map': map,
-        #                     'remote':'false',
-        #                     'headless':headless,
-        #                     'robot_id':robot_id,
-        #                     'robot_name':robot_name}.items(),
-        # ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(nav2_launch_file_dir, 'shelfino_nav.launch.py')),
+            launch_arguments={'use_sim_time':use_sim_time,
+                            'map': map,
+                            'remote':'false',
+                            'headless':headless,
+                            'robot_id':robot_id,
+                            'robot_name':robot_name}.items(),
+        ),
 
-        # Node(
-        #     package='get_positions',
-        #     executable='get_positions',
-        #     namespace=robot_name
-        # ),
+        Node(
+            package='get_positions',
+            executable='get_positions',
+            namespace=robot_name
+        ),
     ])
