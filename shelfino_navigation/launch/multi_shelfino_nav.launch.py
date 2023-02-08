@@ -42,8 +42,7 @@ def generate_launch_description():
                                 'remote':remote,
                                 'headless':headless,
                                 'robot_id':robot_id,
-                                'robot_name':robot,
-                                'multi':'True'}.items(),
+                                'robot_name':robot}.items(),
             )
             nav_instances_cmds.append(nav_launch)
         return nav_instances_cmds
@@ -59,19 +58,6 @@ def generate_launch_description():
                         description='Flag to toggle between navigation stack running on robot or locally'),
         DeclareLaunchArgument(name='robot_id', default_value='G',
                         description='ID of the robot'),
-
-        Node(
-            package='nav2_map_server',
-            executable='map_server',
-            name='map_server',
-            output='screen',
-            respawn=True,
-            respawn_delay=2.0,
-            parameters=[{'use_sim_time': use_sim_time},
-                        {'topic_name': "/map"},
-                        {'frame_id': "map"},
-                        {'yaml_filename': map_path}],
-        ),
 
         OpaqueFunction(function=get_namespaces),
     ])

@@ -19,12 +19,12 @@ def generate_launch_description():
     headless = LaunchConfiguration('headless', default='false')
     robot_id = LaunchConfiguration('robot_id', default='G')
     robot_name = PythonExpression(["'", 'shelfino', robot_id, "'"])
-    multi = LaunchConfiguration('multi', default='false')
     
     map_path = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'),'map', ''), map, '.yaml', "'"])
     params = os.path.join(get_package_share_directory('shelfino_navigation'),'config', 'shelfino.yaml')
     rviz_config = PythonExpression(["'", os.path.join(get_package_share_directory('shelfino_navigation'), 'rviz', 'shelfino'), robot_id, '_nav.rviz', "'"])
 
+    map_node = PythonExpression(["'/", robot_name, '/map_server', "'"])
     amcl_node = PythonExpression(["'/", robot_name, '/amcl', "'"])
     bt_navigator_node = PythonExpression(["'/", robot_name, '/bt_navigator', "'"])
     controller_node = PythonExpression(["'/", robot_name, '/controller_server', "'"])
@@ -34,7 +34,7 @@ def generate_launch_description():
     smoother_node = PythonExpression(["'/", robot_name, '/smoother_server', "'"])
     velocity_smoother_node = PythonExpression(["'/", robot_name, '/velocity_smoother', "'"])
 
-    lifecycle_nodes_loc = ['/map_server',
+    lifecycle_nodes_loc = [[map_node],
                           [amcl_node]]
 
     lifecycle_nodes_nav = [[bt_navigator_node], 
@@ -99,13 +99,13 @@ def generate_launch_description():
             executable='map_server',
             name='map_server',
             output='screen',
+            namespace= robot_name,
             respawn=True,
             respawn_delay=2.0,
             parameters=[{'use_sim_time': use_sim_time},
                         {'topic_name': "/map"},
                         {'frame_id': "map"},
                         {'yaml_filename': map_path}],
-            condition=UnlessCondition(multi),
         ),
 
         Node(
@@ -235,7 +235,7 @@ def generate_launch_description():
             namespace= robot_name,
             arguments=['-d', rviz_config],
             parameters=[{'use_sim_time': use_sim_time}],
-            # condition=UnlessCondition(multi), # headless
+            condition=UnlessCondition(headless),
             output='screen'
         ),
     ])
