@@ -130,11 +130,11 @@ def generate_launch_description():
                 ),
 
 
-                Node(
-                    package='get_positions',
-                    executable='get_positions',
-                    namespace='shelfino'+str(i+1),
-                    ),
+                # Node(
+                #     package='get_positions',
+                #     executable='get_positions',
+                #     namespace='shelfino'+str(i+1),
+                #     ),
             ])
 
             nav_instances_cmds.append(group)
