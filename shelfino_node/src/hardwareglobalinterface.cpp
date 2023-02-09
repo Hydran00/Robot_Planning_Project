@@ -91,38 +91,25 @@ void HardwareGlobalInterface::subHW_callback(const char *topic, const char *buf,
     double tick_r = j.at("3").at("state").at("tck");
     double tick_l = j.at("4").at("state").at("tck");
 
+    
+    hwData.rightWheel.omega = -omega_r;
+    hwData.rightWheel.current = i_r;
+    hwData.rightWheel.ticks = -tick_r/1024*2*M_PI;//RIGHT_INCREMENTS_PER_TOUR*2*M_PI;
+
+    hwData.leftWheel.omega = omega_l;
+    hwData.leftWheel.current = i_l;
+    hwData.leftWheel.ticks = tick_l/1024*2*M_PI;//LEFT_INCREMENTS_PER_TOUR*2*M_PI;
+
     if(this->id == 1 || this->id == 3){
-      hwData.rightWheel.omega = omega_r;
-      hwData.rightWheel.current = i_r;
-      hwData.rightWheel.ticks = tick_r/1024*2*M_PI;//RIGHT_INCREMENTS_PER_TOUR*2*M_PI;
-
-      hwData.leftWheel.omega = -omega_l;
-      hwData.leftWheel.current = i_l;
-      hwData.leftWheel.ticks = -tick_l/1024*2*M_PI;//LEFT_INCREMENTS_PER_TOUR*2*M_PI;
-
-
-      hwData.speed = (LEFT_RADIUS/2.0)*(omega_r-omega_l); //0.125->radius
+      hwData.speed = (LEFT_RADIUS/2.0)*(omega_r-omega_l);
       hwData.omega = (LEFT_RADIUS/0.4)*(-omega_r-omega_l);
-      //        hwData.speed = (0.031/2.0)*(omega_r+omega_l);
-      //        hwData.omega = (0.031/0.271756)*(omega_r-omega_l);
 
       hwData.hardwareTimer = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
       updateOdometryV(hwData.hardwareTimer, -omega_l, omega_r);
   } else {
-      hwData.rightWheel.omega = -omega_r;
-      hwData.rightWheel.current = i_r;
-      hwData.rightWheel.ticks = -tick_r/1024*2*M_PI;//RIGHT_INCREMENTS_PER_TOUR*2*M_PI;
-
-      hwData.leftWheel.omega = omega_l;
-      hwData.leftWheel.current = i_l;
-      hwData.leftWheel.ticks = tick_l/1024*2*M_PI;//LEFT_INCREMENTS_PER_TOUR*2*M_PI;
-
-
-      hwData.speed = (LEFT_RADIUS/2.0)*(omega_l-omega_r); //0.125->radius
+      hwData.speed = (LEFT_RADIUS/2.0)*(omega_l-omega_r);
       hwData.omega = (LEFT_RADIUS/0.4)*(-omega_r-omega_l);
-      //        hwData.speed = (0.031/2.0)*(omega_r+omega_l);
-      //        hwData.omega = (0.031/0.271756)*(omega_r-omega_l);
 
       hwData.hardwareTimer = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
