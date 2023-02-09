@@ -84,6 +84,7 @@ class ShelfinoHWNode : public rclcpp::Node
      */
     void lidar_callback()
     {
+      // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending lidar scan...");
       RobotStatus::LidarData lidarData; 
       HardwareGlobalInterface::getInstance().getFrontLidarData(lidarData);
 
