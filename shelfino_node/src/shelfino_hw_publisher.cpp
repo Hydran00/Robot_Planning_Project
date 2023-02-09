@@ -22,9 +22,6 @@
 using namespace std::chrono_literals;
 using namespace nlohmann;
 
-/// @brief Variable for definition of the shelfino ID number
-const auto R_ID_DEFAULT = 2;
-
 /// @brief Pointer to a Hardware Parameters instance which contains all the information on the IP addresses and ports of the specific shelfino robot
 std::unique_ptr<HardwareParameters> hp;
 
@@ -47,8 +44,12 @@ class ShelfinoHWNode : public rclcpp::Node
       auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_sensor_data);
 
       // Load shelfino paths to communicate with ZMQ
-      hp = std::make_unique<HardwareParameters>(R_ID_DEFAULT);
+      this->declare_parameter("robot_id", 1);
+      robot_id = this->get_parameter("robot_id").get_parameter_value().get<int>();
+      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "robot_id: %d", robot_id);
+      hp = std::make_unique<HardwareParameters>(robot_id);
       HardwareGlobalInterface::initialize(hp.get());
+
       // ROS2 transform broadcaster
       tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
       // Creation of ROS2 publishers
@@ -84,7 +85,7 @@ class ShelfinoHWNode : public rclcpp::Node
       sensor_msgs::msg::LaserScan msg;
       msg.header.stamp = this->get_clock()->now();
       
-      msg.header.frame_id = "base_laser";
+      msg.header.frame_id = ns+"/base_laser";
       msg.angle_increment = 0.00872664625;
       msg.angle_min = msg.angle_increment;
       msg.angle_max = 6.27445866092 + msg.angle_min;
@@ -115,8 +116,8 @@ class ShelfinoHWNode : public rclcpp::Node
       nav_msgs::msg::Odometry msg;
       msg.header.stamp = this->get_clock()->now();
       
-      msg.header.frame_id = "odom";
-      msg.child_frame_id = "base_link";
+      msg.header.frame_id = ns+"/odom";
+      msg.child_frame_id = ns+"/base_link";
 
       msg.pose.pose.position.x = odomData.pos_x; 
       msg.pose.pose.position.y = odomData.pos_y;
@@ -154,8 +155,8 @@ class ShelfinoHWNode : public rclcpp::Node
       nav_msgs::msg::Odometry msg;
       msg.header.stamp = this->get_clock()->now();
 
-      msg.header.frame_id = "odom";
-      msg.child_frame_id = "base_link";
+      msg.header.frame_id = ns+"/odom";
+      msg.child_frame_id = ns+"/base_link";
 
       msg.pose.pose.position.x = odomData.pos_x; 
       msg.pose.pose.position.y = odomData.pos_y;
@@ -232,8 +233,8 @@ class ShelfinoHWNode : public rclcpp::Node
 
       t.header.stamp = msg.header.stamp;
 
-      t.header.frame_id = "odom";
-      t.child_frame_id = "base_link";
+      t.header.frame_id = ns+"/odom";
+      t.child_frame_id = ns+"/base_link";
 
       t.transform.translation.x = msg.pose.pose.position.x;
       t.transform.translation.y = msg.pose.pose.position.y;
@@ -263,6 +264,7 @@ class ShelfinoHWNode : public rclcpp::Node
     }
     
     std::string ns;
+    int robot_id;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_subscription_;
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
     rclcpp::TimerBase::SharedPtr lidar_timer_;

@@ -106,6 +106,7 @@ def generate_launch_description():
                         {'topic_name': "/map"},
                         {'frame_id': "map"},
                         {'yaml_filename': map_path}],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -118,6 +119,7 @@ def generate_launch_description():
             respawn_delay=2.0,
             arguments=['--ros-args', '--log-level', 'info'],
             parameters=[configured_params],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -130,6 +132,7 @@ def generate_launch_description():
             respawn_delay=2.0,
             parameters=[configured_params],
             arguments=['--ros-args', '--log-level', 'info'],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -141,7 +144,8 @@ def generate_launch_description():
             respawn_delay=2.0,
             parameters=[configured_params],
             arguments=['--ros-args', '--log-level', 'info'],
-            remappings=[('cmd_vel', 'cmd_vel_nav')]
+            remappings=[('cmd_vel', 'cmd_vel_nav')],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -153,7 +157,8 @@ def generate_launch_description():
             respawn=True,
             respawn_delay=2.0,
             parameters=[configured_params],
-            arguments=['--ros-args', '--log-level', 'info']
+            arguments=['--ros-args', '--log-level', 'info'],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -166,6 +171,7 @@ def generate_launch_description():
             respawn_delay=2.0,
             parameters=[configured_params],
             arguments=['--ros-args', '--log-level', 'info'],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -178,6 +184,7 @@ def generate_launch_description():
             respawn_delay=2.0,
             parameters=[configured_params],
             arguments=['--ros-args', '--log-level', 'info'],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -190,6 +197,7 @@ def generate_launch_description():
             respawn_delay=2.0,
             parameters=[configured_params],
             arguments=['--ros-args', '--log-level', 'info'],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -202,7 +210,8 @@ def generate_launch_description():
             respawn_delay=2.0,
             parameters=[configured_params],
             arguments=['--ros-args', '--log-level', 'info'],
-            remappings = [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel')]
+            remappings = [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel')],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -212,9 +221,10 @@ def generate_launch_description():
             output='screen',
             namespace= robot_name,
             parameters=[{'use_sim_time': use_sim_time},
-                        {'autostart': True},
+                        {'autostart': False},
                         {'bond_timeout': 0.0},
-                        {'node_names': lifecycle_nodes_loc}]
+                        {'node_names': lifecycle_nodes_loc}],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
@@ -226,7 +236,8 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time},
                         {'autostart': False},
                         {'bond_timeout': 0.0},
-                        {'node_names': lifecycle_nodes_nav}]
+                        {'node_names': lifecycle_nodes_nav}],
+            condition=UnlessCondition(remote),
         ),
 
         Node(
