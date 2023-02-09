@@ -58,6 +58,7 @@ def generate_launch_description():
             package='shelfino_node',
             namespace=robot_name,
             parameters=[{'robot_id': robot_id}],
+            output='screen',
             executable='shelfino_node'
         ),
 

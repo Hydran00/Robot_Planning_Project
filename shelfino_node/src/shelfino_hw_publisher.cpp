@@ -47,24 +47,29 @@ class ShelfinoHWNode : public rclcpp::Node
       this->declare_parameter("robot_id", 1);
       robot_id = this->get_parameter("robot_id").get_parameter_value().get<int>();
       RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "robot_id: %d", robot_id);
+
       hp = std::make_unique<HardwareParameters>(robot_id);
       HardwareGlobalInterface::initialize(hp.get());
 
       // ROS2 transform broadcaster
       tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+
       // Creation of ROS2 publishers
       lidar_publisher_ = this->create_publisher<sensor_msgs::msg::LaserScan>("scan", qos);
       t265_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("t265", qos);
       odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("odom", qos);
       encoders_publisher_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", qos);
+    
       // Selectiong the callbacks for the publishers
       lidar_timer_ = this->create_wall_timer(100ms, std::bind(&ShelfinoHWNode::lidar_callback, this));
       t265_timer_ = this->create_wall_timer(100ms, std::bind(&ShelfinoHWNode::t265_callback, this));
       odom_timer_ = this->create_wall_timer(100ms, std::bind(&ShelfinoHWNode::odom_callback, this));
       encoders_timer_ = this->create_wall_timer(100ms, std::bind(&ShelfinoHWNode::enc_callback, this));
+
       // Creation of the CMD_VEL subscriber to move the shelfino
       cmd_subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
         "cmd_vel", 10, std::bind(&ShelfinoHWNode::handle_shelfino_cmd_vel, this, std::placeholders::_1));
+        
       // Retrieve node namespace to use as prefix of transforms
       ns = this->get_namespace();
       ns.erase(0,1);
@@ -216,6 +221,11 @@ class ShelfinoHWNode : public rclcpp::Node
       double v = 0., omega = 0.;
       v = msg->linear.x;
       omega = msg->angular.z;
+
+      if(robot_id == 1 || robot_id == 3){
+        v = -msg->linear.x;
+        omega = -msg->angular.z;
+      }
 
       HardwareGlobalInterface::getInstance().vehicleMove(v,omega);
 
