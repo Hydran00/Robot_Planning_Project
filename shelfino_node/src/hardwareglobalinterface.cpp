@@ -94,11 +94,11 @@ void HardwareGlobalInterface::subHW_callback(const char *topic, const char *buf,
     
     hwData.rightWheel.omega = -omega_r;
     hwData.rightWheel.current = i_r;
-    hwData.rightWheel.ticks = -tick_r/1024*2*M_PI;//RIGHT_INCREMENTS_PER_TOUR*2*M_PI;
+    hwData.rightWheel.ticks = -tick_r/1024*2*M_PI; //RIGHT_INCREMENTS_PER_TOUR*2*M_PI;
 
     hwData.leftWheel.omega = omega_l;
     hwData.leftWheel.current = i_l;
-    hwData.leftWheel.ticks = tick_l/1024*2*M_PI;//LEFT_INCREMENTS_PER_TOUR*2*M_PI;
+    hwData.leftWheel.ticks = tick_l/1024*2*M_PI; //LEFT_INCREMENTS_PER_TOUR*2*M_PI;
 
     if(this->id == 1 || this->id == 3){
       hwData.speed = (LEFT_RADIUS/2.0)*(omega_r-omega_l);
