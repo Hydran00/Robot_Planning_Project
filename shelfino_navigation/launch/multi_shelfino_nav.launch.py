@@ -2,161 +2,61 @@
 # Author: Placido Falqueto
 
 import os
+import subprocess
 
 from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
-from launch.conditions import IfCondition, UnlessCondition
-from launch.actions import DeclareLaunchArgument
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch import LaunchDescription
 
 
 def generate_launch_description():
-    sim = LaunchConfiguration('sim', default='false')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    map = LaunchConfiguration('map', default='lab1')
     remote = LaunchConfiguration('remote', default='false')
     headless = LaunchConfiguration('headless', default='false')
-
-    launch_file_dir = os.path.join(get_package_share_directory('shelfino_description'), 'launch')
     
-    map_dir = LaunchConfiguration(
-        'map',
-        default=os.path.join(
-            get_package_share_directory('shelfino_navigation'),
-            'map',
-            'turtle.yaml'))
+    pkg_shelfino_nav = get_package_share_directory('shelfino_navigation')
 
-    param_file_name1 = LaunchConfiguration(
-        'params_file',
-        default=os.path.join(
-            get_package_share_directory('shelfino_navigation'),
-            'config',
-            'shelfino1.yaml'))
+    def get_namespaces(context, *args, **kwargs):
+        ps = subprocess.Popen(("ros2", "node", "list"), 
+                                    stdout=subprocess.PIPE)
+        output = subprocess.check_output(('grep', 'robot_state_publisher'), 
+                                        stdin=ps.stdout, 
+                                        text=True)
+        namespaces = output.replace("/robot_state_publisher", "")
+        namespaces = namespaces.replace("/", "").splitlines()
+        print(namespaces)
 
-    param_file_name2 = LaunchConfiguration(
-        'params_file',
-        default=os.path.join(
-            get_package_share_directory('shelfino_navigation'),
-            'config',
-            'shelfino2.yaml'))
-
-    param_file_name3 = LaunchConfiguration(
-        'params_file',
-        default=os.path.join(
-            get_package_share_directory('shelfino_navigation'),
-            'config',
-            'shelfino3.yaml'))
-
-    nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
-
-    rviz_config_dir1 = os.path.join(
-        get_package_share_directory('shelfino_navigation'),
-        'rviz',
-        'shelfino1_nav.rviz')
-
-    rviz_config_dir2 = os.path.join(
-        get_package_share_directory('shelfino_navigation'),
-        'rviz',
-        'shelfino2_nav.rviz')
-
-    rviz_config_dir3 = os.path.join(
-        get_package_share_directory('shelfino_navigation'),
-        'rviz',
-        'shelfino3_nav.rviz')
-
-    remappings = [('/tf', 'tf'),
-                    ('/tf_static', 'tf_static'),
-                    ('/goal_pose', 'goal_pose'),
-                    ('/clicked_point', 'clicked_point'),
-                    ('/initialpose', 'initialpose')]
+        nav_instances_cmds = []
+        for robot in namespaces:
+            robot_id = robot.replace("shelfino", "")
+            nav_launch = IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(os.path.join(pkg_shelfino_nav, 'launch', 'shelfino_nav.launch.py')),
+                launch_arguments={'use_sim_time':use_sim_time,
+                                'map': map,
+                                'remote':remote,
+                                'headless':headless,
+                                'robot_id':robot_id,
+                                'robot_name':robot}.items(),
+            )
+            nav_instances_cmds.append(nav_launch)
+        return nav_instances_cmds
 
     return LaunchDescription([
-        DeclareLaunchArgument(
-            'map',
-            default_value=map_dir,
-            description='Full path to map file to load'),
-
-        DeclareLaunchArgument(name='sim', default_value='false', choices=['true', 'false'],
+        DeclareLaunchArgument(name='map', default_value='lab1', choices=['lab1', 'povo', 'hexagon'],
+                        description='World used in the gazebo simulation'),
+        DeclareLaunchArgument(name='use_sim_time', default_value='false', choices=['true', 'false'],
                         description='Flag to toggle between real robot and simulation'),
-
         DeclareLaunchArgument(name='remote', default_value='false', choices=['true', 'false'],
                         description='Flag to toggle between navigation stack running on robot or locally'),
-
         DeclareLaunchArgument(name='headless', default_value='false', choices=['true', 'false'],
                         description='Flag to toggle between navigation stack running on robot or locally'),
+        DeclareLaunchArgument(name='robot_id', default_value='G',
+                        description='ID of the robot'),
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([nav2_launch_file_dir, '/bringup_launch.py']),
-            launch_arguments={
-                'map': map_dir,
-                'use_sim_time': sim,
-                'namespace': 'shelfino1',
-                'use_namespace': 'True',
-                'use_composition': 'False',
-                'autostart': 'False',
-                'use_respawn': 'True',
-                'params_file': param_file_name1}.items(),
-            condition=UnlessCondition(remote),
-        ),
-
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            namespace='shelfino1',
-            arguments=['-d', rviz_config_dir1],
-            parameters=[{'use_sim_time': sim}],
-            condition=UnlessCondition(headless),
-            remappings=remappings,
-            output='screen'),
-
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([nav2_launch_file_dir, '/bringup_launch.py']),
-            launch_arguments={
-                'map': map_dir,
-                'use_sim_time': sim,
-                'namespace': 'shelfino2',
-                'use_namespace': 'True',
-                'use_composition': 'False',
-                'autostart': 'False',
-                'use_respawn': 'True',
-                'params_file': param_file_name2}.items(),
-            condition=UnlessCondition(remote),
-        ),
-
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            namespace='shelfino2',
-            arguments=['-d', rviz_config_dir2],
-            parameters=[{'use_sim_time': sim}],
-            condition=UnlessCondition(headless),
-            remappings=remappings,
-            output='screen'),
-
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([nav2_launch_file_dir, '/bringup_launch.py']),
-            launch_arguments={
-                'map': map_dir,
-                'use_sim_time': sim,
-                'namespace': 'shelfino3',
-                'use_namespace': 'True',
-                'use_composition': 'False',
-                'autostart': 'False',
-                'use_respawn': 'True',
-                'params_file': param_file_name3}.items(),
-            condition=UnlessCondition(remote),
-        ),
-
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            namespace='shelfino3',
-            arguments=['-d', rviz_config_dir3],
-            parameters=[{'use_sim_time': sim}],
-            condition=UnlessCondition(headless),
-            remappings=remappings,
-            output='screen'),
+        OpaqueFunction(function=get_namespaces),
     ])
 
     

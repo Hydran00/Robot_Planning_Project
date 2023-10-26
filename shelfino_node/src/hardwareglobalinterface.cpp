@@ -91,23 +91,30 @@ void HardwareGlobalInterface::subHW_callback(const char *topic, const char *buf,
     double tick_r = j.at("3").at("state").at("tck");
     double tick_l = j.at("4").at("state").at("tck");
 
+    
     hwData.rightWheel.omega = -omega_r;
     hwData.rightWheel.current = i_r;
-    hwData.rightWheel.ticks = -tick_r/1024*2*M_PI;//RIGHT_INCREMENTS_PER_TOUR*2*M_PI;
+    hwData.rightWheel.ticks = -tick_r/1024*2*M_PI; //RIGHT_INCREMENTS_PER_TOUR*2*M_PI;
 
     hwData.leftWheel.omega = omega_l;
     hwData.leftWheel.current = i_l;
-    hwData.leftWheel.ticks = tick_l/1024*2*M_PI;//LEFT_INCREMENTS_PER_TOUR*2*M_PI;
+    hwData.leftWheel.ticks = tick_l/1024*2*M_PI; //LEFT_INCREMENTS_PER_TOUR*2*M_PI;
 
+    if(this->id == 1 || this->id == 3){
+      hwData.speed = (LEFT_RADIUS/2.0)*(omega_r-omega_l);
+      hwData.omega = (LEFT_RADIUS/0.4)*(-omega_r-omega_l);
 
-    hwData.speed = (LEFT_RADIUS/2.0)*(omega_l-omega_r); //0.125->radius
-    hwData.omega = (LEFT_RADIUS/0.4)*(-omega_r-omega_l);
-    //        hwData.speed = (0.031/2.0)*(omega_r+omega_l);
-    //        hwData.omega = (0.031/0.271756)*(omega_r-omega_l);
+      hwData.hardwareTimer = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-    hwData.hardwareTimer = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+      updateOdometryV(hwData.hardwareTimer, -omega_l, omega_r);
+  } else {
+      hwData.speed = (LEFT_RADIUS/2.0)*(omega_l-omega_r);
+      hwData.omega = (LEFT_RADIUS/0.4)*(-omega_r-omega_l);
 
-    updateOdometryV(hwData.hardwareTimer, omega_l, -omega_r);
+      hwData.hardwareTimer = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+      updateOdometryV(hwData.hardwareTimer, omega_l, -omega_r);
+  }
 
   }catch(std::exception &e){
 
@@ -360,7 +367,8 @@ void HardwareGlobalInterface::updateOdometryV(double current_time, double vl, do
   }
   else {
     //wsLeft.dTick = (vl*36/(2*M_PI)*2048)*(current_time-wsLeft.lastTime)/1000; //pL-wsLeft.lastTick;
-    wsLeft.dTick = (vl/(2*M_PI)*ENCODER_PPR)*(current_time-wsLeft.lastTime)/1000; //pL-wsLeft.lastTick;
+    wsLeft.dTick = (vl/(2*M_PI)*this->encoder_ppr)*(current_time-wsLeft.lastTime)/1000; //pL-wsLeft.lastTick;
+    // std::cout << this->encoder_ppr << std::endl;
     //wsLeft.lastTick = pL;
     wsLeft.lastTime = current_time;
   }
@@ -373,7 +381,7 @@ void HardwareGlobalInterface::updateOdometryV(double current_time, double vl, do
   }
   else {
     //wsRight.dTick = (vr*36/(2*M_PI)*2048)*(current_time-wsRight.lastTime)/1000; //pR-wsRight.lastTick;
-    wsRight.dTick = (vr/(2*M_PI)*ENCODER_PPR)*(current_time-wsRight.lastTime)/1000; //pR-wsRight.lastTick;
+    wsRight.dTick = (vr/(2*M_PI)*this->encoder_ppr)*(current_time-wsRight.lastTime)/1000; //pR-wsRight.lastTick;
     //wsRight.lastTick = pR;
     wsRight.lastTime = current_time;
   }
@@ -761,10 +769,10 @@ void HardwareGlobalInterface::powerEnable(bool val){
     j_req["enable"] = true;
     std::string response;
     reqHW->request(j_req.dump(),response,req_status);
-    std::cout << j_req.dump()<<std::endl;
+    // std::cout << j_req.dump()<<std::endl;
     if(req_status==ZMQCommon::RequesterSimple::status_t::STATUS_OK){
       try{nlohmann::json j_resp = nlohmann::json::parse(response);
-        std::cout << j_resp.dump()<<std::endl;
+        // std::cout << j_resp.dump()<<std::endl;
         if(j_resp.at("ack") == "true"){
         }else{
 
@@ -807,10 +815,10 @@ void HardwareGlobalInterface::calibrateTrolley()
   j_req["cmd"] = std::string("calibrate_trolley_angle");
   std::string response;
   reqHW->request(j_req.dump(),response,req_status);
-  std::cout << j_req.dump()<<std::endl;
+  // std::cout << j_req.dump()<<std::endl;
   if(req_status==ZMQCommon::RequesterSimple::status_t::STATUS_OK){
     try{nlohmann::json j_resp = nlohmann::json::parse(response);
-      std::cout << j_resp.dump()<<std::endl;
+      // std::cout << j_resp.dump()<<std::endl;
       if(j_resp.at("ack") == "true"){
 
       }else{
@@ -849,10 +857,10 @@ void HardwareGlobalInterface::setDeviceMode(int deviceMode){
   j_req["device_mode"] = deviceMode;
   std::string response;
   reqHW->request(j_req.dump(),response,req_status);
-  std::cout << j_req.dump()<<std::endl;
+  // std::cout << j_req.dump()<<std::endl;
   if(req_status==ZMQCommon::RequesterSimple::status_t::STATUS_OK){
     try{nlohmann::json j_resp = nlohmann::json::parse(response);
-      std::cout << j_resp.dump()<<std::endl;
+      // std::cout << j_resp.dump()<<std::endl;
       if(j_resp.at("ack") == "true"){
 
       }else{

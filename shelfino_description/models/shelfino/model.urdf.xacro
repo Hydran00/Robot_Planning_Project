@@ -1,5 +1,8 @@
-<?xml version='1.0'?>
-<robot name="shelfino">
+<?xml version='1.0' ?>
+<robot name="shelfino" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="robot_id" default="X" />
+
+  <xacro:macro name="shelfino" params="robot_id">
 
   <!--
                                                         MATERIALS 
@@ -19,7 +22,7 @@
   <!--
                                                         BODY OF SHELFINO 
   -->
-    <link name='base_link'>
+    <link name='shelfino${robot_id}/base_link'>
       <visual name='body_visual'>
         <origin xyz='0 0 0.25'/>
         <geometry>
@@ -56,8 +59,8 @@
                                                         LEFT WHEEL JOINT 
   -->
     <joint name="wheel_left_joint" type="continuous">
-      <parent link="base_link"/>
-      <child link="left_wheel"/>
+      <parent link="shelfino${robot_id}/base_link"/>
+      <child link="shelfino${robot_id}/left_wheel"/>
       <origin xyz="0 0.27 0.125" rpy="0 1.5707 1.5707"/>
       <axis xyz="0 0 1"/>
     </joint>
@@ -65,7 +68,7 @@
   <!--
                                                         LEFT WHEEL
   -->
-    <link name="left_wheel">
+    <link name="shelfino${robot_id}/left_wheel">
       <visual name="visual">
         <geometry>
         <cylinder radius="0.125" length="0.03" />
@@ -91,8 +94,8 @@
                                                         RIGHT WHEEL JOINT 
   -->
     <joint name="wheel_right_joint" type="continuous">
-      <parent link="base_link"/>
-      <child link="right_wheel"/>
+      <parent link="shelfino${robot_id}/base_link"/>
+      <child link="shelfino${robot_id}/right_wheel"/>
       <origin xyz="0 -0.27 0.125" rpy="0 1.5707 1.5707"/> 
       <axis xyz="0 0 1"/>
     </joint>
@@ -100,7 +103,7 @@
   <!--
                                                         RIGHT WHEEL 
   -->
-    <link name="right_wheel">
+    <link name="shelfino${robot_id}/right_wheel">
       <visual name="visual">
         <geometry>
           <cylinder radius="0.125" length="0.03" />
@@ -126,15 +129,15 @@
                                                         LIDAR FIXED JOINT 
   -->
     <joint name="lidar2d_joint" type="fixed">
-      <parent link="base_link"></parent>
-      <child link="base_laser"></child>
+      <parent link="shelfino${robot_id}/base_link"></parent>
+      <child link="shelfino${robot_id}/base_laser"></child>
       <origin xyz="0 0 0.45" rpy="0 0 0"/>
     </joint>
 
   <!--
                                                         LIDAR 
   -->
-    <link name="base_laser">
+    <link name="shelfino${robot_id}/base_laser">
       <visual>
         <geometry>
           <mesh filename="package://shelfino_description/models/lidar2d/meshes/hokuyo.dae" />
@@ -157,5 +160,8 @@
                 izz="0.001" />
       </inertial>
     </link>
-</robot>
 
+  </xacro:macro>
+
+  <xacro:shelfino robot_id="$(arg robot_id)" />
+</robot>

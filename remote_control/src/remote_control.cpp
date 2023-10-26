@@ -24,7 +24,7 @@ double DEC_OMEGA = 0.3;
 double STEP = 0.01;
 double A_LAT = 2.0;
 
-std::string robot_id_topic;
+std::string robot_name;
 
 /**
  * @brief ROS2 node to send velocities commands to the **cmd_vel** topic using the keyboard
@@ -40,7 +40,7 @@ class CMDPublisher : public rclcpp::Node
     CMDPublisher()
     : Node("remote_control")
     {
-      client_ = this->create_client<std_srvs::srv::SetBool>(robot_id_topic+"/power");
+      client_ = this->create_client<std_srvs::srv::SetBool>(robot_name+"/power");
       auto request = std::make_shared<std_srvs::srv::SetBool::Request>();
       while (!client_->wait_for_service(1s)) {
         if (!rclcpp::ok()) {
@@ -52,7 +52,7 @@ class CMDPublisher : public rclcpp::Node
       request->data = true;
       client_->async_send_request(request);
 
-      publisher_ = rclcpp::Node::create_publisher<geometry_msgs::msg::Twist>(robot_id_topic+"/cmd_vel", 10);
+      publisher_ = rclcpp::Node::create_publisher<geometry_msgs::msg::Twist>(robot_name+"/cmd_vel", 10);
       initscr();
       noecho();
       last = std::chrono::system_clock::now();
@@ -196,8 +196,8 @@ void kbhit()
  */
 void start_ros_node(int argc, char * argv[])
 {
-  if(argc < 2)  robot_id_topic = "";
-  else          robot_id_topic = argv[1];
+  if(argc < 2)  robot_name = "";
+  else          robot_name = argv[1];
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<CMDPublisher>());
 }

@@ -1,18 +1,21 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>shelfino_gazebo</name>
+  <name> evader</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="eecs@todo.todo">eecs</maintainer>
+  <maintainer email="placido@todo.todo">placido</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-
-  <depend>xacro</depend>
-  <depend>ros_gz</depend>
-  <depend>gazebo_ros_pkgs</depend>
-  <depend>gazebo_ros2_control</depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>nav2_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>graph_msgs</depend>
+  <depend>rclcpp_components</depend>
+  <depend>rclcpp_action</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

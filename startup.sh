@@ -12,5 +12,5 @@ route add -net 224.0.0.0 netmask 240.0.0.0 dev enp1s0
 ifconfig enp1s0 multicast
 
 # export FASTRTPS_DEFAULT_PROFILES_FILE=super_client_configuration_file.xml
-# ros2 daemon stop
-# ros2 daemon start
+ros2 daemon stop
+ros2 daemon start

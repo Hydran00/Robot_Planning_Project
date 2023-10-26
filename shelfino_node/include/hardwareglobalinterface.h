@@ -28,7 +28,7 @@ static const double RIGHT_RADIUS = 0.99 * 0.125 ; //0.99*0.125; //0.125138;
 static const double WHEEL_BASE = 0.383;
 static const double LEFT_B_D = 4* WHEEL_BASE / (2.*LEFT_RADIUS); 
 static const double RIGHT_B_D = 4* WHEEL_BASE / (2.*RIGHT_RADIUS); 
-static const double ENCODER_PPR = 36*4*2048*1; // (Shelfino1) *1,376  | (Shelfino2) *1  | (Shelfino3) *0.6
+static const double ENCODER_PPR = 36*4*2048;
 static const double RATIO_LEFT_RIGHT = RIGHT_B_D/LEFT_B_D;
 
 /**
@@ -85,6 +85,10 @@ public:
     instances.push_back(new HardwareGlobalInterface(hp));
 
     instances.back()->params = hp;
+    instances.back()->id = hp->id;
+    instances.back()->encoder_ppr = ENCODER_PPR; // (Shelfino1) *1,376  | (Shelfino2) *1  | (Shelfino3) *0.6
+    if(hp->id == 1) instances.back()->encoder_ppr = ENCODER_PPR*1,376 ;
+    if(hp->id == 3) instances.back()->encoder_ppr = ENCODER_PPR*0.6;
 
     instances.back()->frontLidar.setMountingPosition(0,0);
     instances.back()->rearLidar.setMountingPosition(-0.7,0);
@@ -413,6 +417,9 @@ private:
   double hb = 0.25; //0.7; //distanza x della coda del veicolo rispetto al suo sistema di riferimento
   double width = 0.5; //larghezza veicolo
   double length = 0.5;
+  int id = 0;
+
+  double encoder_ppr = ENCODER_PPR;
 
   double lastInputVel = 0;
   double lastInputOmega = 0;

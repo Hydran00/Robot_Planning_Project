@@ -50,7 +50,6 @@ target_link_libraries(shelfino_node
 
 install(DIRECTORY 
         launch
-        rviz
   DESTINATION share/${PROJECT_NAME})
 
 install(TARGETS

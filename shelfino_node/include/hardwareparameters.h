@@ -25,6 +25,8 @@ public:
   std::string trackingPublisher = "tcp://192.168.3.5:7901";
   std::string autnavServer = "tcp://192.168.3.5:1991";
 
+  int id = 0;
+
   double vehicleWidth = 0.5;
   double vehicleLength = 0.5;
   double cameraOffsetX = 0.25;
@@ -84,6 +86,7 @@ public:
   HardwareParameters(int i){
     int bbIP = 100 + i*10 + 2;
     int nucIP = 100 + i*10 + 5;
+    id = i;
     hardwareServer = "tcp://10.196.80." + std::to_string(bbIP) + ":5601";
     hardwarePublisher = "tcp://10.196.80." + std::to_string(bbIP) + ":6000";
     trolleyPublisher = "tcp://10.196.80." + std::to_string(bbIP) + ":6001";
