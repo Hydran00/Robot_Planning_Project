@@ -113,6 +113,12 @@ def generate_launch_description():
             condition=IfCondition(rviz),
         ),
 
+        Node(
+            package='get_positions',
+            executable='get_positions',
+            # namespace='shelfinoG',
+        ),
+
         # Node(
         #     package='get_positions',
         #     executable='get_positions',

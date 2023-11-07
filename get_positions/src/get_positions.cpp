@@ -28,7 +28,7 @@ class PositionListener : public rclcpp::Node
       std::make_unique<tf2_ros::Buffer>(this->get_clock());
       tf_listener_ =
       std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
-      publisher_ = this->create_publisher<geometry_msgs::msg::TransformStamped>("transform", qos);
+      publisher_ = this->create_publisher<geometry_msgs::msg::TransformStamped>("shelfinoG/transform", qos);
       timer_ = this->create_wall_timer(
       500ms, std::bind(&PositionListener::timer_callback, this));
     }
@@ -40,11 +40,13 @@ class PositionListener : public rclcpp::Node
 
       try {
           rclcpp::Time now = this->get_clock()->now();
-          t = tf_buffer_->lookupTransform("map", "base_link", tf2::TimePointZero, 1s);
+          t = tf_buffer_->lookupTransform("map", "shelfinoG/base_link", tf2::TimePointZero, 1s);
       } catch (const tf2::TransformException & ex) {
-          // RCLCPP_INFO(this->get_logger(), "Could not transform map to base_link: %s", ex.what());
+          RCLCPP_INFO(this->get_logger(), "Could not transform map to base_link: %s", ex.what());
           // return;
       }
+      // RCLCPP_INFO(this->get_logger(), "Publishing");
+
       publisher_->publish(t);
     }
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};

@@ -20,7 +20,7 @@ def generate_launch_description():
         Node(
             package='dubins_planner',
             executable='dubins_planner',
-            namespace='shelfino2',
+            namespace='shelfinoG',
             parameters=[{'use_sim_time': use_sim_time}],
             remappings=remappings
         ),
