@@ -16,6 +16,10 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_action REQUIRED)
+find_package(CGAL REQUIRED)
+find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt5)
+
+
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -35,12 +39,22 @@ ament_target_dependencies(dubins_planner
   rclcpp_action
 )
 
+add_executable(rec src/rec.cpp)
+#link it with the required CGAL libraries
+if(CGAL_Qt5_FOUND)
+  message("QT5 FOUND")
+  target_link_libraries(rec CGAL::CGAL CGAL::CGAL_Basic_viewer)
+else(
+  message("QT5 NOT FOUND")
+)
+endif()
 install(DIRECTORY 
         launch
   DESTINATION share/${PROJECT_NAME})
 
 install(TARGETS
   dubins_planner
+  rec
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
