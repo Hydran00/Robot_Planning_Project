@@ -37,6 +37,7 @@ typedef VoronoiDiagram::Bounded_halfedges_iterator BHE_Iter;
 typedef VoronoiDiagram::Halfedge Halfedge;
 typedef VoronoiDiagram::Vertex Vertex;
 typedef CGAL::Polygon_with_holes_2<K> Polygon;
+typedef CGAL::Polygon_2<K> Polygon_2;
 typedef std::deque<Polygon> MultiPolygon;
 
 /// Creates a hash of a Point_2, used for making O(1) point lookups
@@ -354,30 +355,48 @@ MedialData filter_voronoi_diagram_to_medial_axis(
     return ret;
 }
 
+
+
+
+
+
+bool is_point_inside_polygon(const Point_2& point, const Polygon_2& polygon) {
+    return CGAL::bounded_side_2(polygon.vertices_begin(), polygon.vertices_end(), point, K()) == CGAL::ON_BOUNDED_SIDE;
+}
+
+
+
+
+
+
 bool edge_connected_to_hole(const Halfedge_handle &edge_iter, const MultiPolygon &mp)
 {
-    // ignore edges connected to holes
-    std::cout << "MP " << mp.size() << std::endl<< std::endl;
-    sleep(5);
-
+    // For each polygon in MultiPolygon
     for (const auto &poly : mp)
-    {   // For each polygon in MultiPolygon
+    {
+        // ignore edges connected to the external polygon or inside holes
+        for (auto vertex_iter = poly.outer_boundary().vertices_begin(); vertex_iter != poly.outer_boundary().vertices_end(); vertex_iter++)
+        {
+            if ((edge_iter->source()->point() == *vertex_iter) || (edge_iter->target()->point() == *vertex_iter) )
+            {
+                return true;
+            }
+        }
+
+        // For each hole in the polygon
         for (const auto &hole : poly.holes())
-        {   //check for each vertex
-            std::cout << "Hole size: " << hole.size() << std::endl;
+        { // check for each vertex
             for (auto vertex_iter = hole.vertices_begin(); vertex_iter != hole.vertices_end(); vertex_iter++)
             {
-                std::cout <<"Comparing vertex: "<< vertex_iter->x() << "," << vertex_iter->y() << " with edge: " << edge_iter->source()->point().x() << "," << edge_iter->target()->point().y() << std::endl;
-                if ((edge_iter->source()->point().x() == vertex_iter->x() && edge_iter->source()->point().y() == vertex_iter->y()) ||
-                (edge_iter->target()->point().x)() == vertex_iter->x() && edge_iter->target()->point().y() == vertex_iter->y())
+                // ignore edges connected to holes
+                if ((edge_iter->source()->point() == *vertex_iter) || (edge_iter->target()->point() == *vertex_iter) ||
+                is_point_inside_polygon(edge_iter->source()->point(), hole) || is_point_inside_polygon(edge_iter->target()->point(), hole))
                 {
-                    std::cout << "Vertex is connected to an hole" << std::endl;
                     return true;
                 }
             }
         }
     }
-    std::cout << "Vertex not connected to an hole" << std::endl;
     return false;
 }
 int main()
@@ -396,6 +415,9 @@ int main()
     // draw_voronoi_diagram(voronoi);
     //  CGAL::draw(voronoi);
     //  constrains each edge of the Voronoi diagram
+    Point_2 pt1(0, 0);
+    Point_2 pt2(0, 0);
+    std::cout << (pt1 == pt2) << std::endl;
     std::ofstream fout1("/home/robotics/Desktop/voronoi_points.csv");
     std::ofstream fout2("/home/robotics/Desktop/voronoi_edges.csv");
     fout1 << "x1,y1,x2,y2" << std::endl;
@@ -407,9 +429,9 @@ int main()
         edge_iter++)
     {
         // ignore edges connected to holes
-        if (!edge_connected_to_hole(edge_iter,mp))
+        if (!edge_connected_to_hole(edge_iter, mp))
         {
-            std::cout << "Vertex: " << edge_iter->source()->point() << edge_iter->source()->point() << std::endl;
+            std::cout << "Edge: " << edge_iter->source()->point() << edge_iter->target()->point() << std::endl;
             fout1 << edge_iter->source()->point().x() << "," << edge_iter->source()->point().y() << "," << edge_iter->target()->point().x() << "," << edge_iter->target()->point().y() << std::endl;
         }
     }
