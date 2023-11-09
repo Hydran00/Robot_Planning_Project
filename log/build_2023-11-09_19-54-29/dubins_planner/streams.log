@@ -1,0 +1,84 @@
+[0.040s] Invoking command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner -- -j12 -l12
+[0.054s] -- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.144s] -- Found rclcpp: 16.0.6 (/opt/ros/humble/share/rclcpp/cmake)
+[0.160s] -- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.161s] -- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.164s] -- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.171s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.179s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.212s] -- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.213s] -- Found rmw_fastrtps_cpp: 6.2.4 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.281s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.372s] -- Found nav_msgs: 4.2.3 (/opt/ros/humble/share/nav_msgs/cmake)
+[0.460s] -- Found nav2_msgs: 1.1.12 (/opt/ros/humble/share/nav2_msgs/cmake)
+[0.584s] -- Found tf2: 0.25.4 (/opt/ros/humble/share/tf2/cmake)
+[0.589s] -- Found tf2_ros: 0.25.4 (/opt/ros/humble/share/tf2_ros/cmake)
+[0.740s] [33mCMake Warning (dev) at CMakeLists.txt:21 (find_package):
+[0.740s]   Policy CMP0074 is not set: find_package uses <PackageName>_ROOT variables.
+[0.740s]   Run "cmake --help-policy CMP0074" for policy details.  Use the cmake_policy
+[0.740s]   command to set the policy and suppress this warning.
+[0.740s] 
+[0.740s]   CMake variable CGAL_ROOT is set to:
+[0.740s] 
+[0.740s]     .
+[0.740s] 
+[0.741s]   For compatibility, CMake is ignoring the variable.
+[0.741s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[0.741s] [0m
+[0.741s] [33mCMake Warning at /usr/lib/x86_64-linux-gnu/cmake/CGAL/CGALConfig.cmake:92 (message):
+[0.741s]   CGAL_DATA_DIR cannot be deduced, set the variable CGAL_DATA_DIR to set the
+[0.741s]   default value of CGAL::data_file_path()
+[0.741s] Call Stack (most recent call first):
+[0.741s]   CMakeLists.txt:21 (find_package)
+[0.741s] 
+[0.741s] [0m
+[0.741s] -- Using header-only CGAL
+[0.742s] -- Targetting Unix Makefiles
+[0.742s] -- Using /usr/bin/c++ compiler.
+[0.746s] -- Boost include dirs: /usr/include
+[0.746s] -- Boost libraries:    
+[0.746s] -- Using gcc version 4 or later. Adding -frounding-math
+[0.747s] [33mCMake Warning at /usr/lib/x86_64-linux-gnu/cmake/CGAL/CGALConfig.cmake:92 (message):
+[0.747s]   CGAL_DATA_DIR cannot be deduced, set the variable CGAL_DATA_DIR to set the
+[0.747s]   default value of CGAL::data_file_path()
+[0.747s] Call Stack (most recent call first):
+[0.747s]   CMakeLists.txt:22 (find_package)
+[0.747s] 
+[0.747s] [0m
+[0.748s] -- Using header-only CGAL
+[0.798s] -- Configuring done
+[0.811s] -- Generating done
+[0.813s] -- Build files have been written to: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner
+[0.829s] [35m[1mConsolidate compiler generated dependencies of target dubins_planner[0m
+[0.837s] [  6%] [34m[1mAutomatic MOC for target CGAL_Qt5_moc_and_resources[0m
+[0.843s] [ 18%] Built target dubins_planner
+[0.853s] [ 18%] Built target CGAL_Qt5_moc_and_resources_autogen
+[0.859s] [35m[1mConsolidate compiler generated dependencies of target CGAL_Qt5_moc_and_resources[0m
+[0.877s] [ 87%] Built target CGAL_Qt5_moc_and_resources
+[0.884s] [35m[1mConsolidate compiler generated dependencies of target rec[0m
+[0.908s] [ 93%] [32mBuilding CXX object CMakeFiles/rec.dir/src/rec.cpp.o[0m
+[17.348s] [100%] [32m[1mLinking CXX executable rec[0m
+[17.435s] [100%] Built target rec
+[17.441s] Invoked command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner -- -j12 -l12
+[17.469s] Invoking command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner
+[17.475s] -- Install configuration: "Release"
+[17.475s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/launch
+[17.475s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/launch/dubins.launch.py
+[17.475s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/lib/dubins_planner/dubins_planner
+[17.475s] -- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/lib/dubins_planner/rec
+[17.477s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/ament_index/resource_index/package_run_dependencies/dubins_planner
+[17.477s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/ament_index/resource_index/parent_prefix_path/dubins_planner
+[17.477s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/ament_prefix_path.sh
+[17.477s] -- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/ament_prefix_path.dsv
+[17.477s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/path.sh
+[17.477s] -- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/path.dsv
+[17.477s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.bash
+[17.477s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.sh
+[17.477s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.zsh
+[17.478s] -- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.dsv
+[17.478s] -- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/package.dsv
+[17.478s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/ament_index/resource_index/packages/dubins_planner
+[17.478s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/cmake/dubins_plannerConfig.cmake
+[17.478s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/cmake/dubins_plannerConfig-version.cmake
+[17.478s] -- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/package.xml
+[17.480s] Invoked command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner

@@ -1,13 +1,16 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.12)
 project(dubins_planner)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
+  add_compile_options(-Wall -Wextra -Wpedantic -Wno-dev)
 endif()
+set(CMAKE_BUILD_TYPE "Release")
+set(CGAL_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(nav2_msgs REQUIRED)
@@ -18,7 +21,6 @@ find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(CGAL REQUIRED)
 find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt5)
-
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -41,20 +43,28 @@ ament_target_dependencies(dubins_planner
 
 add_executable(rec src/rec.cpp)
 #link it with the required CGAL libraries
-if(CGAL_Qt5_FOUND)
-  message("QT5 FOUND")
-  target_link_libraries(rec CGAL::CGAL CGAL::CGAL_Basic_viewer)
-else(
-  message("QT5 NOT FOUND")
-)
-endif()
+
+target_link_libraries(rec CGAL::CGAL CGAL::CGAL_Basic_viewer)
+
 install(DIRECTORY 
-        launch
+  launch
   DESTINATION share/${PROJECT_NAME})
 
+install(DIRECTORY 
+    scripts
+    DESTINATION share/${PROJECT_NAME})
 install(TARGETS
   dubins_planner
   rec
   DESTINATION lib/${PROJECT_NAME})
+
+# Install Python modules
+ament_python_install_package(${PROJECT_NAME})
+# Install Python executables
+install(PROGRAMS
+  scripts/plot.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 
 ament_package()

@@ -1,0 +1,25 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from graph_msgs/msg/GeometryGraph.msg
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/Point.idl"
+#include "graph_msgs/msg/Edges.idl"
+#include "std_msgs/msg/Header.idl"
+
+module graph_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "A reference coordinate frame and timestamp")
+    struct GeometryGraph {
+      std_msgs::msg::Header header;
+
+      @verbatim (language="comment", text=
+        "3D spacial graph")
+      sequence<geometry_msgs::msg::Point> nodes;
+
+      @verbatim (language="comment", text=
+        "This vector should be the same length as nodes, above, and represents all the connecting nodes")
+      sequence<graph_msgs::msg::Edges> edges;
+    };
+  };
+};

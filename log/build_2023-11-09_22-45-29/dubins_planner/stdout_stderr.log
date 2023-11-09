@@ -1,0 +1,79 @@
+-- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found rclcpp: 16.0.6 (/opt/ros/humble/share/rclcpp/cmake)
+-- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+-- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+-- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+-- Found rmw_fastrtps_cpp: 6.2.4 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+-- Using RMW implementation 'rmw_fastrtps_cpp' as default
+-- Found rclpy: 3.3.10 (/opt/ros/humble/share/rclpy/cmake)
+-- Found nav_msgs: 4.2.3 (/opt/ros/humble/share/nav_msgs/cmake)
+-- Found nav2_msgs: 1.1.12 (/opt/ros/humble/share/nav2_msgs/cmake)
+-- Found tf2: 0.25.4 (/opt/ros/humble/share/tf2/cmake)
+-- Found tf2_ros: 0.25.4 (/opt/ros/humble/share/tf2_ros/cmake)
+-- Using header-only CGAL
+-- Targetting Unix Makefiles
+-- Using /usr/bin/c++ compiler.
+-- Boost include dirs: /usr/include
+-- Boost libraries:    
+-- Using gcc version 4 or later. Adding -frounding-math
+-- Using header-only CGAL
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner
+[35m[1mConsolidate compiler generated dependencies of target dubins_planner[0m
+[  6%] [34m[1mAutomatic MOC for target CGAL_Qt5_moc_and_resources[0m
+[  6%] Built target ament_cmake_python_copy_dubins_planner
+[ 18%] Built target dubins_planner
+[ 18%] Built target CGAL_Qt5_moc_and_resources_autogen
+[35m[1mConsolidate compiler generated dependencies of target CGAL_Qt5_moc_and_resources[0m
+[ 87%] Built target CGAL_Qt5_moc_and_resources
+[35m[1mConsolidate compiler generated dependencies of target rec[0m
+[ 93%] [32mBuilding CXX object CMakeFiles/rec.dir/src/rec.cpp.o[0m
+running egg_info
+creating dubins_planner.egg-info
+writing dubins_planner.egg-info/PKG-INFO
+writing dependency_links to dubins_planner.egg-info/dependency_links.txt
+writing top-level names to dubins_planner.egg-info/top_level.txt
+writing manifest file 'dubins_planner.egg-info/SOURCES.txt'
+reading manifest file 'dubins_planner.egg-info/SOURCES.txt'
+writing manifest file 'dubins_planner.egg-info/SOURCES.txt'
+[ 93%] Built target ament_cmake_python_build_dubins_planner_egg
+[100%] [32m[1mLinking CXX executable rec[0m
+[100%] Built target rec
+-- Install configuration: "Release"
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/launch
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/launch/dubins.launch.py
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/scripts
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/scripts/plot.py
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/lib/dubins_planner/dubins_planner
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/lib/dubins_planner/rec
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/pythonpath.sh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/pythonpath.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/local/lib/python3.10/dist-packages/dubins_planner-0.0.0-py3.10.egg-info
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/local/lib/python3.10/dist-packages/dubins_planner-0.0.0-py3.10.egg-info/dependency_links.txt
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/local/lib/python3.10/dist-packages/dubins_planner-0.0.0-py3.10.egg-info/SOURCES.txt
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/local/lib/python3.10/dist-packages/dubins_planner-0.0.0-py3.10.egg-info/PKG-INFO
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/local/lib/python3.10/dist-packages/dubins_planner-0.0.0-py3.10.egg-info/top_level.txt
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/local/lib/python3.10/dist-packages/dubins_planner
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/local/lib/python3.10/dist-packages/dubins_planner/__init__.py
+Listing '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/local/lib/python3.10/dist-packages/dubins_planner'...
+Compiling '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/local/lib/python3.10/dist-packages/dubins_planner/__init__.py'...
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/lib/dubins_planner/plot.py
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/ament_index/resource_index/package_run_dependencies/dubins_planner
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/ament_index/resource_index/parent_prefix_path/dubins_planner
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/ament_prefix_path.sh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/path.sh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/path.dsv
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.bash
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.sh
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.zsh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/package.dsv
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/ament_index/resource_index/packages/dubins_planner
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/cmake/dubins_plannerConfig.cmake
+-- Up-to-date: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/cmake/dubins_plannerConfig-version.cmake
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/package.xml

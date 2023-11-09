@@ -1,0 +1,3 @@
+gmake[2]: *** [CMakeFiles/send_borders.dir/build.make:76: CMakeFiles/send_borders.dir/src/send_borders.cpp.o] Interrupt
+gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/send_borders.dir/all] Interrupt
+gmake: *** [Makefile:146: all] Interrupt

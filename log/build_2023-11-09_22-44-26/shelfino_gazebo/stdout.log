@@ -1,0 +1,40 @@
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_gazebo
+-- Install configuration: ""
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/launch
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/launch/shelfino.launch.py
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/launch/multi_shelfino.launch.py
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/worlds
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/worlds/hexagon.world
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/worlds/empty.world
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/worlds/povo.world
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/ament_index/resource_index/package_run_dependencies/shelfino_gazebo
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/ament_index/resource_index/parent_prefix_path/shelfino_gazebo
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/environment/ament_prefix_path.sh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/environment/ament_prefix_path.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/environment/path.sh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/environment/path.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/local_setup.bash
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/local_setup.sh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/local_setup.zsh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/local_setup.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/package.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/ament_index/resource_index/packages/shelfino_gazebo
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/cmake/shelfino_gazeboConfig.cmake
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/cmake/shelfino_gazeboConfig-version.cmake
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_gazebo/share/shelfino_gazebo/package.xml

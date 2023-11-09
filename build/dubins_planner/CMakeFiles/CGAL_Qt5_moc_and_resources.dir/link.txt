@@ -1,0 +1,2 @@
+/usr/bin/ar qc libCGAL_Qt5_moc_and_resources.a CMakeFiles/CGAL_Qt5_moc_and_resources.dir/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp.o CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_CGAL.cpp.o CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_Input.cpp.o CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_File.cpp.o CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_Triangulation_2.cpp.o
+/usr/bin/ranlib libCGAL_Qt5_moc_and_resources.a

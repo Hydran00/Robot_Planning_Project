@@ -1,0 +1,4 @@
+source;share/send_borders/local_setup.bash
+source;share/send_borders/local_setup.dsv
+source;share/send_borders/local_setup.sh
+source;share/send_borders/local_setup.zsh

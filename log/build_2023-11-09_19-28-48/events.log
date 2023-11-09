@@ -1,0 +1,375 @@
+[0.000000] (-) TimerEvent: {}
+[0.000123] (-) JobUnselected: {'identifier': 'evader'}
+[0.000190] (-) JobUnselected: {'identifier': 'get_positions'}
+[0.000202] (-) JobUnselected: {'identifier': 'graph_msgs'}
+[0.000210] (-) JobUnselected: {'identifier': 'obstacles_msgs'}
+[0.000218] (-) JobUnselected: {'identifier': 'remote_control'}
+[0.000226] (-) JobUnselected: {'identifier': 'send_borders'}
+[0.000234] (-) JobUnselected: {'identifier': 'send_gates'}
+[0.000241] (-) JobUnselected: {'identifier': 'send_obstacles'}
+[0.000249] (-) JobUnselected: {'identifier': 'shelfino_description'}
+[0.000256] (-) JobUnselected: {'identifier': 'shelfino_gazebo'}
+[0.000264] (-) JobUnselected: {'identifier': 'shelfino_navigation'}
+[0.000271] (-) JobUnselected: {'identifier': 'shelfino_node'}
+[0.000281] (dubins_planner) JobQueued: {'identifier': 'dubins_planner', 'dependencies': OrderedDict()}
+[0.000292] (dubins_planner) JobStarted: {'identifier': 'dubins_planner'}
+[0.038468] (dubins_planner) JobProgress: {'identifier': 'dubins_planner', 'progress': 'cmake'}
+[0.038720] (dubins_planner) Command: {'cmd': ['/usr/bin/cmake', '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/dubins_planner', '-DCMAKE_INSTALL_PREFIX=/home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner'], 'cwd': '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'en_GB:en'), ('USER', 'hydran00'), ('LC_TIME', 'it_IT.UTF-8'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '0'), ('LD_LIBRARY_PATH', '/home/hydran00/shelfino_ws/install/obstacles_msgs/lib:/home/hydran00/shelfino_ws/install/graph_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/hydran00'), ('OLDPWD', '/home/hydran00/shelfino_ws'), ('DESKTOP_SESSION', 'ubuntu'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('LC_MONETARY', 'it_IT.UTF-8'), ('MANAGERPID', '1399'), ('SYSTEMD_EXEC_PID', '1900'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator23558193cd9818af7fe4d2c2f5bd9d00f'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '2487'), ('COLCON_PREFIX_PATH', '/home/hydran00/shelfino_ws/install'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'hydran00'), ('JOURNAL_STREAM', '8:21165'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'hydran00'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/hydran00:@/tmp/.ICE-unix/1743,unix/hydran00:/tmp/.ICE-unix/1743'), ('INVOCATION_ID', 'e6fcda4dfb2c4145bd1b97cf50fb335b'), ('PAPERSIZE', 'a4'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'it_IT.UTF-8'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':1'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_GB.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('IBUS_DISABLE_SNOOPER', '1'), ('LC_TELEPHONE', 'it_IT.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/hydran00/shelfino_ws/install/shelfino_node:/home/hydran00/shelfino_ws/install/shelfino_navigation:/home/hydran00/shelfino_ws/install/shelfino_gazebo:/home/hydran00/shelfino_ws/install/shelfino_description:/home/hydran00/shelfino_ws/install/send_obstacles:/home/hydran00/shelfino_ws/install/send_gates:/home/hydran00/shelfino_ws/install/send_borders:/home/hydran00/shelfino_ws/install/remote_control:/home/hydran00/shelfino_ws/install/obstacles_msgs:/home/hydran00/shelfino_ws/install/evader:/home/hydran00/shelfino_ws/install/graph_msgs:/home/hydran00/shelfino_ws/install/get_positions:/home/hydran00/shelfino_ws/install/dubins_planner:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'it_IT.UTF-8'), ('TERMINATOR_UUID', 'urn:uuid:41665ad9-91b6-4cf9-9de0-3a184cfa7678'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'it_IT.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('LC_IDENTIFICATION', 'it_IT.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/hydran00/shelfino_ws/install/obstacles_msgs/local/lib/python3.10/dist-packages:/home/hydran00/shelfino_ws/install/graph_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'it_IT.UTF-8'), ('LC_PAPER', 'it_IT.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CMAKE_PREFIX_PATH', '/home/hydran00/shelfino_ws/install/shelfino_node:/home/hydran00/shelfino_ws/install/shelfino_navigation:/home/hydran00/shelfino_ws/install/shelfino_gazebo:/home/hydran00/shelfino_ws/install/shelfino_description:/home/hydran00/shelfino_ws/install/send_obstacles:/home/hydran00/shelfino_ws/install/send_gates:/home/hydran00/shelfino_ws/install/send_borders:/home/hydran00/shelfino_ws/install/remote_control:/home/hydran00/shelfino_ws/install/obstacles_msgs:/home/hydran00/shelfino_ws/install/evader:/home/hydran00/shelfino_ws/install/graph_msgs:/home/hydran00/shelfino_ws/install/get_positions:/home/hydran00/shelfino_ws/install/dubins_planner:/opt/ros/humble')]), 'shell': False}
+[0.090536] (dubins_planner) StdoutLine: {'line': b'-- The C compiler identification is GNU 11.4.0\n'}
+[0.099640] (-) TimerEvent: {}
+[0.137162] (dubins_planner) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 11.4.0\n'}
+[0.145666] (dubins_planner) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.193869] (dubins_planner) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.199780] (-) TimerEvent: {}
+[0.201004] (dubins_planner) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[0.201405] (dubins_planner) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.202069] (dubins_planner) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.204912] (dubins_planner) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.258271] (dubins_planner) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.262772] (dubins_planner) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[0.262988] (dubins_planner) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.263320] (dubins_planner) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.267918] (dubins_planner) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.299949] (-) TimerEvent: {}
+[0.374429] (dubins_planner) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter \n'}
+[0.400042] (-) TimerEvent: {}
+[0.456712] (dubins_planner) StdoutLine: {'line': b'-- Found rclcpp: 16.0.6 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.487419] (dubins_planner) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.491320] (dubins_planner) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.497467] (dubins_planner) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.500112] (-) TimerEvent: {}
+[0.507474] (dubins_planner) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.521161] (dubins_planner) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.573262] (dubins_planner) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.575290] (dubins_planner) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.4 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.600243] (-) TimerEvent: {}
+[0.642150] (dubins_planner) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  \n'}
+[0.658313] (dubins_planner) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/humble/include  \n'}
+[0.687808] (dubins_planner) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[0.694751] (dubins_planner) StdoutLine: {'line': b'-- Looking for pthread.h\n'}
+[0.700320] (-) TimerEvent: {}
+[0.737993] (dubins_planner) StdoutLine: {'line': b'-- Looking for pthread.h - found\n'}
+[0.738314] (dubins_planner) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[0.787229] (dubins_planner) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success\n'}
+[0.787825] (dubins_planner) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[0.800420] (-) TimerEvent: {}
+[0.885273] (dubins_planner) StdoutLine: {'line': b'-- Found nav_msgs: 4.2.3 (/opt/ros/humble/share/nav_msgs/cmake)\n'}
+[0.900501] (-) TimerEvent: {}
+[0.967820] (dubins_planner) StdoutLine: {'line': b'-- Found nav2_msgs: 1.1.12 (/opt/ros/humble/share/nav2_msgs/cmake)\n'}
+[1.000630] (-) TimerEvent: {}
+[1.098657] (dubins_planner) StdoutLine: {'line': b'-- Found tf2: 0.25.4 (/opt/ros/humble/share/tf2/cmake)\n'}
+[1.100718] (-) TimerEvent: {}
+[1.107554] (dubins_planner) StdoutLine: {'line': b'-- Found tf2_ros: 0.25.4 (/opt/ros/humble/share/tf2_ros/cmake)\n'}
+[1.200851] (-) TimerEvent: {}
+[1.268773] (dubins_planner) StderrLine: {'line': b'\x1b[33mCMake Warning at /usr/lib/x86_64-linux-gnu/cmake/CGAL/CGALConfig.cmake:92 (message):\n'}
+[1.268912] (dubins_planner) StderrLine: {'line': b'  CGAL_DATA_DIR cannot be deduced, set the variable CGAL_DATA_DIR to set the\n'}
+[1.268953] (dubins_planner) StderrLine: {'line': b'  default value of CGAL::data_file_path()\n'}
+[1.268986] (dubins_planner) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[1.269017] (dubins_planner) StderrLine: {'line': b'  CMakeLists.txt:19 (find_package)\n'}
+[1.269053] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.269084] (dubins_planner) StderrLine: {'line': b'\x1b[0m\n'}
+[1.269967] (dubins_planner) StdoutLine: {'line': b'-- Using header-only CGAL\n'}
+[1.270693] (dubins_planner) StdoutLine: {'line': b'-- Targetting Unix Makefiles\n'}
+[1.270751] (dubins_planner) StdoutLine: {'line': b'-- Using /usr/bin/c++ compiler.\n'}
+[1.272752] (dubins_planner) StdoutLine: {'line': b'-- Found GMP: /usr/lib/x86_64-linux-gnu/libgmp.so  \n'}
+[1.273972] (dubins_planner) StdoutLine: {'line': b'-- Found MPFR: /usr/lib/x86_64-linux-gnu/libmpfr.so  \n'}
+[1.284233] (dubins_planner) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found suitable version "1.74.0", minimum required is "1.48")  \n'}
+[1.284530] (dubins_planner) StdoutLine: {'line': b'-- Boost include dirs: /usr/include\n'}
+[1.284588] (dubins_planner) StdoutLine: {'line': b'-- Boost libraries:    \n'}
+[1.284700] (dubins_planner) StdoutLine: {'line': b'-- Using gcc version 4 or later. Adding -frounding-math\n'}
+[1.285034] (dubins_planner) StderrLine: {'line': b'\x1b[33mCMake Warning (dev) at CMakeLists.txt:20 (find_package):\n'}
+[1.285086] (dubins_planner) StderrLine: {'line': b'  Policy CMP0074 is not set: find_package uses <PackageName>_ROOT variables.\n'}
+[1.285119] (dubins_planner) StderrLine: {'line': b'  Run "cmake --help-policy CMP0074" for policy details.  Use the cmake_policy\n'}
+[1.285151] (dubins_planner) StderrLine: {'line': b'  command to set the policy and suppress this warning.\n'}
+[1.285183] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.285213] (dubins_planner) StderrLine: {'line': b'  CMake variable CGAL_ROOT is set to:\n'}
+[1.285243] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.285272] (dubins_planner) StderrLine: {'line': b'    /usr\n'}
+[1.285301] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.285331] (dubins_planner) StderrLine: {'line': b'  For compatibility, CMake is ignoring the variable.\n'}
+[1.285367] (dubins_planner) StderrLine: {'line': b'This warning is for project developers.  Use -Wno-dev to suppress it.\n'}
+[1.285399] (dubins_planner) StderrLine: {'line': b'\x1b[0m\n'}
+[1.285564] (dubins_planner) StderrLine: {'line': b'\x1b[33mCMake Warning at /usr/lib/x86_64-linux-gnu/cmake/CGAL/CGALConfig.cmake:92 (message):\n'}
+[1.285637] (dubins_planner) StderrLine: {'line': b'  CGAL_DATA_DIR cannot be deduced, set the variable CGAL_DATA_DIR to set the\n'}
+[1.285674] (dubins_planner) StderrLine: {'line': b'  default value of CGAL::data_file_path()\n'}
+[1.285706] (dubins_planner) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[1.285736] (dubins_planner) StderrLine: {'line': b'  CMakeLists.txt:20 (find_package)\n'}
+[1.285767] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.285797] (dubins_planner) StderrLine: {'line': b'\x1b[0m\n'}
+[1.286495] (dubins_planner) StdoutLine: {'line': b'-- Using header-only CGAL\n'}
+[1.300945] (-) TimerEvent: {}
+[1.342484] (dubins_planner) StderrLine: {'line': b'\x1b[33mCMake Warning at /usr/lib/x86_64-linux-gnu/cmake/CGAL/CGAL_enable_end_of_configuration_hook.cmake:99 (message):\n'}
+[1.342608] (dubins_planner) StderrLine: {'line': b'  =======================================================================\n'}
+[1.342651] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.342686] (dubins_planner) StderrLine: {'line': b'  CGAL performance notice:\n'}
+[1.342720] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.342754] (dubins_planner) StderrLine: {'line': b'  The variable CMAKE_BUILD_TYPE is set to "".  For performance reasons, you\n'}
+[1.342789] (dubins_planner) StderrLine: {'line': b'  should set CMAKE_BUILD_TYPE to "Release".\n'}
+[1.342824] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.342858] (dubins_planner) StderrLine: {'line': b'  Set CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE to TRUE if you want to disable\n'}
+[1.342892] (dubins_planner) StderrLine: {'line': b'  this warning.\n'}
+[1.342926] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.342959] (dubins_planner) StderrLine: {'line': b'  =======================================================================\n'}
+[1.343087] (dubins_planner) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[1.343128] (dubins_planner) StderrLine: {'line': b'  CMakeLists.txt:9223372036854775807 (CGAL_run_at_the_end_of_configuration)\n'}
+[1.343168] (dubins_planner) StderrLine: {'line': b'\n'}
+[1.343206] (dubins_planner) StderrLine: {'line': b'\x1b[0m\n'}
+[1.343240] (dubins_planner) StdoutLine: {'line': b'-- Configuring done\n'}
+[1.356309] (dubins_planner) StdoutLine: {'line': b'-- Generating done\n'}
+[1.357412] (dubins_planner) StdoutLine: {'line': b'-- Build files have been written to: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner\n'}
+[1.364182] (dubins_planner) CommandEnded: {'returncode': 0}
+[1.365369] (dubins_planner) JobProgress: {'identifier': 'dubins_planner', 'progress': 'build'}
+[1.365390] (dubins_planner) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner', '--', '-j12', '-l12'], 'cwd': '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'en_GB:en'), ('USER', 'hydran00'), ('LC_TIME', 'it_IT.UTF-8'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '0'), ('LD_LIBRARY_PATH', '/home/hydran00/shelfino_ws/install/obstacles_msgs/lib:/home/hydran00/shelfino_ws/install/graph_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/hydran00'), ('OLDPWD', '/home/hydran00/shelfino_ws'), ('DESKTOP_SESSION', 'ubuntu'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('LC_MONETARY', 'it_IT.UTF-8'), ('MANAGERPID', '1399'), ('SYSTEMD_EXEC_PID', '1900'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator23558193cd9818af7fe4d2c2f5bd9d00f'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '2487'), ('COLCON_PREFIX_PATH', '/home/hydran00/shelfino_ws/install'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'hydran00'), ('JOURNAL_STREAM', '8:21165'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'hydran00'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/hydran00:@/tmp/.ICE-unix/1743,unix/hydran00:/tmp/.ICE-unix/1743'), ('INVOCATION_ID', 'e6fcda4dfb2c4145bd1b97cf50fb335b'), ('PAPERSIZE', 'a4'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'it_IT.UTF-8'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':1'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_GB.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('IBUS_DISABLE_SNOOPER', '1'), ('LC_TELEPHONE', 'it_IT.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/hydran00/shelfino_ws/install/shelfino_node:/home/hydran00/shelfino_ws/install/shelfino_navigation:/home/hydran00/shelfino_ws/install/shelfino_gazebo:/home/hydran00/shelfino_ws/install/shelfino_description:/home/hydran00/shelfino_ws/install/send_obstacles:/home/hydran00/shelfino_ws/install/send_gates:/home/hydran00/shelfino_ws/install/send_borders:/home/hydran00/shelfino_ws/install/remote_control:/home/hydran00/shelfino_ws/install/obstacles_msgs:/home/hydran00/shelfino_ws/install/evader:/home/hydran00/shelfino_ws/install/graph_msgs:/home/hydran00/shelfino_ws/install/get_positions:/home/hydran00/shelfino_ws/install/dubins_planner:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'it_IT.UTF-8'), ('TERMINATOR_UUID', 'urn:uuid:41665ad9-91b6-4cf9-9de0-3a184cfa7678'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'it_IT.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('LC_IDENTIFICATION', 'it_IT.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/hydran00/shelfino_ws/install/obstacles_msgs/local/lib/python3.10/dist-packages:/home/hydran00/shelfino_ws/install/graph_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'it_IT.UTF-8'), ('LC_PAPER', 'it_IT.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CMAKE_PREFIX_PATH', '/home/hydran00/shelfino_ws/install/shelfino_node:/home/hydran00/shelfino_ws/install/shelfino_navigation:/home/hydran00/shelfino_ws/install/shelfino_gazebo:/home/hydran00/shelfino_ws/install/shelfino_description:/home/hydran00/shelfino_ws/install/send_obstacles:/home/hydran00/shelfino_ws/install/send_gates:/home/hydran00/shelfino_ws/install/send_borders:/home/hydran00/shelfino_ws/install/remote_control:/home/hydran00/shelfino_ws/install/obstacles_msgs:/home/hydran00/shelfino_ws/install/evader:/home/hydran00/shelfino_ws/install/graph_msgs:/home/hydran00/shelfino_ws/install/get_positions:/home/hydran00/shelfino_ws/install/dubins_planner:/opt/ros/humble')]), 'shell': False}
+[1.397031] (dubins_planner) StdoutLine: {'line': b'[ 12%] \x1b[32mBuilding CXX object CMakeFiles/dubins_planner.dir/src/path_planner.cpp.o\x1b[0m\n'}
+[1.397306] (dubins_planner) StdoutLine: {'line': b'[ 12%] \x1b[34m\x1b[1mAutomatic MOC for target CGAL_Qt5_moc_and_resources\x1b[0m\n'}
+[1.401065] (-) TimerEvent: {}
+[1.501393] (-) TimerEvent: {}
+[1.601909] (-) TimerEvent: {}
+[1.702314] (-) TimerEvent: {}
+[1.802796] (-) TimerEvent: {}
+[1.812501] (dubins_planner) StdoutLine: {'line': b'[ 12%] Built target CGAL_Qt5_moc_and_resources_autogen\n'}
+[1.819046] (dubins_planner) StdoutLine: {'line': b'[ 31%] \x1b[34m\x1b[1mGenerating qrc_Input.cpp\x1b[0m\n'}
+[1.819251] (dubins_planner) StdoutLine: {'line': b'[ 31%] \x1b[34m\x1b[1mGenerating qrc_CGAL.cpp\x1b[0m\n'}
+[1.819325] (dubins_planner) StdoutLine: {'line': b'[ 31%] \x1b[34m\x1b[1mGenerating qrc_Triangulation_2.cpp\x1b[0m\n'}
+[1.819901] (dubins_planner) StdoutLine: {'line': b'[ 37%] \x1b[34m\x1b[1mGenerating ui_ImageInterface.h\x1b[0m\n'}
+[1.820260] (dubins_planner) StdoutLine: {'line': b'[ 43%] \x1b[34m\x1b[1mGenerating qrc_File.cpp\x1b[0m\n'}
+[1.841011] (dubins_planner) StdoutLine: {'line': b'[ 50%] \x1b[32mBuilding CXX object CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_Input.cpp.o\x1b[0m\n'}
+[1.841295] (dubins_planner) StdoutLine: {'line': b'[ 56%] \x1b[32mBuilding CXX object CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_CGAL.cpp.o\x1b[0m\n'}
+[1.841376] (dubins_planner) StdoutLine: {'line': b'[ 62%] \x1b[32mBuilding CXX object CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_Triangulation_2.cpp.o\x1b[0m\n'}
+[1.842685] (dubins_planner) StdoutLine: {'line': b'[ 68%] \x1b[32mBuilding CXX object CMakeFiles/CGAL_Qt5_moc_and_resources.dir/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp.o\x1b[0m\n'}
+[1.844494] (dubins_planner) StdoutLine: {'line': b'[ 75%] \x1b[32mBuilding CXX object CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_File.cpp.o\x1b[0m\n'}
+[1.902911] (-) TimerEvent: {}
+[2.003233] (-) TimerEvent: {}
+[2.103501] (-) TimerEvent: {}
+[2.203765] (-) TimerEvent: {}
+[2.304026] (-) TimerEvent: {}
+[2.404294] (-) TimerEvent: {}
+[2.504578] (-) TimerEvent: {}
+[2.604840] (-) TimerEvent: {}
+[2.705122] (-) TimerEvent: {}
+[2.805398] (-) TimerEvent: {}
+[2.905677] (-) TimerEvent: {}
+[3.005953] (-) TimerEvent: {}
+[3.106224] (-) TimerEvent: {}
+[3.206458] (-) TimerEvent: {}
+[3.306723] (-) TimerEvent: {}
+[3.406994] (-) TimerEvent: {}
+[3.507274] (-) TimerEvent: {}
+[3.607544] (-) TimerEvent: {}
+[3.707814] (-) TimerEvent: {}
+[3.808087] (-) TimerEvent: {}
+[3.908364] (-) TimerEvent: {}
+[4.008646] (-) TimerEvent: {}
+[4.108926] (-) TimerEvent: {}
+[4.209207] (-) TimerEvent: {}
+[4.309500] (-) TimerEvent: {}
+[4.409783] (-) TimerEvent: {}
+[4.510026] (-) TimerEvent: {}
+[4.610258] (-) TimerEvent: {}
+[4.710528] (-) TimerEvent: {}
+[4.810759] (-) TimerEvent: {}
+[4.911020] (-) TimerEvent: {}
+[5.011287] (-) TimerEvent: {}
+[5.111556] (-) TimerEvent: {}
+[5.211805] (-) TimerEvent: {}
+[5.312123] (-) TimerEvent: {}
+[5.412357] (-) TimerEvent: {}
+[5.512630] (-) TimerEvent: {}
+[5.612895] (-) TimerEvent: {}
+[5.713119] (-) TimerEvent: {}
+[5.733313] (dubins_planner) StdoutLine: {'line': b'[ 81%] \x1b[32m\x1b[1mLinking CXX static library libCGAL_Qt5_moc_and_resources.a\x1b[0m\n'}
+[5.767395] (dubins_planner) StdoutLine: {'line': b'[ 81%] Built target CGAL_Qt5_moc_and_resources\n'}
+[5.779358] (dubins_planner) StdoutLine: {'line': b'[ 87%] \x1b[32mBuilding CXX object CMakeFiles/rec.dir/src/rec.cpp.o\x1b[0m\n'}
+[5.813225] (-) TimerEvent: {}
+[5.913508] (-) TimerEvent: {}
+[6.013805] (-) TimerEvent: {}
+[6.114084] (-) TimerEvent: {}
+[6.214384] (-) TimerEvent: {}
+[6.314690] (-) TimerEvent: {}
+[6.414951] (-) TimerEvent: {}
+[6.515215] (-) TimerEvent: {}
+[6.615488] (-) TimerEvent: {}
+[6.715758] (-) TimerEvent: {}
+[6.816028] (-) TimerEvent: {}
+[6.916295] (-) TimerEvent: {}
+[7.016616] (-) TimerEvent: {}
+[7.116937] (-) TimerEvent: {}
+[7.217203] (-) TimerEvent: {}
+[7.317462] (-) TimerEvent: {}
+[7.417686] (-) TimerEvent: {}
+[7.517939] (-) TimerEvent: {}
+[7.618160] (-) TimerEvent: {}
+[7.718396] (-) TimerEvent: {}
+[7.818618] (-) TimerEvent: {}
+[7.918854] (-) TimerEvent: {}
+[8.019152] (-) TimerEvent: {}
+[8.082307] (dubins_planner) StdoutLine: {'line': b'[ 93%] \x1b[32m\x1b[1mLinking CXX executable dubins_planner\x1b[0m\n'}
+[8.119268] (-) TimerEvent: {}
+[8.219571] (-) TimerEvent: {}
+[8.319882] (-) TimerEvent: {}
+[8.420195] (-) TimerEvent: {}
+[8.423265] (dubins_planner) StdoutLine: {'line': b'[ 93%] Built target dubins_planner\n'}
+[8.520325] (-) TimerEvent: {}
+[8.620604] (-) TimerEvent: {}
+[8.720871] (-) TimerEvent: {}
+[8.821100] (-) TimerEvent: {}
+[8.921366] (-) TimerEvent: {}
+[9.021635] (-) TimerEvent: {}
+[9.121868] (-) TimerEvent: {}
+[9.222092] (-) TimerEvent: {}
+[9.322349] (-) TimerEvent: {}
+[9.422579] (-) TimerEvent: {}
+[9.522839] (-) TimerEvent: {}
+[9.623108] (-) TimerEvent: {}
+[9.723372] (-) TimerEvent: {}
+[9.823637] (-) TimerEvent: {}
+[9.923900] (-) TimerEvent: {}
+[10.024125] (-) TimerEvent: {}
+[10.124394] (-) TimerEvent: {}
+[10.224657] (-) TimerEvent: {}
+[10.324935] (-) TimerEvent: {}
+[10.425203] (-) TimerEvent: {}
+[10.525475] (-) TimerEvent: {}
+[10.625699] (-) TimerEvent: {}
+[10.725960] (-) TimerEvent: {}
+[10.826230] (-) TimerEvent: {}
+[10.926452] (-) TimerEvent: {}
+[11.026711] (-) TimerEvent: {}
+[11.126982] (-) TimerEvent: {}
+[11.227279] (-) TimerEvent: {}
+[11.327540] (-) TimerEvent: {}
+[11.427801] (-) TimerEvent: {}
+[11.528072] (-) TimerEvent: {}
+[11.628339] (-) TimerEvent: {}
+[11.728609] (-) TimerEvent: {}
+[11.828890] (-) TimerEvent: {}
+[11.929162] (-) TimerEvent: {}
+[12.029437] (-) TimerEvent: {}
+[12.129673] (-) TimerEvent: {}
+[12.229899] (-) TimerEvent: {}
+[12.330127] (-) TimerEvent: {}
+[12.430419] (-) TimerEvent: {}
+[12.530684] (-) TimerEvent: {}
+[12.630932] (-) TimerEvent: {}
+[12.731195] (-) TimerEvent: {}
+[12.831430] (-) TimerEvent: {}
+[12.931690] (-) TimerEvent: {}
+[13.031962] (-) TimerEvent: {}
+[13.132194] (-) TimerEvent: {}
+[13.232450] (-) TimerEvent: {}
+[13.332709] (-) TimerEvent: {}
+[13.432931] (-) TimerEvent: {}
+[13.533188] (-) TimerEvent: {}
+[13.633450] (-) TimerEvent: {}
+[13.733728] (-) TimerEvent: {}
+[13.833956] (-) TimerEvent: {}
+[13.934188] (-) TimerEvent: {}
+[14.034452] (-) TimerEvent: {}
+[14.134683] (-) TimerEvent: {}
+[14.234948] (-) TimerEvent: {}
+[14.335223] (-) TimerEvent: {}
+[14.435493] (-) TimerEvent: {}
+[14.535742] (-) TimerEvent: {}
+[14.635994] (-) TimerEvent: {}
+[14.736242] (-) TimerEvent: {}
+[14.836492] (-) TimerEvent: {}
+[14.936747] (-) TimerEvent: {}
+[15.037009] (-) TimerEvent: {}
+[15.137265] (-) TimerEvent: {}
+[15.237542] (-) TimerEvent: {}
+[15.337767] (-) TimerEvent: {}
+[15.437985] (-) TimerEvent: {}
+[15.538234] (-) TimerEvent: {}
+[15.638454] (-) TimerEvent: {}
+[15.738671] (-) TimerEvent: {}
+[15.838919] (-) TimerEvent: {}
+[15.939138] (-) TimerEvent: {}
+[16.039388] (-) TimerEvent: {}
+[16.139641] (-) TimerEvent: {}
+[16.239897] (-) TimerEvent: {}
+[16.340156] (-) TimerEvent: {}
+[16.440411] (-) TimerEvent: {}
+[16.540667] (-) TimerEvent: {}
+[16.640923] (-) TimerEvent: {}
+[16.741180] (-) TimerEvent: {}
+[16.841440] (-) TimerEvent: {}
+[16.941664] (-) TimerEvent: {}
+[17.041918] (-) TimerEvent: {}
+[17.142144] (-) TimerEvent: {}
+[17.242396] (-) TimerEvent: {}
+[17.342655] (-) TimerEvent: {}
+[17.442876] (-) TimerEvent: {}
+[17.543132] (-) TimerEvent: {}
+[17.643389] (-) TimerEvent: {}
+[17.743646] (-) TimerEvent: {}
+[17.843898] (-) TimerEvent: {}
+[17.944155] (-) TimerEvent: {}
+[18.044412] (-) TimerEvent: {}
+[18.144667] (-) TimerEvent: {}
+[18.244927] (-) TimerEvent: {}
+[18.345188] (-) TimerEvent: {}
+[18.445455] (-) TimerEvent: {}
+[18.545731] (-) TimerEvent: {}
+[18.645991] (-) TimerEvent: {}
+[18.746309] (-) TimerEvent: {}
+[18.846627] (-) TimerEvent: {}
+[18.946953] (-) TimerEvent: {}
+[19.047245] (-) TimerEvent: {}
+[19.147542] (-) TimerEvent: {}
+[19.247839] (-) TimerEvent: {}
+[19.348149] (-) TimerEvent: {}
+[19.448453] (-) TimerEvent: {}
+[19.548751] (-) TimerEvent: {}
+[19.649043] (-) TimerEvent: {}
+[19.749334] (-) TimerEvent: {}
+[19.849637] (-) TimerEvent: {}
+[19.949939] (-) TimerEvent: {}
+[20.050233] (-) TimerEvent: {}
+[20.150525] (-) TimerEvent: {}
+[20.250806] (-) TimerEvent: {}
+[20.351102] (-) TimerEvent: {}
+[20.451354] (-) TimerEvent: {}
+[20.551623] (-) TimerEvent: {}
+[20.651898] (-) TimerEvent: {}
+[20.752170] (-) TimerEvent: {}
+[20.852422] (-) TimerEvent: {}
+[20.952701] (-) TimerEvent: {}
+[21.052979] (-) TimerEvent: {}
+[21.153259] (-) TimerEvent: {}
+[21.253547] (-) TimerEvent: {}
+[21.316179] (dubins_planner) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX executable rec\x1b[0m\n'}
+[21.353678] (-) TimerEvent: {}
+[21.453972] (-) TimerEvent: {}
+[21.554219] (-) TimerEvent: {}
+[21.654479] (-) TimerEvent: {}
+[21.754740] (-) TimerEvent: {}
+[21.855021] (-) TimerEvent: {}
+[21.874886] (dubins_planner) StdoutLine: {'line': b'[100%] Built target rec\n'}
+[21.880706] (dubins_planner) CommandEnded: {'returncode': 0}
+[21.905553] (dubins_planner) JobProgress: {'identifier': 'dubins_planner', 'progress': 'install'}
+[21.910657] (dubins_planner) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner'], 'cwd': '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'en_GB:en'), ('USER', 'hydran00'), ('LC_TIME', 'it_IT.UTF-8'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '0'), ('LD_LIBRARY_PATH', '/home/hydran00/shelfino_ws/install/obstacles_msgs/lib:/home/hydran00/shelfino_ws/install/graph_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/hydran00'), ('OLDPWD', '/home/hydran00/shelfino_ws'), ('DESKTOP_SESSION', 'ubuntu'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('LC_MONETARY', 'it_IT.UTF-8'), ('MANAGERPID', '1399'), ('SYSTEMD_EXEC_PID', '1900'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator23558193cd9818af7fe4d2c2f5bd9d00f'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '2487'), ('COLCON_PREFIX_PATH', '/home/hydran00/shelfino_ws/install'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'hydran00'), ('JOURNAL_STREAM', '8:21165'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'hydran00'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/hydran00:@/tmp/.ICE-unix/1743,unix/hydran00:/tmp/.ICE-unix/1743'), ('INVOCATION_ID', 'e6fcda4dfb2c4145bd1b97cf50fb335b'), ('PAPERSIZE', 'a4'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'it_IT.UTF-8'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':1'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_GB.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('IBUS_DISABLE_SNOOPER', '1'), ('LC_TELEPHONE', 'it_IT.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/hydran00/shelfino_ws/install/shelfino_node:/home/hydran00/shelfino_ws/install/shelfino_navigation:/home/hydran00/shelfino_ws/install/shelfino_gazebo:/home/hydran00/shelfino_ws/install/shelfino_description:/home/hydran00/shelfino_ws/install/send_obstacles:/home/hydran00/shelfino_ws/install/send_gates:/home/hydran00/shelfino_ws/install/send_borders:/home/hydran00/shelfino_ws/install/remote_control:/home/hydran00/shelfino_ws/install/obstacles_msgs:/home/hydran00/shelfino_ws/install/evader:/home/hydran00/shelfino_ws/install/graph_msgs:/home/hydran00/shelfino_ws/install/get_positions:/home/hydran00/shelfino_ws/install/dubins_planner:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'it_IT.UTF-8'), ('TERMINATOR_UUID', 'urn:uuid:41665ad9-91b6-4cf9-9de0-3a184cfa7678'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'it_IT.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('LC_IDENTIFICATION', 'it_IT.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/hydran00/shelfino_ws/install/obstacles_msgs/local/lib/python3.10/dist-packages:/home/hydran00/shelfino_ws/install/graph_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'it_IT.UTF-8'), ('LC_PAPER', 'it_IT.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CMAKE_PREFIX_PATH', '/home/hydran00/shelfino_ws/install/shelfino_node:/home/hydran00/shelfino_ws/install/shelfino_navigation:/home/hydran00/shelfino_ws/install/shelfino_gazebo:/home/hydran00/shelfino_ws/install/shelfino_description:/home/hydran00/shelfino_ws/install/send_obstacles:/home/hydran00/shelfino_ws/install/send_gates:/home/hydran00/shelfino_ws/install/send_borders:/home/hydran00/shelfino_ws/install/remote_control:/home/hydran00/shelfino_ws/install/obstacles_msgs:/home/hydran00/shelfino_ws/install/evader:/home/hydran00/shelfino_ws/install/graph_msgs:/home/hydran00/shelfino_ws/install/get_positions:/home/hydran00/shelfino_ws/install/dubins_planner:/opt/ros/humble')]), 'shell': False}
+[21.915121] (dubins_planner) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[21.915200] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/launch\n'}
+[21.915269] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/launch/dubins.launch.py\n'}
+[21.915457] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/lib/dubins_planner/dubins_planner\n'}
+[21.917927] (dubins_planner) StdoutLine: {'line': b'-- Set runtime path of "/home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/lib/dubins_planner/dubins_planner" to ""\n'}
+[21.917997] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/lib/dubins_planner/rec\n'}
+[21.923968] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/ament_index/resource_index/package_run_dependencies/dubins_planner\n'}
+[21.924083] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/ament_index/resource_index/parent_prefix_path/dubins_planner\n'}
+[21.924158] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/ament_prefix_path.sh\n'}
+[21.924201] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/ament_prefix_path.dsv\n'}
+[21.924249] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/path.sh\n'}
+[21.924330] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/environment/path.dsv\n'}
+[21.924402] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.bash\n'}
+[21.924451] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.sh\n'}
+[21.924511] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.zsh\n'}
+[21.924572] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/local_setup.dsv\n'}
+[21.924632] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/package.dsv\n'}
+[21.924692] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/ament_index/resource_index/packages/dubins_planner\n'}
+[21.924753] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/cmake/dubins_plannerConfig.cmake\n'}
+[21.924814] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/cmake/dubins_plannerConfig-version.cmake\n'}
+[21.924871] (dubins_planner) StdoutLine: {'line': b'-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/dubins_planner/share/dubins_planner/package.xml\n'}
+[21.925909] (dubins_planner) CommandEnded: {'returncode': 0}
+[21.955272] (-) TimerEvent: {}
+[22.027075] (dubins_planner) JobEnded: {'identifier': 'dubins_planner', 'rc': 0}
+[22.027487] (-) EventReactorShutdown: {}

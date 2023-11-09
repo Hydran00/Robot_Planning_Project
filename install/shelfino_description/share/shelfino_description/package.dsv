@@ -1,0 +1,3 @@
+source;share/shelfino_description/hook/cmake_prefix_path.ps1
+source;share/shelfino_description/hook/cmake_prefix_path.dsv
+source;share/shelfino_description/hook/cmake_prefix_path.sh

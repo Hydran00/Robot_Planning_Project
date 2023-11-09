@@ -1,0 +1,10 @@
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/uninstall.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/send_borders_uninstall.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/send_borders.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/test.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/edit_cache.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/rebuild_cache.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/list_install_components.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/install.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/install/local.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders/CMakeFiles/install/strip.dir

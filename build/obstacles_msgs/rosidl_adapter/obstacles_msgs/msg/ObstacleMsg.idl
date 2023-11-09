@@ -1,0 +1,22 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from obstacles_msgs/msg/ObstacleMsg.msg
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/Polygon.idl"
+#include "std_msgs/msg/Header.idl"
+
+module obstacles_msgs {
+  module msg {
+    struct ObstacleMsg {
+      std_msgs::msg::Header header;
+
+      @verbatim (language="comment", text=
+        "Obstacle footprint (polygon descriptions)")
+      geometry_msgs::msg::Polygon polygon;
+
+      @verbatim (language="comment", text=
+        "Specify the radius for circular/point obstacles")
+      double radius;
+    };
+  };
+};

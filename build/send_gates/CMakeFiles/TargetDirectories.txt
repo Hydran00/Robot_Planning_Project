@@ -1,0 +1,10 @@
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/uninstall.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/send_gates_uninstall.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/send_gates.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/test.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/edit_cache.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/rebuild_cache.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/list_install_components.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/install.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/install/local.dir
+/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_gates/CMakeFiles/install/strip.dir

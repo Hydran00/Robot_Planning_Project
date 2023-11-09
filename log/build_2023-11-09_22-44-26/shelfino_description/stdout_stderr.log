@@ -1,0 +1,88 @@
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_description
+-- Install configuration: ""
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/launch
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/launch/rviz.launch.py
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/launch/robot_state_publisher.launch.py
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.sdf.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.urdf.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.sdf_REMOTE_40005.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.sdf_BACKUP_40005.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.sdf_BASE_40005.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.config
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.sdf_LOCAL_39892.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.sdf_REMOTE_39892.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.sdf_BACKUP_39892.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.sdf_BASE_39892.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/shelfino/model.sdf_LOCAL_40005.xacro
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/lidar2d
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/lidar2d/meshes
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/lidar2d/meshes/hokuyo.dae
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/lidar2d/meshes/hokuyo_convex.stl
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/lidar2d/model.config
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/lidar2d/model.sdf
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/povoBricks.dae
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/povo_s.dae
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/wall_s.png
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/povo.dae.bak
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/goods
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/goods/povoBricks.dae
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/goods/wall_s.png
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/goods/wall.jpg
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/goods/povo.dae
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/povo.dae.last_valid
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/wall.jpg
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/povo.dae
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/wall.png.last_valid
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/meshes/povo.dae.old
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/model.config
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/model.sdf
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/materials
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/materials/textures
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/materials/textures/wall.png
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/materials/textures/wall.jpg
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/materials/scripts
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/povo/materials/scripts/povo.material
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/hexagon_world
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/hexagon_world/meshes
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/hexagon_world/meshes/wall.dae
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/hexagon_world/meshes/hexagon.dae
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/hexagon_world/model-1_4.sdf
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/hexagon_world/model.config
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/models/hexagon_world/model.sdf
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/rviz
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/rviz/shelfino.rviz
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/ament_index/resource_index/package_run_dependencies/shelfino_description
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/ament_index/resource_index/parent_prefix_path/shelfino_description
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/environment/ament_prefix_path.sh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/environment/ament_prefix_path.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/environment/path.sh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/environment/path.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/local_setup.bash
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/local_setup.sh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/local_setup.zsh
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/local_setup.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/package.dsv
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/ament_index/resource_index/packages/shelfino_description
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/cmake/shelfino_descriptionConfig.cmake
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/cmake/shelfino_descriptionConfig-version.cmake
+-- Installing: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_description/share/shelfino_description/package.xml

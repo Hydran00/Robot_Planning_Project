@@ -1,0 +1,41 @@
+[0.264s] Invoking command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/hydran00/shelfino_ws/src/Robot_Planning_Project/send_borders -DCMAKE_INSTALL_PREFIX=/home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/send_borders
+[0.318s] -- The C compiler identification is GNU 11.4.0
+[0.385s] -- The CXX compiler identification is GNU 11.4.0
+[0.391s] -- Detecting C compiler ABI info
+[0.465s] -- Detecting C compiler ABI info - done
+[0.471s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.471s] -- Detecting C compile features
+[0.471s] -- Detecting C compile features - done
+[0.472s] -- Detecting CXX compiler ABI info
+[0.556s] -- Detecting CXX compiler ABI info - done
+[0.563s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.564s] -- Detecting CXX compile features
+[0.565s] -- Detecting CXX compile features - done
+[0.585s] -- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.790s] -- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+[0.905s] -- Found rclcpp: 16.0.6 (/opt/ros/humble/share/rclcpp/cmake)
+[0.953s] -- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.958s] -- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.968s] -- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.984s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.014s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.084s] -- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[1.086s] -- Found rmw_fastrtps_cpp: 6.2.4 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[1.158s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[1.187s] -- Found FastRTPS: /opt/ros/humble/include  
+[1.238s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[1.254s] -- Looking for pthread.h
+[1.321s] -- Looking for pthread.h - found
+[1.321s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[1.383s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[1.384s] -- Found Threads: TRUE  
+[1.491s] -- Found geometry_msgs: 4.2.3 (/opt/ros/humble/share/geometry_msgs/cmake)
+[1.586s] -- Configuring done
+[1.591s] -- Generating done
+[1.592s] -- Build files have been written to: /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders
+[1.604s] Invoked command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/hydran00/shelfino_ws/src/Robot_Planning_Project/send_borders -DCMAKE_INSTALL_PREFIX=/home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/send_borders
+[1.610s] Invoking command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/send_borders -- -j12 -l12
+[1.653s] [ 50%] [32mBuilding CXX object CMakeFiles/send_borders.dir/src/send_borders.cpp.o[0m
+[1.928s] gmake[2]: *** [CMakeFiles/send_borders.dir/build.make:76: CMakeFiles/send_borders.dir/src/send_borders.cpp.o] Interrupt
+[1.928s] gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/send_borders.dir/all] Interrupt
+[1.928s] gmake: *** [Makefile:146: all] Interrupt

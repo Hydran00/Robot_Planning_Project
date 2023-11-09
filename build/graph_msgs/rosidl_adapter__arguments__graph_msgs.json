@@ -1,0 +1,7 @@
+{
+  "package_name": "graph_msgs",
+  "non_idl_tuples": [
+    "/home/hydran00/shelfino_ws/src/Robot_Planning_Project/graph_msgs:msg/Edges.msg",
+    "/home/hydran00/shelfino_ws/src/Robot_Planning_Project/graph_msgs:msg/GeometryGraph.msg"
+  ]
+}

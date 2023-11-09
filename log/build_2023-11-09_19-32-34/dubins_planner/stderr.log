@@ -1,0 +1,19 @@
+[33mCMake Warning (dev) at CMakeLists.txt:10:
+  Syntax Warning in cmake code at column 23
+
+  Argument not separated from preceding token by whitespace.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+[0m
+[0mData dir is /home/hydran00/shelfino_ws/src/Robot_Planning_Project/dubins_planner/../data/[0m
+[33mCMake Warning (dev) at CMakeLists.txt:23 (find_package):
+  Policy CMP0074 is not set: find_package uses <PackageName>_ROOT variables.
+  Run "cmake --help-policy CMP0074" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+
+  CMake variable CGAL_ROOT is set to:
+
+    /usr
+
+  For compatibility, CMake is ignoring the variable.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+[0m

@@ -1,0 +1,36 @@
+[0.046s] Invoking command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner -- -j12 -l12
+[0.060s] -- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.148s] -- Found rclcpp: 16.0.6 (/opt/ros/humble/share/rclcpp/cmake)
+[0.164s] -- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.166s] -- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.169s] -- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.175s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.184s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.216s] -- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.217s] -- Found rmw_fastrtps_cpp: 6.2.4 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.285s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.374s] -- Found rclpy: 3.3.10 (/opt/ros/humble/share/rclpy/cmake)
+[0.374s] -- Found nav_msgs: 4.2.3 (/opt/ros/humble/share/nav_msgs/cmake)
+[0.452s] -- Found nav2_msgs: 1.1.12 (/opt/ros/humble/share/nav2_msgs/cmake)
+[0.568s] -- Found tf2: 0.25.4 (/opt/ros/humble/share/tf2/cmake)
+[0.573s] -- Found tf2_ros: 0.25.4 (/opt/ros/humble/share/tf2_ros/cmake)
+[0.721s] -- Using header-only CGAL
+[0.722s] -- Targetting Unix Makefiles
+[0.722s] -- Using /usr/bin/c++ compiler.
+[0.726s] -- Boost include dirs: /usr/include
+[0.726s] -- Boost libraries:    
+[0.726s] -- Using gcc version 4 or later. Adding -frounding-math
+[0.728s] -- Using header-only CGAL
+[0.777s] [31mCMake Error at /opt/ros/humble/share/ament_cmake_python/cmake/ament_python_install_package.cmake:66 (message):
+[0.777s]   ament_python_install_package() the Python package folder
+[0.777s]   '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/dubins_planner/dubins_planner'
+[0.777s]   doesn't contain an '__init__.py' file
+[0.777s] Call Stack (most recent call first):
+[0.777s]   /opt/ros/humble/share/ament_cmake_python/cmake/ament_python_install_package.cmake:39 (_ament_cmake_python_install_package)
+[0.777s]   CMakeLists.txt:62 (ament_python_install_package)
+[0.777s] 
+[0.778s] [0m
+[0.778s] -- Configuring incomplete, errors occurred!
+[0.778s] See also "/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner/CMakeFiles/CMakeOutput.log".
+[0.783s] gmake: *** [Makefile:471: cmake_check_build_system] Error 1
+[0.784s] Invoked command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/dubins_planner -- -j12 -l12

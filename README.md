@@ -13,6 +13,38 @@ Both a bringup node for the physical robot and a simulation of the robot itself 
 
 <br/><br/>
 
+## Install depdencies  
+```
+pip install shapely
+sudo apt-get install libcgal-dev libcgal-qt5-dev
+```
+## Compile the source code
+```
+cd $HOME
+mkdir shelfino_ws
+cd shelfino_ws
+mkdir src
+cd $HOME/shelfino_ws/src
+git clone https://github.com/Hydran00/Robot_Planning_Project.git
+cd $HOME/shelfino_ws
+colcon build
+```
+
+## Run
+```
+ros2 launch shelfino_gazebo shelfino.launch.py
+```
+```
+ros2 launch shelfino_navigation shelfino_nav.launch.py
+```
+```
+ros2 launch dubins_planner dubins_planner
+```
+## Planning
+Create a Voronoi diagram for collision-free best waypoints
+```
+ros2 run dubins_planner rec
+```
 
 ## Shelfino ROS2 topics
 
@@ -43,3 +75,5 @@ You can pull the docker image containing all the ROS2 nodes of this project with
 ## Complete documentation
 
 Check the [complete documentation](https://pla10.github.io/Shelfino_ROS2) of this repository.
+
+MULTIPOLYGON (((0 0, 6 0, 6 6, 0 6, 0 0),(4.2 0.5, 4.2 2, 5.4 0.2, 4.2 0.5),(1.2 1.2, 1.2 3, 3.2 4.5, 1.2 1.2),(4.2 3.2, 5.8 4, 4.5 5, 4.2 3.2)))
