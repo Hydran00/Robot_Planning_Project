@@ -1,1 +1,0 @@
-Invoking command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_node': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/hydran00/shelfino_ws/src/Robot_Planning_Project/shelfino_node -DCMAKE_INSTALL_PREFIX=/home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/shelfino_node

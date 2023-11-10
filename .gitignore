@@ -2,3 +2,6 @@
 .vscode
 docs
 rope_planning
+build
+install
+log

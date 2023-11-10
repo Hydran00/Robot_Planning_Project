@@ -1,9 +1,0 @@
-/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_navigation/CMakeFiles/uninstall.dir
-/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_navigation/CMakeFiles/shelfino_navigation_uninstall.dir
-/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_navigation/CMakeFiles/test.dir
-/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_navigation/CMakeFiles/edit_cache.dir
-/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_navigation/CMakeFiles/rebuild_cache.dir
-/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_navigation/CMakeFiles/list_install_components.dir
-/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_navigation/CMakeFiles/install.dir
-/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_navigation/CMakeFiles/install/local.dir
-/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/shelfino_navigation/CMakeFiles/install/strip.dir

@@ -1,7 +1,0 @@
-{
-  "package_name": "obstacles_msgs",
-  "non_idl_tuples": [
-    "/home/hydran00/shelfino_ws/src/Robot_Planning_Project/obstacles_msgs:msg/ObstacleMsg.msg",
-    "/home/hydran00/shelfino_ws/src/Robot_Planning_Project/obstacles_msgs:msg/ObstacleArrayMsg.msg"
-  ]
-}

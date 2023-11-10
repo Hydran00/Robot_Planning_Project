@@ -1,1 +1,0 @@
-Invoking command in '/home/hydran00/shelfino_ws/src/Robot_Planning_Project/build/graph_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/hydran00/shelfino_ws/src/Robot_Planning_Project/graph_msgs -DCMAKE_INSTALL_PREFIX=/home/hydran00/shelfino_ws/src/Robot_Planning_Project/install/graph_msgs

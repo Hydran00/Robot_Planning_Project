@@ -1,6 +1,0 @@
-setup.py
-dubins_planner/__init__.py
-dubins_planner.egg-info/PKG-INFO
-dubins_planner.egg-info/SOURCES.txt
-dubins_planner.egg-info/dependency_links.txt
-dubins_planner.egg-info/top_level.txt

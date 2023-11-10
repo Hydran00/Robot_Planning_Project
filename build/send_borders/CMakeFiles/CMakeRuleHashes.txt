@@ -1,2 +1,0 @@
-# Hashes of file build rules.
-bce75f404f3da8b4231c58a5a836b3f4 CMakeFiles/send_borders_uninstall

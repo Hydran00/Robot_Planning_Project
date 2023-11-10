@@ -1,4 +1,0 @@
-source;share/send_gates/local_setup.bash
-source;share/send_gates/local_setup.dsv
-source;share/send_gates/local_setup.sh
-source;share/send_gates/local_setup.zsh
