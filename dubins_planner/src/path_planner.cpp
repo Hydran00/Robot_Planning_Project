@@ -17,6 +17,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 
 #include "geometry_msgs/msg/transform_stamped.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "tf2/exceptions.h"
 #include "tf2_ros/transform_listener.h"
@@ -35,14 +36,23 @@ public:
     {
         const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_sensor_data);
 
-        subscription_ = this->create_subscription<geometry_msgs::msg::TransformStamped>(
+        subscription_1 = this->create_subscription<geometry_msgs::msg::TransformStamped>(
             "transform", qos, std::bind(&PathPublisher::handle_transform, this, std::placeholders::_1));
-
+        subscription_2 = this->create_subscription<geometry_msgs::msg::PoseArray>(
+            "waypoints", qos, std::bind(&PathPublisher::store_waypoints, this, std::placeholders::_1));
         publisher_ = this->create_publisher<nav_msgs::msg::Path>("plan", 10);
         RCLCPP_INFO(this->get_logger(), "Node started");
     }
 
 private:
+    void store_waypoints(const std::shared_ptr<geometry_msgs::msg::PoseArray> msg)
+    {
+        for (int i=0; i<msg->poses.size(); i++)
+        {
+            waypoints.poses[i] = msg->poses[i];
+        }
+
+    }
     void handle_transform(const std::shared_ptr<geometry_msgs::msg::TransformStamped> msg)
     {
         t = *msg;
@@ -223,7 +233,10 @@ private:
     bool data_sent = false;
     geometry_msgs::msg::TransformStamped t;
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr publisher_;
-    rclcpp::Subscription<geometry_msgs::msg::TransformStamped>::SharedPtr subscription_;
+    rclcpp::Subscription<geometry_msgs::msg::TransformStamped>::SharedPtr subscription_1;
+    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_2;
+    geometry_msgs::msg::PoseArray waypoints;
+
 };
 
 int main(int argc, char *argv[])
