@@ -21,6 +21,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(CGAL REQUIRED)
 find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt5)
+find_package(ament_index_cpp)
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -40,8 +41,11 @@ ament_target_dependencies(dubins_planner
   rclcpp_components
   rclcpp_action
 )
-
 add_executable(rec src/rec.cpp)
+  ament_target_dependencies(rec
+  rclcpp
+  ament_index_cpp
+)
 #link it with the required CGAL libraries
 
 target_link_libraries(rec CGAL::CGAL CGAL::CGAL_Basic_viewer)
@@ -53,6 +57,12 @@ install(DIRECTORY
 install(DIRECTORY 
     scripts
     DESTINATION share/${PROJECT_NAME})
+
+# send data to share directory
+install(DIRECTORY 
+  data
+  DESTINATION share/${PROJECT_NAME})
+  
 install(TARGETS
   dubins_planner
   rec

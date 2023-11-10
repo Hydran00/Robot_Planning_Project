@@ -20,6 +20,8 @@
 #include <stdexcept>
 #include <unordered_set>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
 typedef CGAL::Exact_predicates_exact_constructions_kernel K;
 typedef CGAL::Segment_Delaunay_graph_traits_2<K> Gt;
 typedef CGAL::Segment_Delaunay_graph_2<Gt> SDG2;
@@ -50,7 +52,7 @@ typedef std::deque<Polygon> MultiPolygon;
 //     return seed;
 //   }
 // };
-const std::string input_file = "/home/hydran00/shelfino_ws/src/Robot_Planning_Project/dubins_planner/data/multipolygon_data.txt";
+const std::string input_file = ament_index_cpp::get_package_share_directory("dubins_planner")+"/data/multipolygon_data.txt";
 typedef std::set<Point_2> Point2_Set;
 typedef std::map<Vertex_handle, int> VH_Int_Map;
 
@@ -410,8 +412,8 @@ int main()
     // draw_voronoi_diagram(voronoi);
     //  CGAL::draw(voronoi);
     //  constrains each edge of the Voronoi diagram
-    std::ofstream fout1("/home/hydran00/shelfino_ws/src/Robot_Planning_Project/dubins_planner/data/voronoi_points.csv");
-    std::ofstream fout2("/home/hydran00/shelfino_ws/src/Robot_Planning_Project/dubins_planner/data/voronoi_edges.csv");
+    std::ofstream fout1(ament_index_cpp::get_package_share_directory("dubins_planner")+"/data/voronoi_points.csv");
+    std::ofstream fout2(ament_index_cpp::get_package_share_directory("dubins_planner")+"/data/voronoi_edges.csv");
     fout1 << "x1,y1,x2,y2" << std::endl;
     fout2 << "SourceIdx,TargetIdx" << std::endl;
 
