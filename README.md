@@ -19,7 +19,7 @@ Both a bringup node for the physical robot and a simulation of the robot itself 
 
 ## Install depdencies  
 ```
-pip install shapely
+pip install shapely networkx
 sudo apt-get install libcgal-dev libcgal-qt5-dev
 ```
 ## Compile the source code

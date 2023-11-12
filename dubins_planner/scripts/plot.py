@@ -11,6 +11,7 @@ from geometry_msgs.msg import Pose,PoseArray
 from ament_index_python.packages import get_package_share_directory
 import networkx as nx
 import random as rand
+import time as tm
 share_dir_path = get_package_share_directory('dubins_planner')
 
 VORONOI_DATA_PATH = share_dir_path+"/data/boost_voronoi_edges.csv"
@@ -19,10 +20,11 @@ MAP_DATA_PATH = share_dir_path+"/data/polygon.txt"
 class WaypointsPublisher(Node):
     def __init__(self):
         super().__init__('waypoint_publisher')
-        self.publisher_ = self.create_publisher(
-            PoseArray, 'shelfinoG/waypoints', 10)
+        self.publisher_ = self.create_publisher(PoseArray, 'voronoi_waypoints', 10)
+        # sleep 1 sec
         
-        print("Node started")
+        self.get_logger().info('Node started')
+
 
     def create_graph(self, x1, y1, x2, y2):
         G = nx.Graph()
@@ -35,7 +37,7 @@ class WaypointsPublisher(Node):
         self.G = G
         print("Voronoi graph created with the following nodes:\n",list(G.nodes))
 
-        self.shortest_path = nx.shortest_path(self.G, source=list(G.nodes)[0], target=list(G.nodes)[6])
+        self.shortest_path = list(nx.shortest_path(self.G, source=list(G.nodes)[0], target=list(G.nodes)[6]))
         print("#####################################")
         print("Shortest path: \n", self.shortest_path)
 
@@ -76,19 +78,25 @@ class WaypointsPublisher(Node):
         self.get_data()
         # Since x2[i],y2[i] = x1[i+1],y1[i+1] we can use just x1,y1
         msg_array = PoseArray()
-        for i in range(len(self.x1)):
+        msg_array.header.frame_id = "map"
+        msg_array.header.stamp = self.get_clock().now().to_msg()
+        for i in range(len(self.shortest_path)):
+            print("Waypoint ", i, ": (", self.shortest_path[i][0]," - ",self.shortest_path[i][1],")")
             msg = Pose()
-            msg.position.x = self.x1[i]
-            msg.position.y = self.y1[i]
+            msg.position.x = 0.0 #self.shortest_path[i][0]
+            msg.position.y = 0.0#self.shortest_path[i][1]
             msg.position.z = 0.0
             msg.orientation.w = 1.0
             msg.orientation.x = 0.0
             msg.orientation.y = 0.0
             msg.orientation.z = 0.0
-            # Add the message to the array
             msg_array.poses.append(msg)
+            # Add the message to the array
         # Publish the array
-        self.publisher_.publish(msg_array) 
+        print("Publishing msg ",msg_array)
+        for i in range(10):
+            self.publisher_.publish(msg_array)
+            tm.sleep(0.1)
         exit()
 
 

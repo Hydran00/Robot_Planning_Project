@@ -48,23 +48,30 @@ public:
         subscription_1 = this->create_subscription<geometry_msgs::msg::TransformStamped>(
             "transform", qos, std::bind(&PathPublisher::store_current_transform, this, std::placeholders::_1));
         subscription_2 = this->create_subscription<geometry_msgs::msg::PoseArray>(
-            "waypoints", qos, std::bind(&PathPublisher::store_waypoints, this, std::placeholders::_1));
+            "voronoi_waypoints", qos, std::bind(&PathPublisher::plan_dubins, this, std::placeholders::_1));
 
         publisher_ = this->create_publisher<nav_msgs::msg::Path>("plan", 10);
 
-        rclcpp_action::Client<FollowPath>::SharedPtr client_ptr_;
-        client_ptr_ = rclcpp_action::create_client<FollowPath>(this, "/shelfinoG/follow_path");
+        client_ptr_ = rclcpp_action::create_client<FollowPath>(this, "follow_path");
 
         RCLCPP_INFO(this->get_logger(), "Node started");
     }
 
 private:
-    void store_waypoints(const std::shared_ptr<geometry_msgs::msg::PoseArray> msg)
+    void store_waypoints(const geometry_msgs::msg::PoseArray::SharedPtr msg)
     {
+        geometry_msgs::msg::Pose pose;
         for (int i = 0; i < msg->poses.size(); i++)
         {
-            waypoints.poses[i] = msg->poses[i];
+            pose.position.x = msg->poses[i].position.x;
+            pose.position.y = msg->poses[i].position.y;
+            pose.orientation.x = msg->poses[i].orientation.x;
+            pose.orientation.y = msg->poses[i].orientation.y;
+            pose.orientation.z = msg->poses[i].orientation.z;
+            pose.orientation.w = msg->poses[i].orientation.w;
+            waypoints.poses.push_back(pose);
         }
+        RCLCPP_INFO(this->get_logger(), "Waypoints stored");
         return;
     }
 
@@ -78,33 +85,30 @@ private:
         m.getRPY(roll, pitch, yaw);
         robot_pose.theta = (float)yaw;
         robot_pose.is_updated = true;
+        // RCLCPP_INFO(this->get_logger(), "Current position stored");
         return;
     }
 
-    void plan_dubins()
+    void plan_dubins(const geometry_msgs::msg::PoseArray::SharedPtr msg)
     {
+        RCLCPP_INFO(this->get_logger(), "msg received");
+
         if (!robot_pose.is_updated)
         {
             RCLCPP_INFO(this->get_logger(), "Cannot plan: Robot position unknown");
             return;
         }
+        store_waypoints(msg);
 
-        // std::cout << "x: " << t.transform.translation.x << std::endl;
-        // std::cout << "y: " << t.transform.translation.y << std::endl;
-
-        // tf2::Quaternion q(t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w);
-        // tf2::Matrix3x3 m(q);
-        // double roll, pitch, yaw;
-        // m.getRPY(roll, pitch, yaw);
         for (int i = 0; i < waypoints.poses.size(); i++)
         {
-            geometry_msgs::msg::Pose current_target = waypoints.poses[i]
+            geometry_msgs::msg::Pose current_target = waypoints.poses[i];
 
             RCLCPP_INFO(this->get_logger(), "Going from x: %f, y: %f, theta: %f to x: %f, y: %f, theta: %f ",
-                        robot_pose.x, robot_pose.y, robot_pose.theta, current_target.x, current_target.y, 0.0);
+                        robot_pose.x, robot_pose.y, robot_pose.theta, current_target.position.x, current_target.position.y, 0.0);
             Dubins_curve curve;
             float Kmax = 3.0;
-            curve = dubins_shortest_path(robot_pose.x, robot_pose.y, robot_pose.theta,current_target.x, current_target.y, 0, Kmax);
+            curve = dubins_shortest_path(robot_pose.x, robot_pose.y, robot_pose.theta, current_target.position.x, current_target.position.y, 0, Kmax);
             nav_msgs::msg::Path path_msg = plot_dubins(curve);
 
             std::vector<geometry_msgs::msg::PoseStamped> poses_temp;
@@ -132,6 +136,7 @@ private:
             client_ptr_->async_send_goal(goal_msg);
             sleep(0.5);
             client_ptr_->async_send_goal(goal_msg);
+            sleep(10);
         }
         return;
     }
@@ -258,6 +263,8 @@ private:
     rclcpp::Subscription<geometry_msgs::msg::TransformStamped>::SharedPtr subscription_1;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_2;
     geometry_msgs::msg::PoseArray waypoints;
+    rclcpp_action::Client<FollowPath>::SharedPtr client_ptr_;
+
     RobotPosition robot_pose;
 };
 
