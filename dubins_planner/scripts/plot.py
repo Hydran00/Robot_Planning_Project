@@ -12,8 +12,9 @@ from ament_index_python.packages import get_package_share_directory
 import networkx as nx
 import random as rand
 share_dir_path = get_package_share_directory('dubins_planner')
-print(share_dir_path)
 
+VORONOI_DATA_PATH = share_dir_path+"/data/boost_voronoi_edges.csv"
+MAP_DATA_PATH = share_dir_path+"/data/polygon.txt"
 
 class WaypointsPublisher(Node):
     def __init__(self):
@@ -32,29 +33,27 @@ class WaypointsPublisher(Node):
             G.add_edge((x1[i], y1[i]), (x2[i], y2[i]))
             G[(x1[i], y1[i])][(x2[i], y2[i])]['weight'] = np.sqrt((x1[i]-x2[i])**2+(y1[i]-y2[i])**2)
         self.G = G
-        print("Graph created")
-        print(G.nodes)
-        print()
-        self.shortest_path = nx.shortest_path(self.G, source=(0.702944, 0.702944), target=(3.04058, 2.0))
-        print("Shortest path: ", self.shortest_path)
+        print("Voronoi graph created with the following nodes:\n",list(G.nodes))
+
+        self.shortest_path = nx.shortest_path(self.G, source=list(G.nodes)[0], target=list(G.nodes)[6])
+        print("#####################################")
+        print("Shortest path: \n", self.shortest_path)
 
 
     def get_data(self):
-        pts = np.loadtxt(
-            share_dir_path+"/data/boost_voronoi_edges.csv", skiprows=1, delimiter=',')
+        pts = np.loadtxt(VORONOI_DATA_PATH, skiprows=1, delimiter=',')
         # first point of each edge
         self.x1 = pts[:, 0]
         self.y1 = pts[:, 1]
         # second point of each edge
         self.x2 = pts[:, 2]
         self.y2 = pts[:, 3]
-        # self.create_graph(self.x1, self.y1, self.x2, self.y2)
+        self.create_graph(self.x1, self.y1, self.x2, self.y2)
+        self.plot()
 
     def plot(self):
-        self.get_data()
         _, ax = plt.subplots()
-        geom = wkt.loads(
-            open(share_dir_path+"/data/polygon.txt").read())
+        geom = wkt.loads(open(MAP_DATA_PATH).read())
         # for geom in fig.geoms:
             # plot the exterior polygons
         xs, ys = geom.exterior.xy
@@ -69,7 +68,7 @@ class WaypointsPublisher(Node):
         # ax.plot(0, 0, 'ro')
 
         # plot shortest path
-        # plt.plot([x[0] for x in self.shortest_path], [x[1] for x in self.shortest_path], '-bo')
+        plt.plot([x[0] for x in self.shortest_path], [x[1] for x in self.shortest_path], '-bo')
         plt.axis('equal')
         plt.show()
 
@@ -97,7 +96,6 @@ def main(args=None):
     rclpy.init(args=args)
 
     node = WaypointsPublisher()
-    node.plot()
     node.publish()
     rclpy.spin(node)
 

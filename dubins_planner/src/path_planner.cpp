@@ -28,6 +28,16 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
 
+using FollowPath = nav2_msgs::action::FollowPath;
+
+typedef struct RobotPosition
+{
+    float x = 0;
+    float y = 0;
+    float theta = 0;
+    bool is_updated = false;
+};
+
 class PathPublisher : public rclcpp::Node
 {
 public:
@@ -35,65 +45,79 @@ public:
         : Node("path_talker")
     {
         const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_sensor_data);
-
         subscription_1 = this->create_subscription<geometry_msgs::msg::TransformStamped>(
-            "transform", qos, std::bind(&PathPublisher::handle_transform, this, std::placeholders::_1));
+            "transform", qos, std::bind(&PathPublisher::store_current_transform, this, std::placeholders::_1));
         subscription_2 = this->create_subscription<geometry_msgs::msg::PoseArray>(
             "waypoints", qos, std::bind(&PathPublisher::store_waypoints, this, std::placeholders::_1));
+
         publisher_ = this->create_publisher<nav_msgs::msg::Path>("plan", 10);
+
+        rclcpp_action::Client<FollowPath>::SharedPtr client_ptr_;
+        client_ptr_ = rclcpp_action::create_client<FollowPath>(this, "/shelfinoG/follow_path");
+
         RCLCPP_INFO(this->get_logger(), "Node started");
     }
 
 private:
     void store_waypoints(const std::shared_ptr<geometry_msgs::msg::PoseArray> msg)
     {
-        for (int i=0; i<msg->poses.size(); i++)
+        for (int i = 0; i < msg->poses.size(); i++)
         {
             waypoints.poses[i] = msg->poses[i];
         }
-
+        return;
     }
-    void handle_transform(const std::shared_ptr<geometry_msgs::msg::TransformStamped> msg)
+
+    void store_current_transform(const std::shared_ptr<geometry_msgs::msg::TransformStamped> msg)
     {
-        t = *msg;
+        robot_pose.x = msg->transform.translation.x;
+        robot_pose.y = msg->transform.translation.y;
+        tf2::Quaternion q(msg->transform.rotation.x, msg->transform.rotation.y, msg->transform.rotation.z, msg->transform.rotation.w);
+        tf2::Matrix3x3 m(q);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
+        robot_pose.theta = (float)yaw;
+        robot_pose.is_updated = true;
+        return;
+    }
 
-        if (!data_sent)
+    void plan_dubins()
+    {
+        if (!robot_pose.is_updated)
         {
-            data_sent = true;
+            RCLCPP_INFO(this->get_logger(), "Cannot plan: Robot position unknown");
+            return;
+        }
 
-            RCLCPP_INFO(this->get_logger(), "x: %f", t.transform.translation.x);
-            RCLCPP_INFO(this->get_logger(), "y: %f", t.transform.translation.y);
+        // std::cout << "x: " << t.transform.translation.x << std::endl;
+        // std::cout << "y: " << t.transform.translation.y << std::endl;
 
-            // std::cout << "x: " << t.transform.translation.x << std::endl;
-            // std::cout << "y: " << t.transform.translation.y << std::endl;
+        // tf2::Quaternion q(t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w);
+        // tf2::Matrix3x3 m(q);
+        // double roll, pitch, yaw;
+        // m.getRPY(roll, pitch, yaw);
+        for (int i = 0; i < waypoints.poses.size(); i++)
+        {
+            geometry_msgs::msg::Pose current_target = waypoints.poses[i]
 
-            tf2::Quaternion q(t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w);
-            tf2::Matrix3x3 m(q);
-            double roll, pitch, yaw;
-            m.getRPY(roll, pitch, yaw);
-
+            RCLCPP_INFO(this->get_logger(), "Going from x: %f, y: %f, theta: %f to x: %f, y: %f, theta: %f ",
+                        robot_pose.x, robot_pose.y, robot_pose.theta, current_target.x, current_target.y, 0.0);
             Dubins_curve curve;
-            curve = dubins_shortest_path(t.transform.translation.x, t.transform.translation.y, yaw, 2, 2, M_PI + M_PI / 4, 3);
+            float Kmax = 3.0;
+            curve = dubins_shortest_path(robot_pose.x, robot_pose.y, robot_pose.theta,current_target.x, current_target.y, 0, Kmax);
             nav_msgs::msg::Path path_msg = plot_dubins(curve);
 
             std::vector<geometry_msgs::msg::PoseStamped> poses_temp;
             path_msg.header.stamp = this->get_clock()->now();
             path_msg.header.frame_id = "map";
 
-            using FollowPath = nav2_msgs::action::FollowPath;
             // using GoalHandleFollowPath = rclcpp_action::ClientGoalHandle<FollowPath>;
-
-            rclcpp_action::Client<FollowPath>::SharedPtr client_ptr_;
-
-            client_ptr_ = rclcpp_action::create_client<FollowPath>(this, "/shelfinoG/follow_path");
-            
 
             if (!client_ptr_->wait_for_action_server())
             {
                 RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");
                 rclcpp::shutdown();
             }
-
 
             publisher_->publish(path_msg);
             sleep(0.5);
@@ -105,16 +129,15 @@ private:
 
             RCLCPP_INFO(this->get_logger(), "Sending goal");
 
-
             client_ptr_->async_send_goal(goal_msg);
             sleep(0.5);
             client_ptr_->async_send_goal(goal_msg);
         }
-
         return;
     }
 
-    Plot_arc_struct plot_arc(Dubins_arc arc)
+    Plot_arc_struct
+    plot_arc(Dubins_arc arc)
     {
 
         float pts[npts + 1][2] = {};
@@ -230,13 +253,12 @@ private:
         return path_msg;
     }
 
-    bool data_sent = false;
     geometry_msgs::msg::TransformStamped t;
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr publisher_;
     rclcpp::Subscription<geometry_msgs::msg::TransformStamped>::SharedPtr subscription_1;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_2;
     geometry_msgs::msg::PoseArray waypoints;
-
+    RobotPosition robot_pose;
 };
 
 int main(int argc, char *argv[])
