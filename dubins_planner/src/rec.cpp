@@ -412,10 +412,10 @@ int main()
     // draw_voronoi_diagram(voronoi);
     //  CGAL::draw(voronoi);
     //  constrains each edge of the Voronoi diagram
-    std::ofstream fout1(ament_index_cpp::get_package_share_directory("dubins_planner")+"/data/voronoi_points.csv");
-    std::ofstream fout2(ament_index_cpp::get_package_share_directory("dubins_planner")+"/data/voronoi_edges.csv");
+    std::ofstream fout1(ament_index_cpp::get_package_share_directory("dubins_planner")+"/data/voronoi_edges.csv");
+    // std::ofstream fout2(ament_index_cpp::get_package_share_directory("dubins_planner")+"/data/voronoi_points.csv");
     fout1 << "x1,y1,x2,y2" << std::endl;
-    fout2 << "SourceIdx,TargetIdx" << std::endl;
+    // fout2 << "SourceIdx,TargetIdx" << std::endl;
 
     for (
         auto edge_iter = voronoi.bounded_halfedges_begin();
@@ -423,9 +423,9 @@ int main()
         edge_iter++)
     {
         // ignore edges connected to holes
-        if (!is_edge_connected_to_hole(edge_iter, mp))
+        if (true)//!is_edge_connected_to_hole(edge_iter, mp))
         {
-            std::cout << "Edge: " << edge_iter->source()->point() << edge_iter->target()->point() << std::endl;
+            std::cout << "Adding Vertex: " << edge_iter->source()->point() << edge_iter->target()->point() << std::endl;
             fout1 << edge_iter->source()->point().x() << "," << edge_iter->source()->point().y() << "," << edge_iter->target()->point().x() << "," << edge_iter->target()->point().y() << std::endl;
         }
     }

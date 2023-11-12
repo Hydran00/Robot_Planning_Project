@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.12)
 project(dubins_planner)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-  add_compile_options(-Wall -Wextra -Wpedantic -Wno-dev)
+  add_compile_options(-Wall -Wextra -Wpedantic -lboost_timer)
 endif()
 set(CMAKE_BUILD_TYPE "Release")
 set(CGAL_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
-
+add_definitions(-w)
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -22,6 +24,7 @@ find_package(rclcpp_action REQUIRED)
 find_package(CGAL REQUIRED)
 find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt5)
 find_package(ament_index_cpp)
+find_package(Boost 1.74)
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -41,14 +44,23 @@ ament_target_dependencies(dubins_planner
   rclcpp_components
   rclcpp_action
 )
-add_executable(rec src/rec.cpp)
-  ament_target_dependencies(rec
+# add_executable(rec src/rec.cpp)
+# ament_target_dependencies(rec
+#   rclcpp
+#   ament_index_cpp
+# )
+
+add_executable(voronoi_boost
+  src/voronoi_boost.cpp
+)
+ament_target_dependencies(voronoi_boost
   rclcpp
   ament_index_cpp
 )
 #link it with the required CGAL libraries
 
-target_link_libraries(rec CGAL::CGAL CGAL::CGAL_Basic_viewer)
+# target_link_libraries(rec CGAL::CGAL CGAL::CGAL_Basic_viewer)
+target_link_libraries(voronoi_boost Boost::headers)
 
 install(DIRECTORY 
   launch
@@ -65,8 +77,10 @@ install(DIRECTORY
   
 install(TARGETS
   dubins_planner
-  rec
+  # rec
+  voronoi_boost
   DESTINATION lib/${PROJECT_NAME})
+
 
 # Install Python modules
 ament_python_install_package(${PROJECT_NAME})

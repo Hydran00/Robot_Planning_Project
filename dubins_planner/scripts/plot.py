@@ -35,41 +35,41 @@ class WaypointsPublisher(Node):
         print("Graph created")
         print(G.nodes)
         print()
-        self.shortest_path = nx.shortest_path(self.G, source=(0.702944, 0.702944), target=(5.87575, 4.09848))
+        self.shortest_path = nx.shortest_path(self.G, source=(0.702944, 0.702944), target=(3.04058, 2.0))
         print("Shortest path: ", self.shortest_path)
 
 
     def get_data(self):
         pts = np.loadtxt(
-            share_dir_path+"/data/voronoi_points.csv", skiprows=1, delimiter=',')
+            share_dir_path+"/data/boost_voronoi_edges.csv", skiprows=1, delimiter=',')
         # first point of each edge
         self.x1 = pts[:, 0]
         self.y1 = pts[:, 1]
         # second point of each edge
         self.x2 = pts[:, 2]
         self.y2 = pts[:, 3]
-        self.create_graph(self.x1, self.y1, self.x2, self.y2)
+        # self.create_graph(self.x1, self.y1, self.x2, self.y2)
 
     def plot(self):
         self.get_data()
         _, ax = plt.subplots()
-        fig = wkt.loads(
-            open(share_dir_path+"/data/multipolygon_data.txt").read())
-        for geom in fig.geoms:
+        geom = wkt.loads(
+            open(share_dir_path+"/data/polygon.txt").read())
+        # for geom in fig.geoms:
             # plot the exterior polygons
-            xs, ys = geom.exterior.xy
-            ax.plot(xs, ys, '-ok', lw=4)
-            for hole in geom.interiors:
-                # plot holes for each polygon
-                xh, yh = hole.xy
-                ax.plot(xh, yh, '-ok', lw=4)
-                # plot the voronoi edges
+        xs, ys = geom.exterior.xy
+        ax.plot(xs, ys, '-ok', lw=4)
+        for hole in geom.interiors:
+            # plot holes for each polygon
+            xh, yh = hole.xy
+            ax.plot(xh, yh, '-ok', lw=4)
+            # plot the voronoi edges
         ax.plot((self.x1, self.x2), (self.y1, self.y2), '-o')
         # ax.plot(self.x1, self.y1, '-o')
         # ax.plot(0, 0, 'ro')
 
         # plot shortest path
-        plt.plot([x[0] for x in self.shortest_path], [x[1] for x in self.shortest_path], '-bo')
+        # plt.plot([x[0] for x in self.shortest_path], [x[1] for x in self.shortest_path], '-bo')
         plt.axis('equal')
         plt.show()
 
