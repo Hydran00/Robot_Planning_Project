@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import math
 import matplotlib.pyplot as plt
 import numpy as np
 from shapely import wkt
@@ -12,10 +13,47 @@ from ament_index_python.packages import get_package_share_directory
 import networkx as nx
 import random as rand
 import time as tm
+import tf2_ros
 share_dir_path = get_package_share_directory('dubins_planner')
 
 VORONOI_DATA_PATH = share_dir_path+"/data/boost_voronoi_edges.csv"
 MAP_DATA_PATH = share_dir_path+"/data/polygon.txt"
+
+def quaternion_from_euler(ai, aj, ak):
+    ai /= 2.0
+    aj /= 2.0
+    ak /= 2.0
+    ci = math.cos(ai)
+    si = math.sin(ai)
+    cj = math.cos(aj)
+    sj = math.sin(aj)
+    ck = math.cos(ak)
+    sk = math.sin(ak)
+    cc = ci*ck
+    cs = ci*sk
+    sc = si*ck
+    ss = si*sk
+
+    q = np.empty((4, ))
+    q[0] = cj*sc - sj*cs
+    q[1] = cj*ss + sj*cc
+    q[2] = cj*cs - sj*sc
+    q[3] = cj*cc + sj*ss
+
+    return q
+
+def compute_yaw_angle(point1, point2):
+    # Calculate the differences in x, y coordinates
+    dx = point2[0] - point1[0]
+    dy = point2[1] - point1[1]
+
+    # Calculate the yaw angle using arctan2
+    yaw_angle = math.atan2(dy, dx)
+
+    # Convert radians to degrees
+    # yaw_angle_deg = math.degrees(yaw_angle)
+
+    return yaw_angle
 
 class WaypointsPublisher(Node):
     def __init__(self):
@@ -72,7 +110,7 @@ class WaypointsPublisher(Node):
         # plot shortest path
         plt.plot([x[0] for x in self.shortest_path], [x[1] for x in self.shortest_path], '-bo')
         plt.axis('equal')
-        plt.show()
+        plt.show(block=False)
 
     def publish(self):
         self.get_data()
@@ -82,21 +120,32 @@ class WaypointsPublisher(Node):
         msg_array.header.stamp = self.get_clock().now().to_msg()
         for i in range(len(self.shortest_path)):
             print("Waypoint ", i, ": (", self.shortest_path[i][0]," - ",self.shortest_path[i][1],")")
+            # compute orintation
+            if(i == len(self.shortest_path)-1):
+                yaw = compute_yaw_angle(self.shortest_path[i-1], self.shortest_path[i])
+            else:
+                yaw = compute_yaw_angle(self.shortest_path[i], self.shortest_path[i+1])
+            quaternion = quaternion_from_euler(0, 0, yaw)
+
+            self.get_logger().info("x: {}, y: {}, yaw: {}".format(self.shortest_path[i][0], self.shortest_path[i][1], yaw))
+            # convert yaw to quaternion
+
             msg = Pose()
-            msg.position.x = 0.0 #self.shortest_path[i][0]
-            msg.position.y = 0.0#self.shortest_path[i][1]
+            msg.position.x = self.shortest_path[i][0]
+            msg.position.y = self.shortest_path[i][1]
             msg.position.z = 0.0
-            msg.orientation.w = 1.0
-            msg.orientation.x = 0.0
-            msg.orientation.y = 0.0
-            msg.orientation.z = 0.0
+            msg.orientation.x = quaternion[0]
+            msg.orientation.y = quaternion[1]
+            msg.orientation.z = quaternion[2]
+            msg.orientation.w = quaternion[3]
             msg_array.poses.append(msg)
             # Add the message to the array
         # Publish the array
         print("Publishing msg ",msg_array)
-        for i in range(10):
+        for i in range(50):
             self.publisher_.publish(msg_array)
             tm.sleep(0.1)
+        plt.show()
         exit()
 
 

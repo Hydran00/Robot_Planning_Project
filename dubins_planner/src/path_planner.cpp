@@ -85,7 +85,7 @@ private:
         m.getRPY(roll, pitch, yaw);
         robot_pose.theta = (float)yaw;
         robot_pose.is_updated = true;
-        // RCLCPP_INFO(this->get_logger(), "Current position stored");
+        RCLCPP_INFO(this->get_logger(), "Current position stored: x: %f, y: %f, yaw: %f", robot_pose.x, robot_pose.y, robot_pose.theta);
         return;
     }
 
@@ -103,12 +103,17 @@ private:
         for (int i = 0; i < waypoints.poses.size(); i++)
         {
             geometry_msgs::msg::Pose current_target = waypoints.poses[i];
+            tf2::Quaternion q(current_target.orientation.x, current_target.orientation.y, current_target.orientation.z, current_target.orientation.w);
+            tf2::Matrix3x3 m(q);
+            double roll, pitch, yaw;
+            m.getRPY(roll, pitch, yaw);
+            robot_pose.theta = (float)yaw;
 
-            RCLCPP_INFO(this->get_logger(), "Going from x: %f, y: %f, theta: %f to x: %f, y: %f, theta: %f ",
-                        robot_pose.x, robot_pose.y, robot_pose.theta, current_target.position.x, current_target.position.y, 0.0);
+            RCLCPP_INFO(this->get_logger(), "Going from x: %f, y: %f, yaw: %f to x: %f, y: %f, yaw: %f ",
+                        robot_pose.x, robot_pose.y, robot_pose.theta, current_target.position.x, current_target.position.y, yaw);
             Dubins_curve curve;
             float Kmax = 3.0;
-            curve = dubins_shortest_path(robot_pose.x, robot_pose.y, robot_pose.theta, current_target.position.x, current_target.position.y, 0, Kmax);
+            curve = dubins_shortest_path(robot_pose.x, robot_pose.y, robot_pose.theta, current_target.position.x, current_target.position.y, yaw, Kmax);
             nav_msgs::msg::Path path_msg = plot_dubins(curve);
 
             std::vector<geometry_msgs::msg::PoseStamped> poses_temp;
@@ -136,7 +141,17 @@ private:
             client_ptr_->async_send_goal(goal_msg);
             sleep(0.5);
             client_ptr_->async_send_goal(goal_msg);
-            sleep(10);
+            double distance = 1;
+            while (distance > 0.1)
+            {
+                distance = sqrt(pow((robot_pose.x - current_target.position.x), 2) +
+                                   pow((robot_pose.y - current_target.position.y), 2) +
+                                   pow((robot_pose.theta - yaw), 2));
+                rclcpp::sleep_for(std::chrono::milliseconds(500));
+                RCLCPP_INFO(this->get_logger(), "Distance: %f", distance);
+                // rclcpp::wait_for_message(this->get_node_base_interface(), subscription_1, std::chrono::milliseconds(100));
+                // rclcpp::spin_some(this->get_node_base_interface());
+            }
         }
         return;
     }
