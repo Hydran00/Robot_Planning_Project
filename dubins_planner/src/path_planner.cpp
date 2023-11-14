@@ -142,7 +142,7 @@ private:
             sleep(0.5);
             client_ptr_->async_send_goal(goal_msg);
             double distance = 1;
-            while (distance > 0.1)
+            while (rclcpp::ok() && distance > 0.1)
             {
                 distance = sqrt(pow((robot_pose.x - current_target.position.x), 2) +
                                    pow((robot_pose.y - current_target.position.y), 2) +
