@@ -56,10 +56,21 @@ public:
 
         RCLCPP_INFO(this->get_logger(), "Node started");
     }
+    geometry_msgs::msg::TransformStamped t;
+    rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr publisher_;
+    rclcpp::Subscription<geometry_msgs::msg::TransformStamped>::SharedPtr subscription_1;
+    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_2;
+    rclcpp_action::Client<FollowPath>::SharedPtr client_ptr_;
+    geometry_msgs::msg::PoseArray waypoints;
+    RobotPosition robot_pose;
+    bool waypoints_received = false;
+    bool already_received = false;
 
-private:
     void store_waypoints(const geometry_msgs::msg::PoseArray::SharedPtr msg)
     {
+        if(already_received){
+            return;
+        } 
         geometry_msgs::msg::Pose pose;
         for (int i = 0; i < msg->poses.size(); i++)
         {
@@ -71,6 +82,8 @@ private:
             pose.orientation.w = msg->poses[i].orientation.w;
             waypoints.poses.push_back(pose);
         }
+        waypoints_received = true;
+        already_received = true;
         RCLCPP_INFO(this->get_logger(), "Waypoints stored");
         return;
     }
@@ -91,7 +104,7 @@ private:
 
     void plan_dubins(const geometry_msgs::msg::PoseArray::SharedPtr msg)
     {
-        RCLCPP_INFO(this->get_logger(), "msg received");
+        // RCLCPP_INFO(this->get_logger(), "msg received");
 
         if (!robot_pose.is_updated)
         {
@@ -100,59 +113,6 @@ private:
         }
         store_waypoints(msg);
 
-        for (int i = 0; i < waypoints.poses.size(); i++)
-        {
-            geometry_msgs::msg::Pose current_target = waypoints.poses[i];
-            tf2::Quaternion q(current_target.orientation.x, current_target.orientation.y, current_target.orientation.z, current_target.orientation.w);
-            tf2::Matrix3x3 m(q);
-            double roll, pitch, yaw;
-            m.getRPY(roll, pitch, yaw);
-            robot_pose.theta = (float)yaw;
-
-            RCLCPP_INFO(this->get_logger(), "Going from x: %f, y: %f, yaw: %f to x: %f, y: %f, yaw: %f ",
-                        robot_pose.x, robot_pose.y, robot_pose.theta, current_target.position.x, current_target.position.y, yaw);
-            Dubins_curve curve;
-            float Kmax = 3.0;
-            curve = dubins_shortest_path(robot_pose.x, robot_pose.y, robot_pose.theta, current_target.position.x, current_target.position.y, yaw, Kmax);
-            nav_msgs::msg::Path path_msg = plot_dubins(curve);
-
-            std::vector<geometry_msgs::msg::PoseStamped> poses_temp;
-            path_msg.header.stamp = this->get_clock()->now();
-            path_msg.header.frame_id = "map";
-
-            // using GoalHandleFollowPath = rclcpp_action::ClientGoalHandle<FollowPath>;
-
-            if (!client_ptr_->wait_for_action_server())
-            {
-                RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");
-                rclcpp::shutdown();
-            }
-
-            publisher_->publish(path_msg);
-            sleep(0.5);
-            publisher_->publish(path_msg);
-
-            auto goal_msg = FollowPath::Goal();
-            goal_msg.path = path_msg;
-            goal_msg.controller_id = "FollowPath";
-
-            RCLCPP_INFO(this->get_logger(), "Sending goal");
-
-            client_ptr_->async_send_goal(goal_msg);
-            sleep(0.5);
-            client_ptr_->async_send_goal(goal_msg);
-            double distance = 1;
-            while (rclcpp::ok() && distance > 0.1)
-            {
-                distance = sqrt(pow((robot_pose.x - current_target.position.x), 2) +
-                                   pow((robot_pose.y - current_target.position.y), 2) +
-                                   pow((robot_pose.theta - yaw), 2));
-                rclcpp::sleep_for(std::chrono::milliseconds(500));
-                RCLCPP_INFO(this->get_logger(), "Distance: %f", distance);
-                // rclcpp::wait_for_message(this->get_node_base_interface(), subscription_1, std::chrono::milliseconds(100));
-                // rclcpp::spin_some(this->get_node_base_interface());
-            }
-        }
         return;
     }
 
@@ -272,21 +232,77 @@ private:
 
         return path_msg;
     }
-
-    geometry_msgs::msg::TransformStamped t;
-    rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr publisher_;
-    rclcpp::Subscription<geometry_msgs::msg::TransformStamped>::SharedPtr subscription_1;
-    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_2;
-    geometry_msgs::msg::PoseArray waypoints;
-    rclcpp_action::Client<FollowPath>::SharedPtr client_ptr_;
-
-    RobotPosition robot_pose;
 };
 
 int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<PathPublisher>());
+    auto node = std::make_shared<PathPublisher>();
+    while (rclcpp::ok())
+    {
+        if (node->waypoints_received)
+        {
+            // if new_m
+            for (int i = 0; i < node->waypoints.poses.size(); i++)
+            {
+                geometry_msgs::msg::Pose current_target = node->waypoints.poses[i];
+                tf2::Quaternion q(current_target.orientation.x, current_target.orientation.y, current_target.orientation.z, current_target.orientation.w);
+                tf2::Matrix3x3 m(q);
+                double roll, pitch, yaw;
+                m.getRPY(roll, pitch, yaw);
+                node->robot_pose.theta = (float)yaw;
+
+                RCLCPP_INFO(node->get_logger(), "Going from x: %f, y: %f, yaw: %f to x: %f, y: %f, yaw: %f ",
+                            node->robot_pose.x, node->robot_pose.y, node->robot_pose.theta, current_target.position.x, current_target.position.y, node->robot_pose.theta);
+                Dubins_curve curve;
+                float Kmax = 3.0;
+                curve = dubins_shortest_path(node->robot_pose.x, node->robot_pose.y, node->robot_pose.theta, current_target.position.x, current_target.position.y, node->robot_pose.theta, Kmax);
+                nav_msgs::msg::Path path_msg = node->plot_dubins(curve);
+
+                std::vector<geometry_msgs::msg::PoseStamped> poses_temp;
+                path_msg.header.stamp = node->get_clock()->now();
+                path_msg.header.frame_id = "map";
+
+                // using GoalHandleFollowPath = rclcpp_action::ClientGoalHandle<FollowPath>;
+
+                if (!node->client_ptr_->wait_for_action_server())
+                {
+                    RCLCPP_ERROR(node->get_logger(), "Action server not available after waiting");
+                    rclcpp::shutdown();
+                }
+
+                node->publisher_->publish(path_msg);
+                sleep(0.5);
+                node->publisher_->publish(path_msg);
+
+                auto goal_msg = FollowPath::Goal();
+                goal_msg.path = path_msg;
+                goal_msg.controller_id = "FollowPath";
+
+                RCLCPP_INFO(node->get_logger(), "Sending goal");
+
+                node->client_ptr_->async_send_goal(goal_msg);
+                sleep(0.5);
+                node->client_ptr_->async_send_goal(goal_msg);
+                double distance = 1;
+                while (rclcpp::ok() && distance > 0.25)
+                {
+                    rclcpp::spin_some(node);
+                    distance = sqrt(pow((node->robot_pose.x - current_target.position.x), 2) +
+                                    pow((node->robot_pose.y - current_target.position.y), 2));
+                                    //pow((node->robot_pose.theta - yaw), 2));
+                    rclcpp::sleep_for(std::chrono::milliseconds(500));
+                    RCLCPP_INFO(node->get_logger(), "Distance: %f", distance);
+                    // rclcpp::wait_for_message(this->get_node_base_interface(), subscription_1, std::chrono::milliseconds(100));
+                    // rclcpp::spin_some(this->get_node_base_interface());
+                }
+                // rclcpp::spin(node);
+            }
+            node->waypoints_received = false;
+        }
+        // RCLCPP_INFO(node->get_logger(), "spin");
+        rclcpp::spin_some(node);
+    }
     rclcpp::shutdown();
     return 0;
 }

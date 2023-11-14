@@ -21,8 +21,6 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_action REQUIRED)
-find_package(CGAL REQUIRED)
-find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt5)
 find_package(ament_index_cpp)
 find_package(Boost 1.74)
 
