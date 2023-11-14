@@ -75,7 +75,7 @@ class WaypointsPublisher(Node):
         self.G = G
         print("Voronoi graph created with the following nodes:\n",list(G.nodes))
 
-        self.shortest_path = list(nx.shortest_path(self.G, source=list(G.nodes)[0], target=list(G.nodes)[6]))
+        self.shortest_path = list(nx.shortest_path(self.G, source=list(G.nodes)[0], target=list(G.nodes)[18]))
         print("#####################################")
         print("Shortest path: \n", self.shortest_path)
 

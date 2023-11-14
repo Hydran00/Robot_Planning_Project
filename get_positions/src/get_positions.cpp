@@ -30,7 +30,9 @@ class PositionListener : public rclcpp::Node
       std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
       publisher_ = this->create_publisher<geometry_msgs::msg::TransformStamped>("shelfinoG/transform", qos);
       timer_ = this->create_wall_timer(
-      500ms, std::bind(&PositionListener::timer_callback, this));
+      50ms, std::bind(&PositionListener::timer_callback, this));
+      RCLCPP_WARN(this->get_logger(), "\033[0;31mmap frame is unknown, start navigation plugin\033[0m");
+
     }
 
   private:
@@ -40,10 +42,10 @@ class PositionListener : public rclcpp::Node
 
       try {
           rclcpp::Time now = this->get_clock()->now();
-          t = tf_buffer_->lookupTransform("map", "shelfinoG/base_link", tf2::TimePointZero, 1s);
+          t = tf_buffer_->lookupTransform("map", "shelfinoG/base_link", tf2::TimePointZero, 50ms);
       } catch (const tf2::TransformException & ex) {
-          RCLCPP_INFO(this->get_logger(), "Could not transform map to base_link: %s", ex.what());
-          // return;
+          // RCLCPP_INFO(this->get_logger(), "Could not transform map to base_link: %s", ex.what());
+          return;
       }
       // RCLCPP_INFO(this->get_logger(), "Publishing");
 
