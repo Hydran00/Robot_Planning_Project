@@ -23,50 +23,46 @@ find_package(rclcpp_action REQUIRED)
 find_package(ament_index_cpp)
 find_package(Boost 1.74)
 
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
-
-# add_executable(planner 
-#   src/path_planner.cpp
-# )
-# ament_target_dependencies(planner 
-#   rclcpp 
-#   std_msgs
-#   nav_msgs
-#   nav2_msgs
-#   geometry_msgs
-#   tf2
-#   tf2_ros
-#   rclcpp_components
-#   rclcpp_action
-# )
 
 add_executable(voronoi_boost
   src/voronoi_boost.cpp
 )
+
+
+# Voronoi Boost
+target_include_directories(voronoi_boost PUBLIC
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+$<INSTALL_INTERFACE:include>)
+
 ament_target_dependencies(voronoi_boost
-  rclcpp
-  ament_index_cpp
+rclcpp
+ament_index_cpp
 )
 target_link_libraries(voronoi_boost Boost::headers)
 
+
+# Planner
+add_executable(planner
+  src/planner.cpp
+)
+ament_target_dependencies(planner
+  rclcpp
+  ament_index_cpp
+)
+target_include_directories(planner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Install 
 install(DIRECTORY 
   launch
   DESTINATION share/${PROJECT_NAME})
-
 install(DIRECTORY 
     scripts
     DESTINATION share/${PROJECT_NAME})
-
-# send data to share directory
 install(DIRECTORY 
   data
-  DESTINATION share/${PROJECT_NAME})
-  
+  DESTINATION share/${PROJECT_NAME})  
 install(TARGETS
-  # planner
-  # rec
+  planner
   voronoi_boost
   DESTINATION lib/${PROJECT_NAME})
 
