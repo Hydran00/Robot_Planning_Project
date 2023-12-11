@@ -94,7 +94,6 @@ public:
     voronoi_diagram<double> voronoi_diagram_;
 
     /// @brief polygon data structure in which we load the WTK string
-
     Polygon polygon_;
     /// @brief create a polygon from a wkt string coming from a txt file
     /// @param filename name of the WTF .txt file to read

@@ -16,6 +16,7 @@ find_package(std_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(nav2_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(obstacles_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(rclcpp_components REQUIRED)
@@ -47,6 +48,8 @@ add_executable(planner
 )
 ament_target_dependencies(planner
   rclcpp
+  obstacles_msgs
+  geometry_msgs
   ament_index_cpp
 )
 target_include_directories(planner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
