@@ -5,7 +5,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
   add_compile_options(-Wall -Wextra -Wpedantic -lboost_timer)
 endif()
 set(CMAKE_BUILD_TYPE "Release")
-add_definitions(-w)
+
+
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
 # find dependencies
@@ -75,6 +76,7 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   scripts/plot.py
+  scripts/map_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -72,7 +72,7 @@ void VoronoiBuilder::save_voronoi(string path)
     for (voronoi_diagram<double>::const_edge_iterator edge = voronoi_diagram_.edges().begin(); edge != voronoi_diagram_.edges().end(); ++edge)
     {
         // if edges are infinite, we do not want to save them
-        if (edge->is_finite() && !is_edge_connected_to_polygon(edge, polygon))
+        if (edge->is_finite() && !is_edge_valid(edge, polygon))
         {
             std::cout << "Adding edge: " << edge->vertex0()->x() << ", " << edge->vertex0()->y() << " - " << edge->vertex1()->x() << ", " << edge->vertex1()->y() << std::endl;
             fout << edge->vertex0()->x() << "," << edge->vertex0()->y() << "," << edge->vertex1()->x() << "," << edge->vertex1()->y() << std::endl;
@@ -100,7 +100,7 @@ void VoronoiBuilder::correct_geometry(Polygon &polygon)
     }
 }
 
-bool VoronoiBuilder::is_edge_connected_to_polygon(voronoi_diagram<double>::const_edge_iterator edge, Polygon &polygon)
+bool VoronoiBuilder::is_edge_valid(voronoi_diagram<double>::const_edge_iterator edge, Polygon &polygon)
 {
     // check the edge ends in a outer polygon's vertex
     for (const auto &point : polygon.outer())
@@ -115,24 +115,29 @@ bool VoronoiBuilder::is_edge_connected_to_polygon(voronoi_diagram<double>::const
         }
     }
     // check the edge ends in a inner polygon's vertex
+    point vertex0 = point(edge->vertex0()->x(), edge->vertex0()->y());
+    point vertex1 = point(edge->vertex1()->x(), edge->vertex1()->y());
     for (const auto &inner_ring : polygon.inners())
     {
+        // Create a polygon object and assign the points to it.
+        if (boost::geometry::within(vertex0, inner_ring) || boost::geometry::within(vertex1, inner_ring))
+        {
+            return true;
+        }
         for (const auto &point : inner_ring)
         {
-            if (edge->vertex0()->x() == point.x() && edge->vertex0()->y() == point.y())
+            if (vertex0.x() == point.x() && vertex0.y() == point.y())
             {
                 return true;
             }
-            if (edge->vertex1()->x() == point.x() && edge->vertex1()->y() == point.y())
+            if (vertex1.x() == point.x() && vertex1.y() == point.y())
             {
                 return true;
             }
         }
     }
-
     return false;
 }
-
 
 int main()
 {

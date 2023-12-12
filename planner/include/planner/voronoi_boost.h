@@ -102,6 +102,7 @@ public:
     /// @brief save the voronoi diagram into a csv file
     /// @param path
 
+
     void save_voronoi(string path);
 
 private:
@@ -110,6 +111,6 @@ private:
     /// @param polygon polygon to correct
     void correct_geometry(Polygon &polygon);
 
-    bool is_edge_connected_to_polygon(voronoi_diagram<double>::const_edge_iterator edge, Polygon &polygon);
+    bool is_edge_valid(voronoi_diagram<double>::const_edge_iterator edge, Polygon &polygon);
 };
 #endif

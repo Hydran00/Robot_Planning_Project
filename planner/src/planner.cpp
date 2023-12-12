@@ -63,11 +63,11 @@ public:
         created_wkt_ = false;
         RCLCPP_INFO(this->get_logger(), "Node started");
     }
-
+ 
 private:
     void obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
     {
-        // RCLCPP_INFO(this->get_logger(), "Obstacles received!");
+        RCLCPP_INFO(this->get_logger(), "Obstacles received!");
         // store obstacles into class member
         this->obstacles_ = std::move(msg);
         this->obstacles_received_ = true;
@@ -78,7 +78,7 @@ private:
     }
     void borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
     {
-        // RCLCPP_INFO(this->get_logger(), "Map borders received!");
+        RCLCPP_INFO(this->get_logger(), "Map borders received!");
         // store borders into class member
         this->borders_ = std::move(msg);
         this->borders_received_ = true;
@@ -89,17 +89,15 @@ private:
     }
     void createWKT()
     {
-        RCLCPP_INFO(this->get_logger(), "Map borders received!");
-        RCLCPP_INFO(this->get_logger(), "Obstacles received!");
-        RCLCPP_INFO(this->get_logger(), "Creating received!");
+        RCLCPP_INFO(this->get_logger(), "Creating WKT!");
 
         std::string wkt = "POLYGON((";
-        // add borders
-        for (int i = 0; i < this->borders_.polygon.points.size(); i++)
+        // add map borders
+        for (int i = 0; i < (int)this->borders_.polygon.points.size(); i++)
         {
             wkt += to_string((int)(this->borders_.polygon.points[i].x * PRECISION)) + " " +
                    to_string((int)(this->borders_.polygon.points[i].y * PRECISION));
-            if (i != this->borders_.polygon.points.size() - 1)
+            if (i != (int)this->borders_.polygon.points.size() - 1)
             {
                 wkt += ", ";
             }
@@ -109,18 +107,18 @@ private:
         wkt += ")";
 
         // add obstacles
-        for (int i = 0; i < this->obstacles_.obstacles.size(); i++)
+        for (int i = 0; i < (int)this->obstacles_.obstacles.size(); i++)
         {
             if (this->obstacles_.obstacles[i].polygon.points.size() <= 1)
             {
                 continue;
             }
             wkt += ", (";
-            for (int j = 0; j < this->obstacles_.obstacles[i].polygon.points.size(); j++)
+            for (int j = 0; j < (int)this->obstacles_.obstacles[i].polygon.points.size(); j++)
             {
                 wkt += to_string((int)(this->obstacles_.obstacles[i].polygon.points[j].x * PRECISION)) + " " +
                        to_string((int)(this->obstacles_.obstacles[i].polygon.points[j].y * PRECISION));
-                if (j != this->obstacles_.obstacles[i].polygon.points.size() - 1)
+                if (j != (int)this->obstacles_.obstacles[i].polygon.points.size() - 1)
                 {
                     wkt += ", ";
                 }
