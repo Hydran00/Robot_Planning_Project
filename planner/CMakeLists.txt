@@ -26,12 +26,12 @@ find_package(ament_index_cpp)
 find_package(Boost 1.74)
 
 
+# Voronoi Boost
 add_executable(voronoi_boost
   src/voronoi_boost.cpp
 )
 
 
-# Voronoi Boost
 target_include_directories(voronoi_boost PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<INSTALL_INTERFACE:include>)
@@ -55,6 +55,16 @@ ament_target_dependencies(planner
 )
 target_include_directories(planner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# RRT_Dubins
+add_executable(RRT_Dubins
+  src/RRT_Dubins.cpp
+)
+ament_target_dependencies(RRT_Dubins
+  rclcpp
+)
+
+
+
 # Install 
 install(DIRECTORY 
   launch
@@ -68,6 +78,7 @@ install(DIRECTORY
 install(TARGETS
   planner
   voronoi_boost
+  RRT_Dubins
   DESTINATION lib/${PROJECT_NAME})
 
 
