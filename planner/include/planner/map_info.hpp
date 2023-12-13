@@ -14,16 +14,16 @@ private:
     enum MarkerID
     {
         _id_boundary = 0,
-        _id_obstacle,
-        _id_start,
-        _id_end,
-        _id_path,
-        _id_openlist,
-        _id_closelist,
-        _id_rand_points,
-        _id_roadmap,
-        _id_rand_point,
-        _id_rrt,
+        _id_obstacle = 1,
+        _id_start = 2,
+        _id_end = 3,
+        _id_path = 4,
+        _id_openlist = 5,
+        _id_closelist = 6,
+        _id_rand_points = 7,
+        _id_roadmap = 8,
+        _id_rand_point = 9,
+        _id_rrt = 10,
     };
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
     double _width, _height;

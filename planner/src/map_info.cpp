@@ -6,16 +6,14 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0)
 }
 
 MapInfo::~MapInfo()
-{
-    // _marker_pub->on_deactivate();
-}
+{}
 
 void MapInfo::set_boundary(int w, int h)
 {
     _width = (double)w;
     _height = (double)h;
 
-    _line_boundary.header.frame_id = "my_frame";
+    _line_boundary.header.frame_id = "map";
     _line_boundary.header.stamp = now();
     _line_boundary.action = visualization_msgs::msg::Marker::ADD;
     _line_boundary.ns = "map";
@@ -47,12 +45,8 @@ void MapInfo::set_boundary(int w, int h)
 
 void MapInfo::set_obstacle(std::vector<KDPoint> &points)
 {
-    std::cout << "e1\n";
-
     _okdtree = KDTree(points);
-    std::cout << "e2\n";
-
-    _obstacle.header.frame_id = "my_frame";
+    _obstacle.header.frame_id = "map";
     _obstacle.header.stamp = now();
     _obstacle.action = visualization_msgs::msg::Marker::ADD;
     _obstacle.ns = "map";
@@ -60,9 +54,8 @@ void MapInfo::set_obstacle(std::vector<KDPoint> &points)
     _obstacle.type = visualization_msgs::msg::Marker::POINTS;
     _obstacle.pose.orientation.w = 1.0;
     _obstacle.scale.x = 1;
+    _obstacle.scale.y = 1;
     _obstacle.color.a = 1.0;
-    std::cout << "e3\n";
-
     _obstacle.points.clear();
     for (auto p : points)
     {
@@ -72,22 +65,21 @@ void MapInfo::set_obstacle(std::vector<KDPoint> &points)
         p_.z = 0;
         _obstacle.points.push_back(p_);
     }
-    std::cout << "e4\n";
-
 }
 
 void MapInfo::set_start(KDPoint &point)
 {
     pt_start.assign(point.begin(), point.end());
 
-    _m_start.header.frame_id = "my_frame";
     _m_start.header.stamp = now();
+    _m_start.header.frame_id = "map";
     _m_start.action = visualization_msgs::msg::Marker::ADD;
     _m_start.ns = "map";
     _m_start.id = _id_start;
     _m_start.type = visualization_msgs::msg::Marker::POINTS;
     _m_start.pose.orientation.w = 1.0;
     _m_start.scale.x = 1.0;
+    _m_start.scale.y = 1.0;
     _m_start.color.g = 1.0;
     _m_start.color.a = 1.0;
 
@@ -95,6 +87,7 @@ void MapInfo::set_start(KDPoint &point)
     p.x = point[0];
     p.y = point[1];
     p.z = 0;
+
     _m_start.points.clear();
     _m_start.points.push_back(p);
 }
@@ -103,14 +96,15 @@ void MapInfo::set_end(KDPoint &point)
 {
     pt_end.assign(point.begin(), point.end());
 
-    _m_end.header.frame_id = "my_frame";
     _m_end.header.stamp = now();
+    _m_end.header.frame_id = "map";
     _m_end.action = visualization_msgs::msg::Marker::ADD;
     _m_end.ns = "map";
     _m_end.id = _id_end;
     _m_end.type = visualization_msgs::msg::Marker::POINTS;
     _m_end.pose.orientation.w = 1.0;
     _m_end.scale.x = 1.0;
+    _m_end.scale.y = 1.0;
     _m_end.color.r = 1.0;
     _m_end.color.a = 1.0;
 
@@ -124,7 +118,7 @@ void MapInfo::set_end(KDPoint &point)
 
 void MapInfo::set_path(std::vector<KDPoint> &path)
 {
-    _m_path.header.frame_id = "my_frame";
+    _m_path.header.frame_id = "map";
     _m_path.header.stamp = now();
     _m_path.action = visualization_msgs::msg::Marker::ADD;
     _m_path.ns = "map";
@@ -132,6 +126,7 @@ void MapInfo::set_path(std::vector<KDPoint> &path)
     _m_path.type = visualization_msgs::msg::Marker::LINE_STRIP;
     _m_path.pose.orientation.w = 1.0;
     _m_path.scale.x = 0.2;
+    _m_path.scale.y = 0.2;
     _m_path.color.r = 1.0;
     _m_path.color.a = 1.0;
 
@@ -149,7 +144,7 @@ void MapInfo::set_path(std::vector<KDPoint> &path)
 
 void MapInfo::set_openlist(std::vector<KDPoint> &points)
 {
-    _m_openlist.header.frame_id = "my_frame";
+    _m_openlist.header.frame_id = "map";
     _m_openlist.header.stamp = now();
     _m_openlist.action = visualization_msgs::msg::Marker::ADD;
     _m_openlist.ns = "map";
@@ -157,6 +152,7 @@ void MapInfo::set_openlist(std::vector<KDPoint> &points)
     _m_openlist.type = visualization_msgs::msg::Marker::POINTS;
     _m_openlist.pose.orientation.w = 1.0;
     _m_openlist.scale.x = 0.3;
+    _m_openlist.scale.y = 0.3;
     _m_openlist.color.b = 0.5;
     _m_openlist.color.g = 0.5;
     _m_openlist.color.a = 1.0;
@@ -178,7 +174,7 @@ void MapInfo::set_openlist(std::vector<KDPoint> &points)
 
 void MapInfo::set_closelist(std::vector<KDPoint> &points)
 {
-    _m_closelist.header.frame_id = "my_frame";
+    _m_closelist.header.frame_id = "map";
     _m_closelist.header.stamp = now();
     _m_closelist.action = visualization_msgs::msg::Marker::ADD;
     _m_closelist.ns = "map";
@@ -186,6 +182,7 @@ void MapInfo::set_closelist(std::vector<KDPoint> &points)
     _m_closelist.type = visualization_msgs::msg::Marker::POINTS;
     _m_closelist.pose.orientation.w = 1.0;
     _m_closelist.scale.x = 0.3;
+    _m_closelist.scale.y = 0.3;
     _m_closelist.color.b = 1.0;
     _m_closelist.color.a = 1.0;
 
@@ -206,7 +203,7 @@ void MapInfo::set_closelist(std::vector<KDPoint> &points)
 
 void MapInfo::set_rand_points(std::vector<KDPoint> &points)
 {
-    _m_rand_points.header.frame_id = "my_frame";
+    _m_rand_points.header.frame_id = "map";
     _m_rand_points.header.stamp = now();
     _m_rand_points.action = visualization_msgs::msg::Marker::ADD;
     _m_rand_points.ns = "map";
@@ -214,6 +211,7 @@ void MapInfo::set_rand_points(std::vector<KDPoint> &points)
     _m_rand_points.type = visualization_msgs::msg::Marker::POINTS;
     _m_rand_points.pose.orientation.w = 1.0;
     _m_rand_points.scale.x = 0.3;
+    _m_rand_points.scale.y = 0.3;
     _m_rand_points.color.b = 0.8;
     _m_rand_points.color.r = 0.8;
     _m_rand_points.color.a = 1.0;
@@ -232,7 +230,7 @@ void MapInfo::set_rand_points(std::vector<KDPoint> &points)
 
 void MapInfo::set_roadmap(std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map)
 {
-    _m_roadmap.header.frame_id = "my_frame";
+    _m_roadmap.header.frame_id = "map";
     _m_roadmap.header.stamp = now();
     _m_roadmap.action = visualization_msgs::msg::Marker::ADD;
     _m_roadmap.ns = "map";
@@ -240,6 +238,7 @@ void MapInfo::set_roadmap(std::vector<std::pair<KDPoint, std::vector<KDPoint>>> 
     _m_roadmap.type = visualization_msgs::msg::Marker::LINE_LIST;
     _m_roadmap.pose.orientation.w = 1.0;
     _m_roadmap.scale.x = 0.1;
+    _m_roadmap.scale.y = 0.1;
     _m_roadmap.color.b = 0.3;
     _m_roadmap.color.r = 0.1;
     _m_roadmap.color.a = 1.0;
@@ -266,7 +265,7 @@ void MapInfo::set_roadmap(std::vector<std::pair<KDPoint, std::vector<KDPoint>>> 
 
 void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
 {
-    _m_rand_point.header.frame_id = "my_frame";
+    _m_rand_point.header.frame_id = "map";
     _m_rand_point.header.stamp = now();
     _m_rand_point.action = visualization_msgs::msg::Marker::ADD;
     _m_rand_point.ns = "map";
@@ -274,6 +273,7 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
     _m_rand_point.type = visualization_msgs::msg::Marker::POINTS;
     _m_rand_point.pose.orientation.w = 1.0;
     _m_rand_point.scale.x = 0.5;
+    _m_rand_point.scale.y = 0.5;
     _m_rand_point.color.b = 1.0;
     _m_rand_point.color.a = 1.0;
 
@@ -284,7 +284,7 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
     p.z = 0;
     _m_rand_point.points.push_back(p);
 
-    _m_rrt.header.frame_id = "my_frame";
+    _m_rrt.header.frame_id = "map";
     _m_rrt.header.stamp = now();
     _m_rrt.action = visualization_msgs::msg::Marker::ADD;
     _m_rrt.ns = "map";
@@ -292,6 +292,7 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
     _m_rrt.type = visualization_msgs::msg::Marker::LINE_LIST;
     _m_rrt.pose.orientation.w = 1.0;
     _m_rrt.scale.x = 0.1;
+    _m_rrt.scale.y = 0.1;
     _m_rrt.color.b = 0.5;
     _m_rrt.color.g = 0.5;
     _m_rrt.color.a = 1.0;
@@ -343,7 +344,7 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
     {
         int i = 0;
         int j = 1;
-        while (j < ps.size())
+        while (j < (int)ps.size())
         {
             ps.insert(ps.begin() + j, MiddlePoint(ps[i], ps[j]));
             i += 2;
@@ -362,17 +363,13 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
 
 void MapInfo::ShowMap(void)
 {
-    std::cout << "show map0" << std::endl;
-
     while (_marker_pub->get_subscription_count() < 1)
     {
-        rclcpp::sleep_for(std::chrono::seconds(1));
+        rclcpp::sleep_for(std::chrono::milliseconds(100));
     }
-    std::cout << "show map1" << std::endl;
-    
+
     _marker_pub->publish(_line_boundary);
     _marker_pub->publish(_obstacle);
     _marker_pub->publish(_m_start);
     _marker_pub->publish(_m_end);
-    std::cout << "show map2" << std::endl;
 }

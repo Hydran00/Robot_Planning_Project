@@ -12,7 +12,7 @@ def generate_launch_description():
             executable='rrt_star',
             name='RRTSTAR',
             output='screen',
-            prefix  ="xterm -fa 'Monospace' -fs 18 -e ",
+            # prefix  ="xterm -fa 'Monospace' -fs 18 -e ",
             parameters=[{'type': launch.substitutions.LaunchConfiguration('type')}]
         ),
         
@@ -21,6 +21,6 @@ def generate_launch_description():
             executable='rviz2',
             name='rviz',
             output='screen',
-            arguments=['-d', rviz_config_dir]
+            # arguments=['-d', rviz_config_dir]
         )
     ])

@@ -60,11 +60,8 @@ KDPoint MiddlePoint(KDPoint &p1, KDPoint &p2)
 KDTree::KDTree(std::vector<KDPoint> &points)
 {
     _points.assign(points.begin(), points.end());
-    std::cout << "Constructor1\n";
     _dim = points[0].size();
-    std::cout << "Constructor2\n";
     _proot = _CreatNode(0, points.size() - 1, 0, nullptr);
-    std::cout << "Constructor3\n";
 }
 
 KDTree::~KDTree()

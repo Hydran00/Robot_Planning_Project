@@ -1,13 +1,13 @@
 #include <iostream>
 #include <unistd.h>
-#include <fstream> 
+#include <fstream>
 #include "planner/kdtree.hpp"
 #include "planner/rrt.hpp"
 #include "planner/rrt_plan.hpp"
 #include "planner/rrt_star_plan.hpp"
 #include "planner/map_info.hpp"
 using namespace std;
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
     auto m = std::make_shared<MapInfo>();
@@ -33,32 +33,14 @@ int main(int argc, char** argv)
 
     m->ShowMap();
 
-    char c;
-    cout << "press y to star:";
-    cin >> c;
-
-    std::string type = "rrt_star";
+    sleep(1);
     std::vector<KDPoint> path;
 
-    if (type.compare("rrt_star") == 0)
-    {
-        RRTStarPlan plan(m, true);
-        path = plan.run();
-    }
-    else
-    {
-        std::cout << type << " is not exist" << std::endl;
-    }
+    RRTStarPlan plan(m, true);
+    path = plan.run();
 
     if (!path.empty())
         m->set_path(path);
-    // print path in a file
-   std::ofstream fout("/home/robotics/Desktop/path.txt");
-    for (auto &p : path)
-    {
-        fout << p[0] << ' ' << p[1] << std::endl;
-    }
-    // std::cin >> c;
-    sleep(2);
+
     return 0;
 }
