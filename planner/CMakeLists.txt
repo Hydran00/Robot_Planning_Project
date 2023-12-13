@@ -26,11 +26,12 @@ find_package(ament_index_cpp)
 find_package(Boost 1.74)
 
 
+find_package(visualization_msgs REQUIRED)
+
 # Voronoi Boost
 add_executable(voronoi_boost
   src/voronoi_boost.cpp
 )
-
 
 target_include_directories(voronoi_boost PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -48,20 +49,28 @@ add_executable(planner
   src/planner.cpp
 )
 ament_target_dependencies(planner
-  rclcpp
+rclcpp
   obstacles_msgs
   geometry_msgs
   ament_index_cpp
 )
 target_include_directories(planner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+
+
 # RRT_Dubins
-add_executable(RRT_Dubins
-  src/RRT_Dubins.cpp
+add_executable(rrt_star src/main.cpp
+src/rrt.cpp src/rrt_plan.cpp src/rrt_star_plan.cpp
+src/kdtree.cpp
+src/map_info.cpp 
 )
-ament_target_dependencies(RRT_Dubins
-  rclcpp
+
+ament_target_dependencies(rrt_star
+rclcpp
+visualization_msgs
 )
+
+target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
 
@@ -74,12 +83,15 @@ install(DIRECTORY
     DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY 
   data
+  rviz
   DESTINATION share/${PROJECT_NAME})  
+
 install(TARGETS
   planner
   voronoi_boost
-  RRT_Dubins
+  rrt_star
   DESTINATION lib/${PROJECT_NAME})
+
 
 
 # Install Python modules
