@@ -81,6 +81,8 @@ add_executable(rrt_star
 ament_target_dependencies(rrt_star
   rclcpp
   visualization_msgs
+  geometry_msgs
+  obstacles_msgs
 )
 
 target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

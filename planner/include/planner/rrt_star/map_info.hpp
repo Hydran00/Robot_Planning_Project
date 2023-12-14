@@ -7,6 +7,23 @@
 #include "rrt.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "visualization_msgs/msg/marker.hpp"
+#include "visualization_msgs/msg/marker_array.hpp"
+#include "geometry_msgs/msg/polygon_stamped.hpp"
+#include "obstacles_msgs/msg/obstacle_msg.hpp"
+#include "obstacles_msgs/msg/obstacle_array_msg.hpp"
+
+
+static const rmw_qos_profile_t rmw_qos_profile_custom =
+    {
+        RMW_QOS_POLICY_HISTORY_KEEP_LAST,
+        10,
+        RMW_QOS_POLICY_RELIABILITY_RELIABLE,
+        RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL,
+        RMW_QOS_DEADLINE_DEFAULT,
+        RMW_QOS_LIFESPAN_DEFAULT,
+        RMW_QOS_POLICY_LIVELINESS_SYSTEM_DEFAULT,
+        RMW_QOS_LIVELINESS_LEASE_DURATION_DEFAULT,
+        false};
 
 class MapInfo : public rclcpp::Node
 {
@@ -26,10 +43,16 @@ private:
         _id_rrt = 10,
     };
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
-    double _width, _height;
+    rclcpp::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr subscription_borders_;
+    rclcpp::Subscription<obstacles_msgs::msg::ObstacleArrayMsg>::SharedPtr subscription_obstacles_;
+    double _width =4.0;
+    double _height=4.0;
+    bool obstacles_received_;
+    bool borders_received_;
+    // geometry_msgs::msg::PolygonStamped borders_;
+    // obstacles_msgs::msg::ObstacleArrayMsg obstacles_;
     visualization_msgs::msg::Marker _line_boundary;
-    visualization_msgs::msg::Marker _obstacle;
-    KDTree _okdtree;
+    visualization_msgs::msg::MarkerArray _obstacle_array;
     visualization_msgs::msg::Marker _m_start;
     visualization_msgs::msg::Marker _m_end;
     visualization_msgs::msg::Marker _m_openlist;
@@ -39,6 +62,8 @@ private:
     visualization_msgs::msg::Marker _m_roadmap;
     visualization_msgs::msg::Marker _m_rand_point;
     visualization_msgs::msg::Marker _m_rrt;
+    KDTree _okdtree;
+
     int _pub_i;
 
 public:
@@ -48,10 +73,13 @@ public:
     MapInfo();
     ~MapInfo();
 
-    void set_boundary(int w, int h);
+    void obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg);
+    void borders_cb(const geometry_msgs::msg::PolygonStamped &msg);
+    void set_boundary(std::vector<KDPoint> &points);
+    void set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg);
+
     double get_width(void) { return _width; }
     double get_height(void) { return _height; }
-    void set_obstacle(std::vector<KDPoint> &points);
     void set_start(KDPoint &point);
     void set_end(KDPoint &point);
     void set_path(std::vector<KDPoint> &path);

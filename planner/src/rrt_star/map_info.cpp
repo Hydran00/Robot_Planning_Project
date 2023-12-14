@@ -3,19 +3,56 @@
 MapInfo::MapInfo() : Node("map"), _pub_i(0)
 {
     this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 1000);
-    this->declare_parameter("show_graphics", false); 
+    this->declare_parameter("show_graphics", false);
     this->_show_graphics = this->get_parameter("show_graphics").as_bool();
     RCLCPP_INFO(this->get_logger(), "show_graphics: %s", this->_show_graphics ? "true" : "false");
+
+    const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_custom);
+    subscription_obstacles_ = this->create_subscription<obstacles_msgs::msg::ObstacleArrayMsg>(
+        "/obstacles", qos, std::bind(&MapInfo::obstacles_cb, this, std::placeholders::_1));
+    subscription_borders_ = this->create_subscription<geometry_msgs::msg::PolygonStamped>(
+        "/borders", qos, std::bind(&MapInfo::borders_cb, this, std::placeholders::_1));
+    // TODO: add subscription for start and end points
+    obstacles_received_ = false;
+    borders_received_ = false;
+
+    RCLCPP_INFO(this->get_logger(), "Node started");
 }
 
 MapInfo::~MapInfo()
-{}
-
-void MapInfo::set_boundary(int w, int h)
 {
-    _width = (double)w;
-    _height = (double)h;
+}
 
+void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
+{
+    RCLCPP_INFO(this->get_logger(), "Obstacles received!");
+    // store obstacles into class member
+    // this->obstacles_ = std::move(msg);
+    // this->obstacles_received_ = true;
+
+    this->set_obstacle(msg);
+}
+void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
+{
+    RCLCPP_INFO(this->get_logger(), "Map borders received!");
+    // store borders into class member
+    // this->borders_ = std::move(msg);
+    // this->borders_received_ = true;
+
+    // read the msg and set the boundary
+    std::vector<KDPoint> points;
+    for (auto p : msg.polygon.points)
+    {
+        KDPoint pt = {p.x, p.y};
+        points.push_back(pt);
+    }
+    KDPoint pt = {msg.polygon.points[0].x, msg.polygon.points[0].y};
+    points.push_back(pt);
+    this->set_boundary(points);
+}
+
+void MapInfo::set_boundary(std::vector<KDPoint> &points)
+{
     _line_boundary.header.frame_id = "map";
     _line_boundary.header.stamp = now();
     _line_boundary.action = visualization_msgs::msg::Marker::ADD;
@@ -27,47 +64,62 @@ void MapInfo::set_boundary(int w, int h)
     _line_boundary.color.a = 1.0;
 
     _line_boundary.points.clear();
-    geometry_msgs::msg::Point p;
-    p.x = 0.0;
-    p.y = 0.0;
-    _line_boundary.points.push_back(p);
-    p.x = _width;
-    p.y = 0.0;
-    _line_boundary.points.push_back(p);
-    p.x = _width;
-    p.y = _height;
-
-    _line_boundary.points.push_back(p);
-    p.x = 0.0;
-    p.y = _height;
-    _line_boundary.points.push_back(p);
-    p.x = 0.0;
-    p.y = 0.0;
-    _line_boundary.points.push_back(p);
-}
-
-void MapInfo::set_obstacle(std::vector<KDPoint> &points)
-{
-    _okdtree = KDTree(points);
-    _obstacle.header.frame_id = "map";
-    _obstacle.header.stamp = now();
-    _obstacle.action = visualization_msgs::msg::Marker::ADD;
-    _obstacle.ns = "map";
-    _obstacle.id = _id_obstacle;
-    _obstacle.type = visualization_msgs::msg::Marker::POINTS;
-    _obstacle.pose.orientation.w = 1.0;
-    _obstacle.scale.x = 1;
-    _obstacle.scale.y = 1;
-    _obstacle.color.a = 1.0;
-    _obstacle.points.clear();
     for (auto p : points)
     {
         geometry_msgs::msg::Point p_;
         p_.x = p[0];
         p_.y = p[1];
         p_.z = 0;
-        _obstacle.points.push_back(p_);
+        _line_boundary.points.push_back(p_);
     }
+}
+
+void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
+{
+    int i = 100;
+    for (auto obs : msg.obstacles)
+    {
+        visualization_msgs::msg::Marker marker;
+        marker.points.clear();
+        marker.header.frame_id = "map";
+        marker.header.stamp = now();
+        marker.ns = "map";
+        marker.id = _id_obstacle + (i++);
+        marker.action = visualization_msgs::msg::Marker::ADD;
+        marker.color.r = 0.0;
+        marker.color.a = 1.0;
+
+        // if (obs.radius != 0.0)
+        // {
+        //     // Adding circles
+        //     marker.type = visualization_msgs::msg::Marker::CYLINDER;
+        //     marker.pose.position.x = obs.polygon.points[0].x;
+        //     marker.pose.position.y = obs.polygon.points[0].y;
+        //     marker.pose.position.z = obs.polygon.points[0].z;
+        //     marker.scale.x = obs.radius * 2;
+        //     marker.scale.y = obs.radius * 2;
+        //     marker.scale.z = 1;
+        // }
+
+        // else
+        // {
+            // Adding rectangles
+            marker.type = visualization_msgs::msg::Marker::CUBE;
+            marker.pose.position.x = (obs.polygon.points[0].x + obs.polygon.points[2].x)/2;
+            marker.pose.position.y = (obs.polygon.points[0].y + obs.polygon.points[2].y)/2;
+            marker.pose.position.z = 0;
+            marker.scale.x = abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
+            marker.scale.y = abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
+            std::cout << "scale: " << marker.scale.x << ", " << marker.scale.y << std::endl;
+            marker.scale.z = 1;
+        // }
+
+        _obstacle_array.markers.push_back(marker);
+    }
+    // _obstacle.pose.orientation.w = 1.0;
+    // _obstacle.scale.x = 1;
+    // _obstacle.scale.y = 1;
+    // _obstacle.color.a = 1.0;
 }
 
 void MapInfo::set_start(KDPoint &point)
@@ -81,8 +133,8 @@ void MapInfo::set_start(KDPoint &point)
     _m_start.id = _id_start;
     _m_start.type = visualization_msgs::msg::Marker::POINTS;
     _m_start.pose.orientation.w = 1.0;
-    _m_start.scale.x = 1.0;
-    _m_start.scale.y = 1.0;
+    _m_start.scale.x = 0.4;
+    _m_start.scale.y = 0.4;
     _m_start.color.g = 1.0;
     _m_start.color.a = 1.0;
 
@@ -106,8 +158,8 @@ void MapInfo::set_end(KDPoint &point)
     _m_end.id = _id_end;
     _m_end.type = visualization_msgs::msg::Marker::POINTS;
     _m_end.pose.orientation.w = 1.0;
-    _m_end.scale.x = 1.0;
-    _m_end.scale.y = 1.0;
+    _m_end.scale.x = 0.4;
+    _m_end.scale.y = 0.4;
     _m_end.color.r = 1.0;
     _m_end.color.a = 1.0;
 
@@ -171,7 +223,8 @@ void MapInfo::set_openlist(std::vector<KDPoint> &points)
     }
     _marker_pub->publish(_m_openlist);
     _pub_i = (_pub_i + 1) % 10;
-    if (_pub_i == 0){
+    if (_pub_i == 0)
+    {
         // rclcpp::sleep_for(std::chrono::milliseconds(10));
         return;
     }
@@ -202,7 +255,8 @@ void MapInfo::set_closelist(std::vector<KDPoint> &points)
     }
     _marker_pub->publish(_m_closelist);
     _pub_i = (_pub_i + 1) % 10;
-    if (_pub_i == 0){
+    if (_pub_i == 0)
+    {
         // rclcpp::sleep_for(std::chrono::milliseconds(10));
         return;
     }
@@ -321,7 +375,8 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
     _marker_pub->publish(_m_rand_point);
     _marker_pub->publish(_m_rrt);
     _pub_i = (_pub_i + 1) % 10;
-    if (_pub_i == 0){
+    if (_pub_i == 0)
+    {
         // rclcpp::sleep_for(std::chrono::milliseconds(10));
         return;
     }
@@ -378,7 +433,11 @@ void MapInfo::ShowMap(void)
     }
 
     _marker_pub->publish(_line_boundary);
-    _marker_pub->publish(_obstacle);
+    for (auto obstacle : _obstacle_array.markers)
+    {
+        _marker_pub->publish(obstacle);
+        std::cout << "obstacle: " << obstacle.pose.position.x << ", " << obstacle.pose.position.y << std::endl;
+    }
     _marker_pub->publish(_m_start);
     _marker_pub->publish(_m_end);
 }

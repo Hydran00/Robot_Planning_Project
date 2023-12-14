@@ -22,13 +22,17 @@ KDPoint RRTStarPlan::_GenerateRandPoint(void)
         std::uniform_int_distribution<int> dis_y(1, int(MotionPlanning::_map_info->get_height()) - 1);
         while (true)
         {
+            std::cout << "rand" << std::endl;
             int x = dis_x(generator);
             int y = dis_y(generator);
             KDPoint p = {double(x), double(y)};
+            std::cout << "rand2" << std::endl;
             if (!MotionPlanning::_map_info->Collision(p))
             {
                 return p;
             }
+            std::cout << "rand3" << std::endl;
+
         }
     }
 }
@@ -53,8 +57,9 @@ std::vector<KDPoint> RRTStarPlan::run(void)
         KDPoint q_rand = _GenerateRandPoint();
         KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
         KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
-        if (MotionPlanning::_map_info->Collision(q_new))
+        if (MotionPlanning::_map_info->Collision(q_new)){
             continue;
+        }
         _rrt.Add(q_new, q_near);
         _rrt.Rewire(q_new, 5.0, [&](KDPoint &p1, KDPoint &p2){return MotionPlanning::_map_info->Collision(p1, p2);});
         if (MotionPlanning::_display)

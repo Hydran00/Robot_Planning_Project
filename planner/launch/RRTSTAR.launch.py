@@ -9,7 +9,7 @@ rviz_config_dir = get_package_share_directory("planner") + "/rviz/map.rviz"
 
 
 def generate_launch_description():
-    show_graphics = False
+    show_graphics = True
     return LaunchDescription(
         [
             launch.actions.DeclareLaunchArgument("type", default_value="rrt_star"),
