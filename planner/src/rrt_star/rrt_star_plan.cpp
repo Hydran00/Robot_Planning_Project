@@ -22,16 +22,15 @@ KDPoint RRTStarPlan::_GenerateRandPoint(void)
         std::uniform_int_distribution<int> dis_y(1, int(MotionPlanning::_map_info->get_height()) - 1);
         while (true)
         {
-            std::cout << "rand" << std::endl;
+
             int x = dis_x(generator);
             int y = dis_y(generator);
             KDPoint p = {double(x), double(y)};
-            std::cout << "rand2" << std::endl;
-            if (!MotionPlanning::_map_info->Collision(p))
+            if (true)//!MotionPlanning::_map_info->Collision(p))
             {
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "rand point: %f, %f", p[0], p[1]);
                 return p;
             }
-            std::cout << "rand3" << std::endl;
 
         }
     }

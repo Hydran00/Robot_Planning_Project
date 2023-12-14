@@ -49,6 +49,7 @@ int main(int argc, char **argv)
     if (m->_show_graphics)
         m->ShowMap();
 
+    sleep(4);
     std::vector<KDPoint> path;
 
     RRTStarPlan plan(m);
@@ -57,5 +58,10 @@ int main(int argc, char **argv)
     if (!path.empty())
         m->set_path(path);
 
+    // print path   
+    for (auto p : path)
+    {
+        std::cout << p[0] << " " << p[1] << std::endl;
+    }
     return 0;
 }

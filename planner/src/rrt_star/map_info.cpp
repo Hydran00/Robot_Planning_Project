@@ -3,7 +3,7 @@
 MapInfo::MapInfo() : Node("map"), _pub_i(0)
 {
     this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 1000);
-    this->declare_parameter("show_graphics", false);
+    this->declare_parameter("show_graphics", true);
     this->_show_graphics = this->get_parameter("show_graphics").as_bool();
     RCLCPP_INFO(this->get_logger(), "show_graphics: %s", this->_show_graphics ? "true" : "false");
 
@@ -75,26 +75,22 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
         p_ros.z = 0;
         _line_boundary.points.push_back(p_ros);
 
-        // Boost point
-        // polygon_points.push_back(p_boost);
-        // _map.outer().push_back(point_xy(p[0], p[1]));
-        // _map.outer().push_back(p_boost);
-        polygon_points.push_back(point_xy(p[0], p[1]));    
-
+        RCLCPP_INFO(this->get_logger(), "Adding Map boundary: %f, %f", p[0], p[1]);
+        _map.outer().push_back(point_xy(p[0], p[1]));
     }
+    // close ring
+    _map.outer().push_back(_map.outer().front());
     // print polygon in wkt
     std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
-
-    // create a polygon for querying the map
-    // Create points to represent a 5x5 closed polygon.
-
-    // Create a polygon object and assign the points to it.
-    // boost::geometry::assign_points(_map, polygon_points);
 }
 
 void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
 {
     int i = 100;
+    int obs_counter = 0;
+    _map.inners().resize(msg.obstacles.size());
+    RCLCPP_INFO(this->get_logger(), "Found %d obstacles", (int)msg.obstacles.size());
+
     for (auto obs : msg.obstacles)
     {
         visualization_msgs::msg::Marker marker;
@@ -107,33 +103,50 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
         marker.color.r = 0.0;
         marker.color.a = 1.0;
 
-        // if (obs.radius != 0.0)
-        // {
-        //     // Adding circles
-        //     marker.type = visualization_msgs::msg::Marker::CYLINDER;
-        //     marker.pose.position.x = obs.polygon.points[0].x;
-        //     marker.pose.position.y = obs.polygon.points[0].y;
-        //     marker.pose.position.z = obs.polygon.points[0].z;
-        //     marker.scale.x = obs.radius * 2;
-        //     marker.scale.y = obs.radius * 2;
-        //     marker.scale.z = 1;
-        // }
+        if (obs.radius != 0.0)
+        {
+            // Adding circles
+            marker.type = visualization_msgs::msg::Marker::CYLINDER;
+            marker.pose.position.x = obs.polygon.points[0].x;
+            marker.pose.position.y = obs.polygon.points[0].y;
+            marker.pose.position.z = obs.polygon.points[0].z;
+            marker.scale.x = obs.radius * 2;
+            marker.scale.y = obs.radius * 2;
+            marker.scale.z = 1;
+        }
 
-        // else
-        // {
-        // Adding rectangles
-        marker.type = visualization_msgs::msg::Marker::CUBE;
-        marker.pose.position.x = (obs.polygon.points[0].x + obs.polygon.points[2].x) / 2;
-        marker.pose.position.y = (obs.polygon.points[0].y + obs.polygon.points[2].y) / 2;
-        marker.pose.position.z = 0;
-        marker.scale.x = abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
-        marker.scale.y = abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
-        std::cout << "scale: " << marker.scale.x << ", " << marker.scale.y << std::endl;
-        marker.scale.z = 1;
-        // }
+        else
+        {
+            // Adding rectangles
+            marker.type = visualization_msgs::msg::Marker::CUBE;
+            marker.pose.position.x = (obs.polygon.points[0].x + obs.polygon.points[2].x) / 2;
+            marker.pose.position.y = (obs.polygon.points[0].y + obs.polygon.points[2].y) / 2;
+            marker.pose.position.z = 0;
+            marker.scale.x = abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
+            marker.scale.y = abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
+            marker.scale.z = 1;
+        }
 
         _obstacle_array.markers.push_back(marker);
+        RCLCPP_INFO(this->get_logger(), "##########################");
+        for (int j = 0; j < (int)obs.polygon.points.size(); j++)
+        {
+            // TODO: circles
+            if (abs(obs.radius - 0.0) < EPSILON)
+            {
+                _map.inners()[obs_counter].push_back(point_xy(obs.polygon.points[j].x, obs.polygon.points[j].y));
+            }
+        }
+        // close ring
+        if (abs(obs.radius - 0.0) < EPSILON)
+        {
+            _map.inners()[obs_counter].push_back(_map.inners()[obs_counter].front());
+            obs_counter++;
+        }
     }
+    sleep(1);
+    std::cout << "Polygon with obstacles: " << boost::geometry::wkt(_map) << std::endl;
+
     // _obstacle.pose.orientation.w = 1.0;
     // _obstacle.scale.x = 1;
     // _obstacle.scale.y = 1;

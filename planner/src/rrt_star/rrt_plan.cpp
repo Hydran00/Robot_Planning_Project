@@ -53,13 +53,19 @@ std::vector<KDPoint> RRTPlan::run(void)
         KDPoint q_rand = _GenerateRandPoint();
         KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
         KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
-        if (MotionPlanning::_map_info->Collision(q_new))
+        std::cout << "DEBUG3";
+        if (MotionPlanning::_map_info->Collision(q_new)){
             continue;
+        }
+        std::cout << "DEBUG4";
+
         _rrt.Add(q_new, q_near);
         if (MotionPlanning::_display)
         {
             MotionPlanning::_map_info->set_rrt(_rrt, 0, q_rand);
         }
+        std::cout << "DEBUG5";
+
         if (Distance(q_new, MotionPlanning::_pt_end) < 1.0)
         {
             if (q_new != MotionPlanning::_pt_end)
