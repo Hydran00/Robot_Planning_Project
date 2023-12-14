@@ -3,13 +3,12 @@
 #include <cstdio>
 #include <vector>
 #include <iostream>
-#include <boost/polygon/voronoi.hpp>
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <chrono>
 
 // I/O
 #include <fstream>
 #include <iostream>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 // Boost
 #include <boost/polygon/voronoi.hpp>

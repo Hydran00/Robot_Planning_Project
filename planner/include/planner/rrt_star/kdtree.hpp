@@ -10,7 +10,7 @@
 #include <cmath>
 
 typedef std::vector<double> KDPoint;
-#define E (0.00001)
+#define EPSILON (0.00001)
 void PrintKDPoint(KDPoint &p);
 double Distance(KDPoint &p1, KDPoint &p2);
 bool Equal(double a, double b);

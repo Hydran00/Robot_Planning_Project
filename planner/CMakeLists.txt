@@ -84,7 +84,7 @@ ament_target_dependencies(rrt_star
   geometry_msgs
   obstacles_msgs
 )
-
+target_link_libraries(rrt_star Boost::headers)
 target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################

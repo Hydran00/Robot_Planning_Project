@@ -64,14 +64,32 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
     _line_boundary.color.a = 1.0;
 
     _line_boundary.points.clear();
+    // fill the msg with the map
+    std::vector<point_xy> polygon_points;
     for (auto p : points)
     {
-        geometry_msgs::msg::Point p_;
-        p_.x = p[0];
-        p_.y = p[1];
-        p_.z = 0;
-        _line_boundary.points.push_back(p_);
+        // ROS2 Point
+        geometry_msgs::msg::Point p_ros;
+        p_ros.x = p[0];
+        p_ros.y = p[1];
+        p_ros.z = 0;
+        _line_boundary.points.push_back(p_ros);
+
+        // Boost point
+        // polygon_points.push_back(p_boost);
+        // _map.outer().push_back(point_xy(p[0], p[1]));
+        // _map.outer().push_back(p_boost);
+        polygon_points.push_back(point_xy(p[0], p[1]));    
+
     }
+    // print polygon in wkt
+    std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
+
+    // create a polygon for querying the map
+    // Create points to represent a 5x5 closed polygon.
+
+    // Create a polygon object and assign the points to it.
+    // boost::geometry::assign_points(_map, polygon_points);
 }
 
 void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
@@ -103,15 +121,15 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
 
         // else
         // {
-            // Adding rectangles
-            marker.type = visualization_msgs::msg::Marker::CUBE;
-            marker.pose.position.x = (obs.polygon.points[0].x + obs.polygon.points[2].x)/2;
-            marker.pose.position.y = (obs.polygon.points[0].y + obs.polygon.points[2].y)/2;
-            marker.pose.position.z = 0;
-            marker.scale.x = abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
-            marker.scale.y = abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
-            std::cout << "scale: " << marker.scale.x << ", " << marker.scale.y << std::endl;
-            marker.scale.z = 1;
+        // Adding rectangles
+        marker.type = visualization_msgs::msg::Marker::CUBE;
+        marker.pose.position.x = (obs.polygon.points[0].x + obs.polygon.points[2].x) / 2;
+        marker.pose.position.y = (obs.polygon.points[0].y + obs.polygon.points[2].y) / 2;
+        marker.pose.position.z = 0;
+        marker.scale.x = abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
+        marker.scale.y = abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
+        std::cout << "scale: " << marker.scale.x << ", " << marker.scale.y << std::endl;
+        marker.scale.z = 1;
         // }
 
         _obstacle_array.markers.push_back(marker);

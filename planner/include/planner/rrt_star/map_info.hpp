@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <tuple>
+
+// #include <boost/geometry.hpp>
+
 #include "kdtree.hpp"
 #include "rrt.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -12,7 +15,15 @@
 #include "obstacles_msgs/msg/obstacle_msg.hpp"
 #include "obstacles_msgs/msg/obstacle_array_msg.hpp"
 
+// #include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/algorithms/append.hpp> 
+// wkt
+#include <boost/geometry/io/wkt/wkt.hpp>
 
+typedef boost::geometry::model::d2::point_xy<double> point_xy;
+typedef boost::geometry::model::polygon<point_xy> polygon;
 static const rmw_qos_profile_t rmw_qos_profile_custom =
     {
         RMW_QOS_POLICY_HISTORY_KEEP_LAST,
@@ -51,6 +62,9 @@ private:
     bool borders_received_;
     // geometry_msgs::msg::PolygonStamped borders_;
     // obstacles_msgs::msg::ObstacleArrayMsg obstacles_;
+
+    // define the map as a polygon with holes
+    polygon _map;
     visualization_msgs::msg::Marker _line_boundary;
     visualization_msgs::msg::MarkerArray _obstacle_array;
     visualization_msgs::msg::Marker _m_start;
