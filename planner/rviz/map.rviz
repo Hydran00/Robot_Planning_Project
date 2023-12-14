@@ -48,7 +48,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Fixed Frame: map
-    Frame Rate: 30
+    Frame Rate: 1000
   Name: root
   Tools:
     - Class: rviz_default_plugins/Interact
@@ -90,7 +90,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 93.45133209228516
+      Distance: 115.53730010986328
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

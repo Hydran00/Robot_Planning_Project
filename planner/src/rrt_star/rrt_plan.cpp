@@ -1,7 +1,8 @@
 #include "planner/rrt_star/rrt_plan.hpp"
 
-RRTPlan::RRTPlan(std::shared_ptr<MapInfo> &map_info, bool display) : MotionPlanning(map_info, display)
+RRTPlan::RRTPlan(std::shared_ptr<MapInfo> &map_info) : MotionPlanning(map_info)
 {
+    _display = map_info->_show_graphics;
     _rrt.set_root(MotionPlanning::_pt_start);
 }
 

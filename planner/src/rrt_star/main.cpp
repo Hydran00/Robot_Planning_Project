@@ -10,7 +10,10 @@ using namespace std;
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
+
+ 
     auto m = std::make_shared<MapInfo>();
+
     m->set_boundary(60, 40);
     std::vector<KDPoint> points;
     for (int i = 0; i < 30; ++i)
@@ -31,11 +34,12 @@ int main(int argc, char **argv)
     point = {50, 30};
     m->set_end(point);
 
+    if (m->_show_graphics)
     m->ShowMap();
-
+    
     std::vector<KDPoint> path;
 
-    RRTStarPlan plan(m, true);
+    RRTStarPlan plan(m);
     path = plan.run();
 
     if (!path.empty())

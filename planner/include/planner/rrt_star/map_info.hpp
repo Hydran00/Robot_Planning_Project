@@ -44,6 +44,7 @@ private:
 public:
     KDPoint pt_start;
     KDPoint pt_end;
+    bool _show_graphics;
     MapInfo();
     ~MapInfo();
 

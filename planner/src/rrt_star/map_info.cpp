@@ -2,7 +2,10 @@
 
 MapInfo::MapInfo() : Node("map"), _pub_i(0)
 {
-    _marker_pub = create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 50);
+    this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 1000);
+    this->declare_parameter("show_graphics", false); 
+    this->_show_graphics = this->get_parameter("show_graphics").as_bool();
+    RCLCPP_INFO(this->get_logger(), "show_graphics: %s", this->_show_graphics ? "true" : "false");
 }
 
 MapInfo::~MapInfo()
