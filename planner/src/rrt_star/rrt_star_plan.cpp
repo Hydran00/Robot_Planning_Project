@@ -18,17 +18,16 @@ KDPoint RRTStarPlan::_GenerateRandPoint(void)
     }
     else
     {
-        std::uniform_int_distribution<int> dis_x(1, int(MotionPlanning::_map_info->get_width()) - 1);
-        std::uniform_int_distribution<int> dis_y(1, int(MotionPlanning::_map_info->get_height()) - 1);
+        std::uniform_int_distribution<int> dis_x(int(MotionPlanning::_map_info->min_x), int(MotionPlanning::_map_info->max_x));
+        std::uniform_int_distribution<int> dis_y(int(MotionPlanning::_map_info->min_y), int(MotionPlanning::_map_info->max_y));
         while (true)
         {
 
             int x = dis_x(generator);
             int y = dis_y(generator);
             KDPoint p = {double(x), double(y)};
-            if (true)//!MotionPlanning::_map_info->Collision(p))
+            if (!MotionPlanning::_map_info->Collision(p))
             {
-                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "rand point: %f, %f", p[0], p[1]);
                 return p;
             }
 

@@ -15,12 +15,16 @@
 #include "obstacles_msgs/msg/obstacle_msg.hpp"
 #include "obstacles_msgs/msg/obstacle_array_msg.hpp"
 
-// #include <boost/geometry.hpp>
+// Boost geometry primitives
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/algorithms/append.hpp> 
-// wkt
+// well known text representation of geometry
 #include <boost/geometry/io/wkt/wkt.hpp>
+// within to check if a point is inside a polygon
+#include <boost/geometry/algorithms/within.hpp>
+
+
 
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::polygon<point_xy> polygon;
@@ -56,8 +60,6 @@ private:
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
     rclcpp::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr subscription_borders_;
     rclcpp::Subscription<obstacles_msgs::msg::ObstacleArrayMsg>::SharedPtr subscription_obstacles_;
-    double _width =4.0;
-    double _height=4.0;
     bool obstacles_received_;
     bool borders_received_;
     // geometry_msgs::msg::PolygonStamped borders_;
@@ -81,6 +83,7 @@ private:
     int _pub_i;
 
 public:
+    double min_x, max_x, min_y, max_y;
     KDPoint pt_start;
     KDPoint pt_end;
     bool _show_graphics;
@@ -92,8 +95,6 @@ public:
     void set_boundary(std::vector<KDPoint> &points);
     void set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg);
 
-    double get_width(void) { return _width; }
-    double get_height(void) { return _height; }
     void set_start(KDPoint &point);
     void set_end(KDPoint &point);
     void set_path(std::vector<KDPoint> &path);

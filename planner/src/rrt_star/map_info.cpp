@@ -65,7 +65,6 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
 
     _line_boundary.points.clear();
     // fill the msg with the map
-    std::vector<point_xy> polygon_points;
     for (auto p : points)
     {
         // ROS2 Point
@@ -75,13 +74,34 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
         p_ros.z = 0;
         _line_boundary.points.push_back(p_ros);
 
-        RCLCPP_INFO(this->get_logger(), "Adding Map boundary: %f, %f", p[0], p[1]);
         _map.outer().push_back(point_xy(p[0], p[1]));
     }
     // close ring
     _map.outer().push_back(_map.outer().front());
     // print polygon in wkt
     std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
+
+    // set the min and max values of the map for sampling
+    for (auto p : points)
+    {
+        if (p[0] < min_x){
+            min_x = p[0];
+        }
+        if (p[0] > max_x){
+            max_x = p[0];
+
+        }
+        if (p[1] < min_y){
+            min_y = p[1];
+        }
+        if (p[1] > max_y){
+            max_y = p[1];
+        }
+    }
+    std::cout << "min_x: " << min_x << std::endl;
+    std::cout << "max_x: " << max_x << std::endl;
+    std::cout << "min_y: " << min_y << std::endl;
+    std::cout << "max_y: " << max_y << std::endl;
 }
 
 void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
@@ -128,7 +148,6 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
         }
 
         _obstacle_array.markers.push_back(marker);
-        RCLCPP_INFO(this->get_logger(), "##########################");
         for (int j = 0; j < (int)obs.polygon.points.size(); j++)
         {
             // TODO: circles
@@ -146,11 +165,6 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
     }
     sleep(1);
     std::cout << "Polygon with obstacles: " << boost::geometry::wkt(_map) << std::endl;
-
-    // _obstacle.pose.orientation.w = 1.0;
-    // _obstacle.scale.x = 1;
-    // _obstacle.scale.y = 1;
-    // _obstacle.color.a = 1.0;
 }
 
 void MapInfo::set_start(KDPoint &point)
@@ -415,14 +429,23 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
 
 bool MapInfo::Collision(KDPoint &point)
 {
-    if ((point[0] > 0) && (point[0] < _width) && (point[1] > 0) && (point[1] < _height))
+    // exclude points out of the map
+    // if ((point[0] > 0) && (point[0] < _width) && (point[1] > 0) && (point[1] < _height))
+    if (boost::geometry::within(point_xy(point[0], point[1]), _map))
     {
+        // RCLCPP_INFO(this->get_logger(), "Checking collision for point: %f, %f", point[0], point[1]);
         std::vector<std::pair<KDPoint, double>> result;
-        _okdtree.Query(point, 1, result);
-        return (result.begin()->second < 1.0);
+        // check if the point is inside an obstacle (?)
+        // point is the point to check
+        // 1 is the number of nearest neighbors to return
+        // result is a vector of pairs of points and their distances to the point to check
+        // _okdtree.Query(point, 1, result);
+        // return (result.begin()->second < 1.0);
+        return false;
     }
     else
     {
+        // RCLCPP_INFO(this->get_logger(), "Excluding point out of the map: %f, %f", point[0], point[1]);
         return true;
     }
 }
@@ -446,12 +469,20 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
             j += 2;
         }
     }
+    // again check for collision?
+    // for (auto p : ps)
+    // {
+    //     std::vector<std::pair<KDPoint, double>> result;
+    //     _okdtree.Query(p, 1, result);
+    //     if (result.begin()->second < 1.0)
+    //         return true;
+    // }
     for (auto p : ps)
     {
-        std::vector<std::pair<KDPoint, double>> result;
-        _okdtree.Query(p, 1, result);
-        if (result.begin()->second < 1.0)
+        if (Collision(p))
+        {
             return true;
+        }
     }
     return false;
 }
@@ -463,12 +494,16 @@ void MapInfo::ShowMap(void)
         rclcpp::sleep_for(std::chrono::milliseconds(100));
     }
 
-    _marker_pub->publish(_line_boundary);
     for (auto obstacle : _obstacle_array.markers)
     {
         _marker_pub->publish(obstacle);
-        std::cout << "obstacle: " << obstacle.pose.position.x << ", " << obstacle.pose.position.y << std::endl;
     }
-    _marker_pub->publish(_m_start);
-    _marker_pub->publish(_m_end);
+
+    for (int i = 0; i < 10; i++)
+    {
+        _marker_pub->publish(_line_boundary);
+        _marker_pub->publish(_m_start);
+        _marker_pub->publish(_m_end);
+        rclcpp::sleep_for(std::chrono::milliseconds(100));
+    }
 }

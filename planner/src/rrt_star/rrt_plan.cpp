@@ -18,8 +18,8 @@ KDPoint RRTPlan::_GenerateRandPoint(void)
     }
     else
     {
-        std::uniform_int_distribution<int> dis_x(1, int(MotionPlanning::_map_info->get_width()) - 1);
-        std::uniform_int_distribution<int> dis_y(1, int(MotionPlanning::_map_info->get_height()) - 1);
+        std::uniform_int_distribution<int> dis_x(int(MotionPlanning::_map_info->min_x), int(MotionPlanning::_map_info->max_x));
+        std::uniform_int_distribution<int> dis_y(int(MotionPlanning::_map_info->min_y), int(MotionPlanning::_map_info->max_y));
         while (true)
         {
             int x = dis_x(generator);
@@ -53,18 +53,16 @@ std::vector<KDPoint> RRTPlan::run(void)
         KDPoint q_rand = _GenerateRandPoint();
         KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
         KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
-        std::cout << "DEBUG3";
-        if (MotionPlanning::_map_info->Collision(q_new)){
+        if (MotionPlanning::_map_info->Collision(q_new))
+        {
             continue;
         }
-        std::cout << "DEBUG4";
 
         _rrt.Add(q_new, q_near);
         if (MotionPlanning::_display)
         {
             MotionPlanning::_map_info->set_rrt(_rrt, 0, q_rand);
         }
-        std::cout << "DEBUG5";
 
         if (Distance(q_new, MotionPlanning::_pt_end) < 1.0)
         {

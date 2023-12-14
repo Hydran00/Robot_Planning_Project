@@ -121,8 +121,9 @@ void KDTree::_PrintNode(KDNode *p, int l)
     }
     else
     {
-        if (l != 0)
+        if (l != 0){
             std::cout << "--> ";
+        }
         PrintKDPoint(p->point);
         std::cout << ' ' << l << ' ';
         _PrintNode(p->left, l + 1);
