@@ -1,4 +1,4 @@
-#include "planner/map_info.hpp"
+#include "planner/rrt_star/map_info.hpp"
 
 MapInfo::MapInfo() : Node("map"), _pub_i(0)
 {
@@ -168,8 +168,10 @@ void MapInfo::set_openlist(std::vector<KDPoint> &points)
     }
     _marker_pub->publish(_m_openlist);
     _pub_i = (_pub_i + 1) % 10;
-    if (_pub_i == 0)
-        rclcpp::sleep_for(std::chrono::milliseconds(10));
+    if (_pub_i == 0){
+        // rclcpp::sleep_for(std::chrono::milliseconds(10));
+        return;
+    }
 }
 
 void MapInfo::set_closelist(std::vector<KDPoint> &points)
@@ -197,8 +199,10 @@ void MapInfo::set_closelist(std::vector<KDPoint> &points)
     }
     _marker_pub->publish(_m_closelist);
     _pub_i = (_pub_i + 1) % 10;
-    if (_pub_i == 0)
-        rclcpp::sleep_for(std::chrono::milliseconds(10));
+    if (_pub_i == 0){
+        // rclcpp::sleep_for(std::chrono::milliseconds(10));
+        return;
+    }
 }
 
 void MapInfo::set_rand_points(std::vector<KDPoint> &points)
@@ -314,8 +318,10 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
     _marker_pub->publish(_m_rand_point);
     _marker_pub->publish(_m_rrt);
     _pub_i = (_pub_i + 1) % 10;
-    if (_pub_i == 0)
-        rclcpp::sleep_for(std::chrono::milliseconds(10));
+    if (_pub_i == 0){
+        // rclcpp::sleep_for(std::chrono::milliseconds(10));
+        return;
+    }
 }
 
 bool MapInfo::Collision(KDPoint &point)

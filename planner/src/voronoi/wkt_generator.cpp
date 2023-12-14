@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "planner/voronoi_boost.h"
+#include "planner/voronoi/voronoi_boost.h"
 #include "rclcpp/rclcpp.hpp"
 
 #include "geometry_msgs/msg/polygon_stamped.hpp"

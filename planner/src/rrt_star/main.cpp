@@ -1,11 +1,11 @@
 #include <iostream>
 #include <unistd.h>
 #include <fstream>
-#include "planner/kdtree.hpp"
-#include "planner/rrt.hpp"
-#include "planner/rrt_plan.hpp"
-#include "planner/rrt_star_plan.hpp"
-#include "planner/map_info.hpp"
+#include "planner/rrt_star/kdtree.hpp"
+#include "planner/rrt_star/rrt.hpp"
+#include "planner/rrt_star/rrt_plan.hpp"
+#include "planner/rrt_star/rrt_star_plan.hpp"
+#include "planner/rrt_star/map_info.hpp"
 using namespace std;
 int main(int argc, char **argv)
 {
@@ -33,7 +33,6 @@ int main(int argc, char **argv)
 
     m->ShowMap();
 
-    sleep(1);
     std::vector<KDPoint> path;
 
     RRTStarPlan plan(m, true);

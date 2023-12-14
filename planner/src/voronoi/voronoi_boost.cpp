@@ -1,4 +1,4 @@
-#include "planner/voronoi_boost.h"
+#include "planner/voronoi/voronoi_boost.h"
 
 void VoronoiBuilder::create_voronoi_from_WTK(string filename)
 {
@@ -21,13 +21,14 @@ void VoronoiBuilder::create_voronoi_from_WTK(string filename)
 
     std::cout << "WKT: " << wkt_string << "\n";
     boost::geometry::read_wkt(wkt_string, polygon);
-    std::string reason;
+    boost::geometry::validity_failure_type failure;
     // checks for validity of the polygon otherwise tries to correct it
-    bool ok = boost::geometry::is_valid(polygon, reason);
-    std::cout << "Expected: " << boost::geometry::dsv(polygon) << (ok ? "\nand got: VALID" : "\nand got: INVALID -> '" + reason + "'") << "\n";
+
+    bool ok = boost::geometry::is_valid(polygon, failure);
+    std::cout << "Expected: " << boost::geometry::dsv(polygon) << (ok ? "\nand got: VALID" : "\nand got: INVALID") << "\n";
     if (!ok)
     {
-        correct_geometry(polygon);
+        correct_geometry(polygon, failure);
     }
 
     // prepares data structure for voronoi diagram
@@ -81,10 +82,9 @@ void VoronoiBuilder::save_voronoi(string path)
     return;
 }
 
-void VoronoiBuilder::correct_geometry(Polygon &polygon)
+void VoronoiBuilder::correct_geometry(Polygon& polygon, boost::geometry::validity_failure_type&  failure)
 {
-    boost::geometry::validity_failure_type failure;
-    bool could_be_fixed = (failure == boost::geometry::failure_not_closed || boost::geometry::failure_wrong_orientation);
+    bool could_be_fixed = (failure == boost::geometry::failure_not_closed || failure == boost::geometry::failure_wrong_orientation);
 
     std::cout << "can boost::geometry::correct remedy invalidity? " << (could_be_fixed ? "possibly yes" : "no") << std::endl;
     if (could_be_fixed)

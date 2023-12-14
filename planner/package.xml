@@ -3,7 +3,7 @@
 <package format="3">
   <name>planner</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>ROS2 set of planner</description>
   <maintainer email="davide.nardi-1@studenti.unitn.it">Davide</maintainer>
   <license>TODO: License declaration</license>
   
@@ -19,6 +19,7 @@
   <depend>rclcpp_action</depend>
   <depend>rclpy</depend>
   <depend>obstacles_msgs</depend>
+  <depend>visualization_msgs</depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
   <buildtool_depend>ament_cmake</buildtool_depend>

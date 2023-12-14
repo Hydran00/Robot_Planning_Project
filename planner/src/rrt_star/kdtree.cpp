@@ -1,4 +1,4 @@
-#include "planner/kdtree.hpp"
+#include "planner/rrt_star/kdtree.hpp"
 
 void PrintKDPoint(KDPoint &p)
 {

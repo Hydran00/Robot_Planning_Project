@@ -109,7 +109,7 @@ private:
     // if the invalidity is only due to lack of closing points and/or wrongly oriented rings, then bg::correct can fix it
     /// @brief correct the geometry of a polygon
     /// @param polygon polygon to correct
-    void correct_geometry(Polygon &polygon);
+    void correct_geometry(Polygon &polygon, boost::geometry::validity_failure_type &failure);
 
     bool is_edge_valid(voronoi_diagram<double>::const_edge_iterator edge, Polygon &polygon);
 };

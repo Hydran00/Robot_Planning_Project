@@ -1,4 +1,4 @@
-#include "planner/rrt_plan.hpp"
+#include "planner/rrt_star/rrt_plan.hpp"
 
 RRTPlan::RRTPlan(std::shared_ptr<MapInfo> &map_info, bool display) : MotionPlanning(map_info, display)
 {
