@@ -7,14 +7,18 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0)
     this->_show_graphics = this->get_parameter("show_graphics").as_bool();
     RCLCPP_INFO(this->get_logger(), "show_graphics: %s", this->_show_graphics ? "true" : "false");
 
+    obstacles_received_ = false;
+    borders_received_ = false;
+    gates_received_ = false;
+
     const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_custom);
     subscription_obstacles_ = this->create_subscription<obstacles_msgs::msg::ObstacleArrayMsg>(
         "/obstacles", qos, std::bind(&MapInfo::obstacles_cb, this, std::placeholders::_1));
     subscription_borders_ = this->create_subscription<geometry_msgs::msg::PolygonStamped>(
         "/borders", qos, std::bind(&MapInfo::borders_cb, this, std::placeholders::_1));
-    // TODO: add subscription for start and end points
-    obstacles_received_ = false;
-    borders_received_ = false;
+    subscription_gates_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
+        "/gate_position", qos, std::bind(&MapInfo::gate_cb, this, std::placeholders::_1));
+    // TODO: add subscription for start point
 
     RCLCPP_INFO(this->get_logger(), "Node started");
 }
@@ -26,18 +30,12 @@ MapInfo::~MapInfo()
 void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
 {
     RCLCPP_INFO(this->get_logger(), "Obstacles received!");
-    // store obstacles into class member
-    // this->obstacles_ = std::move(msg);
-    // this->obstacles_received_ = true;
-
     this->set_obstacle(msg);
+    this->obstacles_received_ = true;
 }
 void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
 {
     RCLCPP_INFO(this->get_logger(), "Map borders received!");
-    // store borders into class member
-    // this->borders_ = std::move(msg);
-    // this->borders_received_ = true;
 
     // read the msg and set the boundary
     std::vector<KDPoint> points;
@@ -49,8 +47,19 @@ void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
     KDPoint pt = {msg.polygon.points[0].x, msg.polygon.points[0].y};
     points.push_back(pt);
     this->set_boundary(points);
+    this->borders_received_ = true;
+}
+void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg)
+{
+    RCLCPP_INFO(this->get_logger(), "Gate received!");
+    KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y};
+    set_end(end);
+    this->gates_received_ = true;
 }
 
+
+/////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 void MapInfo::set_boundary(std::vector<KDPoint> &points)
 {
     _line_boundary.header.frame_id = "map";
@@ -84,17 +93,20 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
     // set the min and max values of the map for sampling
     for (auto p : points)
     {
-        if (p[0] < min_x){
+        if (p[0] < min_x)
+        {
             min_x = p[0];
         }
-        if (p[0] > max_x){
+        if (p[0] > max_x)
+        {
             max_x = p[0];
-
         }
-        if (p[1] < min_y){
+        if (p[1] < min_y)
+        {
             min_y = p[1];
         }
-        if (p[1] > max_y){
+        if (p[1] > max_y)
+        {
             max_y = p[1];
         }
     }
@@ -399,6 +411,7 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
     _m_rrt.pose.orientation.w = 1.0;
     _m_rrt.scale.x = 0.1;
     _m_rrt.scale.y = 0.1;
+    _m_rrt.scale.y = 0.1;
     _m_rrt.color.b = 0.5;
     _m_rrt.color.g = 0.5;
     _m_rrt.color.a = 1.0;
@@ -431,10 +444,11 @@ bool MapInfo::Collision(KDPoint &point)
 {
     // exclude points out of the map
     // if ((point[0] > 0) && (point[0] < _width) && (point[1] > 0) && (point[1] < _height))
-    if (boost::geometry::within(point_xy(point[0], point[1]), _map))
+    bool is_inside = boost::geometry::within(point_xy(point[0], point[1]), _map);
+    // RCLCPP_INFO(this->get_logger(), "Checking collision for point: %f, %f -> %s", point[0], point[1], (is_inside ? "INSIDE" : "OUTSIDE"));
+    if (is_inside)
     {
-        // RCLCPP_INFO(this->get_logger(), "Checking collision for point: %f, %f", point[0], point[1]);
-        std::vector<std::pair<KDPoint, double>> result;
+        // std::vector<std::pair<KDPoint, double>> result;
         // check if the point is inside an obstacle (?)
         // point is the point to check
         // 1 is the number of nearest neighbors to return
@@ -453,7 +467,9 @@ bool MapInfo::Collision(KDPoint &point)
 bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
 {
     if (Collision(p1) || Collision(p2))
+    {
         return true;
+    }
     std::vector<KDPoint> ps;
     ps.push_back(p1);
     ps.push_back(p2);
@@ -469,7 +485,8 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
             j += 2;
         }
     }
-    // again check for collision?
+
+    // again check for collision but this time for every point in the path?
     // for (auto p : ps)
     // {
     //     std::vector<std::pair<KDPoint, double>> result;
@@ -494,13 +511,14 @@ void MapInfo::ShowMap(void)
         rclcpp::sleep_for(std::chrono::milliseconds(100));
     }
 
-    for (auto obstacle : _obstacle_array.markers)
-    {
-        _marker_pub->publish(obstacle);
-    }
+    // force publishing
 
     for (int i = 0; i < 10; i++)
     {
+        for (auto obstacle : _obstacle_array.markers)
+        {
+            _marker_pub->publish(obstacle);
+        }
         _marker_pub->publish(_line_boundary);
         _marker_pub->publish(_m_start);
         _marker_pub->publish(_m_end);

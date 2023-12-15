@@ -45,11 +45,11 @@ public:
     this->declare_parameter("max_timeout", 3);
 
     // Obstacle parameters
-    this->declare_parameter("n_obstacles", 3);
-    this->declare_parameter("no_cylinders", false);
+    this->declare_parameter("n_obstacles", 8);
+    this->declare_parameter("no_cylinders", true);
     this->declare_parameter("no_boxes", false);
     this->declare_parameter("min_size", 0.5);
-    this->declare_parameter("max_size", 1.5);
+    this->declare_parameter("max_size", 2.5);
 
     // Print parameters values
     RCLCPP_INFO(this->get_logger(), "Parameters:");

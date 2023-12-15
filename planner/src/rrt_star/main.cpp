@@ -25,7 +25,10 @@ int main(int argc, char **argv)
     // Spin the executor in a separate thread
     auto executor_thread = std::thread([&executor]()
                                        { executor->spin(); });
-
+    while(!m->obstacles_received_ || !m->borders_received_ || !m->gates_received_)
+    {
+        sleep(0.01);
+    }
     // m->set_boundary(60, 40);
     // std::vector<KDPoint> points;
     // for (int i = 0; i < 30; ++i)
@@ -43,8 +46,8 @@ int main(int argc, char **argv)
     // m->set_obstacle(points);
     KDPoint point = {2, 2};
     m->set_start(point);
-    point = {-10, 1.5};
-    m->set_end(point);
+    // point = {-0.8, -6.3};
+    // m->set_end(point);
 
     if (m->_show_graphics)
         m->ShowMap();

@@ -14,7 +14,7 @@
 #include "geometry_msgs/msg/polygon_stamped.hpp"
 #include "obstacles_msgs/msg/obstacle_msg.hpp"
 #include "obstacles_msgs/msg/obstacle_array_msg.hpp"
-
+#include "geometry_msgs/msg/pose_array.hpp"
 // Boost geometry primitives
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
@@ -60,8 +60,7 @@ private:
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
     rclcpp::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr subscription_borders_;
     rclcpp::Subscription<obstacles_msgs::msg::ObstacleArrayMsg>::SharedPtr subscription_obstacles_;
-    bool obstacles_received_;
-    bool borders_received_;
+    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_gates_;
     // geometry_msgs::msg::PolygonStamped borders_;
     // obstacles_msgs::msg::ObstacleArrayMsg obstacles_;
 
@@ -83,6 +82,9 @@ private:
     int _pub_i;
 
 public:
+    bool obstacles_received_;
+    bool borders_received_;
+    bool gates_received_;
     double min_x, max_x, min_y, max_y;
     KDPoint pt_start;
     KDPoint pt_end;
@@ -92,6 +94,7 @@ public:
 
     void obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg);
     void borders_cb(const geometry_msgs::msg::PolygonStamped &msg);
+    void gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg);
     void set_boundary(std::vector<KDPoint> &points);
     void set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg);
 
