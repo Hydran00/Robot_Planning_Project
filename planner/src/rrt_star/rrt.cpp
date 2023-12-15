@@ -19,13 +19,15 @@ KDPoint RRT::SearchNearestVertex(KDPoint &q_rand)
 
 KDPoint RRT::CalcNewPoint(KDPoint &q_near, KDPoint &q_rand)
 {
-    if (Distance(q_near, q_rand) < 1.0)
+    // TODO -> was 1 ,branch_lenght was 1
+    if (Distance(q_near, q_rand) < 0.2)
     {
         return q_rand;
     }
+
     double angle = std::atan2(q_rand[1] - q_near[1], q_rand[0] - q_near[0]);
-    double x_new = q_near[0] + std::cos(angle);
-    double y_new = q_near[1] + std::sin(angle);
+    double x_new = q_near[0] + branch_lenght * std::cos(angle);
+    double y_new = q_near[1] + branch_lenght * std::sin(angle);
     KDPoint p = {x_new, y_new};
     return p;
 }

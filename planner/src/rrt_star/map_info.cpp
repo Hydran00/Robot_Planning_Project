@@ -88,7 +88,7 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
     // close ring
     _map.outer().push_back(_map.outer().front());
     // print polygon in wkt
-    std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
+    // std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
 
     // set the min and max values of the map for sampling
     for (auto p : points)
@@ -166,6 +166,8 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
             if (abs(obs.radius - 0.0) < EPSILON)
             {
                 _map.inners()[obs_counter].push_back(point_xy(obs.polygon.points[j].x, obs.polygon.points[j].y));
+            }else{
+
             }
         }
         // close ring
@@ -175,8 +177,7 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
             obs_counter++;
         }
     }
-    sleep(1);
-    std::cout << "Polygon with obstacles: " << boost::geometry::wkt(_map) << std::endl;
+    // std::cout << "Polygon with obstacles: " << boost::geometry::wkt(_map) << std::endl;
 }
 
 void MapInfo::set_start(KDPoint &point)
@@ -237,8 +238,10 @@ void MapInfo::set_path(std::vector<KDPoint> &path)
     _m_path.id = _id_path;
     _m_path.type = visualization_msgs::msg::Marker::LINE_STRIP;
     _m_path.pose.orientation.w = 1.0;
-    _m_path.scale.x = 0.2;
-    _m_path.scale.y = 0.2;
+    // show path map on top (avoid graphical glitches)
+    _m_path.pose.position.z += 0.05;
+    _m_path.scale.x = 0.1;
+    _m_path.scale.y = 0.1;
     _m_path.color.r = 1.0;
     _m_path.color.a = 1.0;
 
@@ -522,6 +525,6 @@ void MapInfo::ShowMap(void)
         _marker_pub->publish(_line_boundary);
         _marker_pub->publish(_m_start);
         _marker_pub->publish(_m_end);
-        rclcpp::sleep_for(std::chrono::milliseconds(100));
+        rclcpp::sleep_for(std::chrono::milliseconds(200));
     }
 }

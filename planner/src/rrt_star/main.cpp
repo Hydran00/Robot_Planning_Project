@@ -44,15 +44,14 @@ int main(int argc, char **argv)
     // }
 
     // m->set_obstacle(points);
-    KDPoint point = {2, 2};
+    KDPoint point = {0,0};
     m->set_start(point);
     // point = {-0.8, -6.3};
     // m->set_end(point);
 
     if (m->_show_graphics)
         m->ShowMap();
-
-    sleep(1.5);
+    sleep(2.0);
     std::vector<KDPoint> path;
 
     RRTStarPlan plan(m);

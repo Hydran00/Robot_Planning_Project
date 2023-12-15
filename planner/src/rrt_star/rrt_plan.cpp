@@ -66,8 +66,9 @@ std::vector<KDPoint> RRTPlan::run(void)
 
         if (Distance(q_new, MotionPlanning::_pt_end) < 1.0)
         {
-            if (q_new != MotionPlanning::_pt_end)
+            if (q_new != MotionPlanning::_pt_end){
                 _rrt.Add(MotionPlanning::_pt_end, q_new);
+            }
             return _ReconstrucPath();
         }
     }

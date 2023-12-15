@@ -14,6 +14,7 @@ class RRT
 private:
     KDPoint _root;
     std::vector<std::pair<KDPoint, int>> _rrt;
+    const double branch_lenght = 0.2;
 public:
     class iterator
     {
@@ -36,6 +37,8 @@ public:
             return *this;
         }
     };
+    // branch step length
+
     RRT(){}
     void set_root(KDPoint &p);
     KDPoint SearchNearestVertex(KDPoint &q_rand);
