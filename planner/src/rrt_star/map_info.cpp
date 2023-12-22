@@ -57,7 +57,6 @@ void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg)
     this->gates_received_ = true;
 }
 
-
 /////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 void MapInfo::set_boundary(std::vector<KDPoint> &points)
@@ -166,8 +165,9 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
             if (abs(obs.radius - 0.0) < EPSILON)
             {
                 _map.inners()[obs_counter].push_back(point_xy(obs.polygon.points[j].x, obs.polygon.points[j].y));
-            }else{
-
+            }
+            else
+            {
             }
         }
         // close ring
@@ -453,7 +453,6 @@ bool MapInfo::Collision(KDPoint &point)
     {
         // std::vector<std::pair<KDPoint, double>> result;
         // check if the point is inside an obstacle (?)
-        // point is the point to check
         // 1 is the number of nearest neighbors to return
         // result is a vector of pairs of points and their distances to the point to check
         // _okdtree.Query(point, 1, result);
@@ -477,17 +476,43 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
     ps.push_back(p1);
     ps.push_back(p2);
     double d = Distance(p1, p2);
-    while (ps.size() < d * 1.3)
+    return false;
+    // TODO check -> was 1.3
+    // while (ps.size() < d * 1.3)
+    // {
+    //     int i = 0;
+    //     int j = 1;
+    //     while (j < (int)ps.size())
+    //     {
+    //         ps.insert(ps.begin() + j, MiddlePoint(ps[i], ps[j]));
+    //         i += 2;
+    //         j += 2;
+    //     }
+    // }
+
+    // try with within function
+
+    // create segment from p1 to p2
+    // typedef boost::geometry::model::segment<point_xy> Segment;
+    point_xy p1_(p1[0], p1[1]);
+    point_xy p2_(p2[0], p2[1]);
+    Linestring l;
+    boost::geometry::append(l, p1_);
+    boost::geometry::append(l, p2_);
+
+    // check if the segment intersects with any obstacle
+    if(boost::geometry::within(l,_map))
     {
-        int i = 0;
-        int j = 1;
-        while (j < (int)ps.size())
-        {
-            ps.insert(ps.begin() + j, MiddlePoint(ps[i], ps[j]));
-            i += 2;
-            j += 2;
-        }
+        RCLCPP_INFO(this->get_logger(), "Collision detected with WITHIN! between [%f, %f] and [%f, %f] and the map", p1[0], p1[1], p2[0], p2[1]);
     }
+    if(boost::geometry::intersects(l, _map))
+    {
+        RCLCPP_INFO(this->get_logger(), "Collision detected with INTERSECTS! between [%f, %f] and [%f, %f] and the map", p1[0], p1[1], p2[0], p2[1]);
+        RCLCPP_INFO(this->get_logger(), "############################");
+        sleep(5.0);
+        return true;
+    }
+    RCLCPP_INFO(this->get_logger(), "No collision detected!");
 
     // again check for collision but this time for every point in the path?
     // for (auto p : ps)
@@ -497,13 +522,13 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
     //     if (result.begin()->second < 1.0)
     //         return true;
     // }
-    for (auto p : ps)
-    {
-        if (Collision(p))
-        {
-            return true;
-        }
-    }
+    // for (auto p : ps)
+    // {
+    //     if (Collision(p))
+    //     {
+    //         return true;
+    //     }
+    // }
     return false;
 }
 

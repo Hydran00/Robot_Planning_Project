@@ -8,7 +8,6 @@
 #include "planner/rrt_star/rrt_star_plan.hpp"
 #include "planner/rrt_star/map_info.hpp"
 
-
 using namespace std;
 int main(int argc, char **argv)
 {
@@ -25,12 +24,12 @@ int main(int argc, char **argv)
     // Spin the executor in a separate thread
     auto executor_thread = std::thread([&executor]()
                                        { executor->spin(); });
-    while(!m->obstacles_received_ || !m->borders_received_ || !m->gates_received_)
+    while (!m->obstacles_received_ || !m->borders_received_ || !m->gates_received_)
     {
         sleep(0.01);
     }
 
-    KDPoint point = {0,0};
+    KDPoint point = {-0.7, -1.15};
     m->set_start(point);
 
     if (m->_show_graphics)
@@ -42,12 +41,22 @@ int main(int argc, char **argv)
     path = plan.run();
 
     if (!path.empty())
+    {
         m->set_path(path);
+    }
 
-    // print path   
+    // print path
+    int z=0;
+    Linestring best_path;
     for (auto p : path)
     {
-        std::cout << p[0] << " " << p[1] << std::endl;
+        boost::geometry::append(best_path, point_xy(p[0], p[1]));
+        RCLCPP_INFO(m->get_logger(), "Path is in collision with a hole (INT): %d", boost::geometry::intersects(best_path, m->_map));
+        RCLCPP_INFO(m->get_logger(), "Path is in collision with a hole (WITHIN) : %d", !boost::geometry::within(best_path, m->_map));
+        z++;
+        RCLCPP_INFO(m->get_logger(), "########################################");
+
     }
-    return 0;
-}
+    // iterate inner rings
+
+    }

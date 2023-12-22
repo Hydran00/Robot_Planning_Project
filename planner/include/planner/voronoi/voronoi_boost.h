@@ -27,6 +27,7 @@ using namespace std;
 
 typedef boost::geometry::model::d2::point_xy<double> point;
 typedef boost::geometry::model::polygon<point> Polygon;
+//segment
 
 Polygon polygon;
 

@@ -17,17 +17,21 @@
 #include "geometry_msgs/msg/pose_array.hpp"
 // Boost geometry primitives
 #include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/algorithms/append.hpp> 
 // well known text representation of geometry
 #include <boost/geometry/io/wkt/wkt.hpp>
 // within to check if a point is inside a polygon
 #include <boost/geometry/algorithms/within.hpp>
-
+// intersection
+ #include <boost/geometry/algorithms/intersects.hpp> 
 
 
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
+typedef boost::geometry::model::linestring<point_xy> Linestring;
 typedef boost::geometry::model::polygon<point_xy> polygon;
+
 static const rmw_qos_profile_t rmw_qos_profile_custom =
     {
         RMW_QOS_POLICY_HISTORY_KEEP_LAST,
@@ -65,7 +69,6 @@ private:
     // obstacles_msgs::msg::ObstacleArrayMsg obstacles_;
 
     // define the map as a polygon with holes
-    polygon _map;
     visualization_msgs::msg::Marker _line_boundary;
     visualization_msgs::msg::MarkerArray _obstacle_array;
     visualization_msgs::msg::Marker _m_start;
@@ -82,6 +85,7 @@ private:
     int _pub_i;
 
 public:
+    polygon _map;
     bool obstacles_received_;
     bool borders_received_;
     bool gates_received_;
