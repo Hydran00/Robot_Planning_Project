@@ -4,15 +4,16 @@ from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from launch.conditions import IfCondition
 from launch.substitutions import PythonExpression
+from launch.actions import DeclareLaunchArgument
 
 rviz_config_dir = get_package_share_directory("planner") + "/rviz/map.rviz"
 
 
 def generate_launch_description():
-    show_graphics = True
     return LaunchDescription(
         [
             launch.actions.DeclareLaunchArgument("type", default_value="rrt_star"),
+            launch.actions.DeclareLaunchArgument("show_graphics", default_value="true"),
             Node(
                 package="planner",
                 executable="rrt_star",
@@ -21,7 +22,7 @@ def generate_launch_description():
                 parameters=[
                     {
                         "type": launch.substitutions.LaunchConfiguration("type"),
-                        "show_graphics": show_graphics,
+                        "show_graphics": launch.substitutions.LaunchConfiguration('show_graphics'),
                     }
                 ],
             ),
@@ -31,11 +32,9 @@ def generate_launch_description():
                 name="rviz",
                 output="screen",
                 condition=IfCondition(
-                    PythonExpression(
-                        [""+str(show_graphics)]
-                    )
+                    PythonExpression(["'", launch.substitutions.LaunchConfiguration("show_graphics"), "' == 'true'"])
                 ),
                 arguments=["-d", rviz_config_dir],
             ),
-        ]
+        ],
     )

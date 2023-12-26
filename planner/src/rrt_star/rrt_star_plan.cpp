@@ -57,13 +57,18 @@ std::vector<KDPoint> RRTStarPlan::run(void)
         KDPoint q_rand = _GenerateRandPoint();
         KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
         KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
-        if (MotionPlanning::_map_info->Collision(q_new))
+        // TODO check
+        // if (MotionPlanning::_map_info->Collision(q_new))
+        // {
+        //     continue;
+        // }
+        if (MotionPlanning::_map_info->Collision(q_near,q_new))
         {
             continue;
         }
         _rrt.Add(q_new, q_near);
         // TODO check radius -> was 5.0
-        _rrt.Rewire(q_new, 0.1, [&](KDPoint &p1, KDPoint &p2)
+        _rrt.Rewire(q_new, 5.0, [&](KDPoint &p1, KDPoint &p2)
                     { return MotionPlanning::_map_info->Collision(p1, p2); });
         if (MotionPlanning::_display)
         {
@@ -73,7 +78,7 @@ std::vector<KDPoint> RRTStarPlan::run(void)
         // IDEA -> when we found a solution we sample from the path
         // to decrease the cost
         // TODO -> was 1
-        if (Distance(q_new, MotionPlanning::_pt_end) < 0.2)
+        if (Distance(q_new, MotionPlanning::_pt_end) < 0.1)
         {
             if (q_new != MotionPlanning::_pt_end)
             {

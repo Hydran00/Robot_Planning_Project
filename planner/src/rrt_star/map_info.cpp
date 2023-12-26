@@ -29,13 +29,12 @@ MapInfo::~MapInfo()
 
 void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
 {
-    RCLCPP_INFO(this->get_logger(), "Obstacles received!");
     this->set_obstacle(msg);
     this->obstacles_received_ = true;
+    RCLCPP_INFO(this->get_logger(), "Obstacles received!");
 }
 void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
 {
-    RCLCPP_INFO(this->get_logger(), "Map borders received!");
 
     // read the msg and set the boundary
     std::vector<KDPoint> points;
@@ -48,13 +47,24 @@ void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
     points.push_back(pt);
     this->set_boundary(points);
     this->borders_received_ = true;
+    RCLCPP_INFO(this->get_logger(), "Map borders received!");
 }
 void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    RCLCPP_INFO(this->get_logger(), "Gate received!");
     KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y};
+    while (this->Collision(end))
+    {
+        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+        std::default_random_engine generator(seed);
+        std::uniform_real_distribution<> distribution(-3, 3);
+        double x = distribution(generator);
+        double y = distribution(generator);
+        end[0] = x;
+        end[1] = y;
+    }
     set_end(end);
     this->gates_received_ = true;
+    RCLCPP_INFO(this->get_logger(), "Gate received!");
 }
 
 /////////////////////////////////////////////////////////////
@@ -109,10 +119,6 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
             max_y = p[1];
         }
     }
-    std::cout << "min_x: " << min_x << std::endl;
-    std::cout << "max_x: " << max_x << std::endl;
-    std::cout << "min_y: " << min_y << std::endl;
-    std::cout << "max_y: " << max_y << std::endl;
 }
 
 void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
@@ -468,6 +474,7 @@ bool MapInfo::Collision(KDPoint &point)
 
 bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
 {
+
     if (Collision(p1) || Collision(p2))
     {
         return true;
@@ -475,8 +482,8 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
     std::vector<KDPoint> ps;
     ps.push_back(p1);
     ps.push_back(p2);
-    double d = Distance(p1, p2);
-    return false;
+    // double d = Distance(p1, p2);
+    // return false;
     // TODO check -> was 1.3
     // while (ps.size() < d * 1.3)
     // {
@@ -497,22 +504,23 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
     point_xy p1_(p1[0], p1[1]);
     point_xy p2_(p2[0], p2[1]);
     Linestring l;
-    boost::geometry::append(l, p1_);
-    boost::geometry::append(l, p2_);
+    l.push_back(p1_);
+    l.push_back(p2_);
 
     // check if the segment intersects with any obstacle
-    if(boost::geometry::within(l,_map))
+    // bool intersects = boost::geometry::intersects(l, _map);
+    // RCLCPP_INFO(this->get_logger(), "INTERSECTS: %s between [%f, %f] and [%f, %f] and the map", (intersects ? "TRUE" : "FALSE"), p1[0], p1[1], p2[0], p2[1]);
+    bool within = boost::geometry::within(l, _map);
+    // RCLCPP_INFO(this->get_logger(), "WITHIN: %s between [%f, %f] and [%f, %f] and the map", (within ? "TRUE" : "FALSE"), p1[0], p1[1], p2[0], p2[1]);
+    // RCLCPP_INFO(this->get_logger(), "######################################");
+    if (within)
     {
-        RCLCPP_INFO(this->get_logger(), "Collision detected with WITHIN! between [%f, %f] and [%f, %f] and the map", p1[0], p1[1], p2[0], p2[1]);
+        return false;
     }
-    if(boost::geometry::intersects(l, _map))
+    else
     {
-        RCLCPP_INFO(this->get_logger(), "Collision detected with INTERSECTS! between [%f, %f] and [%f, %f] and the map", p1[0], p1[1], p2[0], p2[1]);
-        RCLCPP_INFO(this->get_logger(), "############################");
-        sleep(5.0);
         return true;
     }
-    RCLCPP_INFO(this->get_logger(), "No collision detected!");
 
     // again check for collision but this time for every point in the path?
     // for (auto p : ps)
@@ -529,7 +537,7 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
     //         return true;
     //     }
     // }
-    return false;
+    // return false;
 }
 
 void MapInfo::ShowMap(void)

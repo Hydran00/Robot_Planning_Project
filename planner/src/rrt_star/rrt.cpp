@@ -20,7 +20,7 @@ KDPoint RRT::SearchNearestVertex(KDPoint &q_rand)
 KDPoint RRT::CalcNewPoint(KDPoint &q_near, KDPoint &q_rand)
 {
     // TODO -> was 1 ,branch_lenght was 1
-    if (Distance(q_near, q_rand) < 0.2)
+    if (Distance(q_near, q_rand) < 0.4)
     {
         return q_rand;
     }

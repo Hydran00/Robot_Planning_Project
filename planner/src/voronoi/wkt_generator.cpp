@@ -10,6 +10,8 @@
 #include "geometry_msgs/msg/polygon_stamped.hpp"
 #include "obstacles_msgs/msg/obstacle_msg.hpp"
 #include "obstacles_msgs/msg/obstacle_array_msg.hpp"
+#include <boost/geometry/algorithms/intersects.hpp> 
+
 
 #define PRECISION 100 // [cm]
 
@@ -151,6 +153,22 @@ private:
     bool borders_received_;
     bool created_wkt_;
 };
+
+void within_intersects_demo(){
+    typedef boost::geometry::model::linestring<point> Linestring;
+    // create a square with a hole inside
+    Polygon poly;
+    boost::geometry::read_wkt("POLYGON((-400 692, 400 692, 800 0, 400 -692, -400 -692, -800 0, -400 692), (-463 355, -463 457, -270 457, -270 355, -463 355), (-29 225, -29 379, 170 379, 170 225, -29 225), (300 -21, 300 101, 475 101, 475 -21, 300 -21), (-25 -532, -25 -361, 151 -361, 151 -532, -25 -532), (-300 189, -300 338, -172 338, -172 189, -300 189), (4 443, 4 555, 159 555, 159 443, 4 443), (-397 -352, -397 -214, -212 -214, -212 -352, -397 -352), (-689 207, -689 370, -502 370, -502 207, -689 207), (-351 -117, -351 72, -233 72, -233 -117, -351 -117), (-109 -316, -109 -162, 87 -162, 87 -316, -109 -316), (-201 -569, -201 -404, -57 -404, -57 -569, -201 -569), (516 52, 516 248, 662 248, 662 52, 516 52))", poly);
+    point p1(5, 5);
+    point p2(0.5, 0.5);
+    Linestring line;
+    line.push_back(p1);
+    line.push_back(p2);
+    //check within
+    std::cout << "within: " << boost::geometry::within(line, poly) << std::endl;
+    std::cout << "intersects: " << boost::geometry::intersects(line, poly) << std::endl;
+
+}
 
 int main(int argc, char *argv[])
 {

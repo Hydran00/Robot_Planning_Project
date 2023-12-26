@@ -1,6 +1,6 @@
 #include <iostream>
-#include <unistd.h>
-#include <fstream>
+// #include <unistd.h>
+// #include <fstream>
 
 #include "planner/rrt_star/kdtree.hpp"
 #include "planner/rrt_star/rrt.hpp"
@@ -16,27 +16,36 @@ int main(int argc, char **argv)
     auto m = std::make_shared<MapInfo>();
 
     // Create a MultiThreadedExecutor
-    auto executor = std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
+    rclcpp::executors::SingleThreadedExecutor executor;
 
     // Add your node to the executor
-    executor->add_node(m);
+    executor.add_node(m);
 
     // Spin the executor in a separate thread
-    auto executor_thread = std::thread([&executor]()
-                                       { executor->spin(); });
+    std::thread([&executor]()
+                { executor.spin(); })
+        .detach();
+    RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
     while (!m->obstacles_received_ || !m->borders_received_ || !m->gates_received_)
     {
-        sleep(0.01);
+        rclcpp::sleep_for(std::chrono::milliseconds(10));
     }
-
     KDPoint point = {-0.7, -1.15};
+    while (m->Collision(point))
+    {
+        point[0] += 0.1;
+    }
     m->set_start(point);
 
     if (m->_show_graphics)
+    {
         m->ShowMap();
-    sleep(2.0);
+    }
+    rclcpp::sleep_for(std::chrono::seconds(1));
     std::vector<KDPoint> path;
 
+    // Monitor execution time
+    auto time_start = rclcpp::Clock().now();
     RRTStarPlan plan(m);
     path = plan.run();
 
@@ -46,17 +55,25 @@ int main(int argc, char **argv)
     }
 
     // print path
-    int z=0;
+    int z = 0;
     Linestring best_path;
     for (auto p : path)
     {
-        boost::geometry::append(best_path, point_xy(p[0], p[1]));
-        RCLCPP_INFO(m->get_logger(), "Path is in collision with a hole (INT): %d", boost::geometry::intersects(best_path, m->_map));
-        RCLCPP_INFO(m->get_logger(), "Path is in collision with a hole (WITHIN) : %d", !boost::geometry::within(best_path, m->_map));
+        best_path.push_back(point_xy(p[0], p[1]));
+        cout << boost::geometry::wkt(best_path) << endl;
+        // RCLCPP_INFO(m->get_logger(), "(WITHIN) : %s", (boost::geometry::within(best_path, m->_map)) ? "true" : "false");
         z++;
-        RCLCPP_INFO(m->get_logger(), "########################################");
-
+        // RCLCPP_INFO(m->get_logger(), "########################################");
+        cout << "WITHIN: " << (boost::geometry::within(best_path, m->_map) ? "TRUE" : "FALSE") << endl;
+        cout << "########################################" << endl;
     }
+    auto time_end = rclcpp::Clock().now();
+    auto time_diff = time_end - time_start;
+    cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
+    executor.cancel();
+    // executor_thread.join();
+    rclcpp::shutdown();
+    cout << "Done!" << endl;
+    return 0;
     // iterate inner rings
-
-    }
+}
