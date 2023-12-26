@@ -68,7 +68,7 @@ target_include_directories(wkt_generator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/incl
 
 #############################################################################
 
-# RRT_Dubins
+# RRT
 add_executable(rrt_star 
   ${RRTSTAR_FOLDER}/main.cpp
   ${RRTSTAR_FOLDER}/rrt.cpp 
@@ -88,6 +88,21 @@ target_link_libraries(rrt_star Boost::headers)
 target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
+
+
+# Dubins
+
+add_executable(dubins
+  src/dubins/dubins.cpp
+)
+
+ament_target_dependencies(dubins
+  rclcpp
+  geometry_msgs
+)
+
+#############################################################################
+
 
 # Install folders
 
