@@ -25,7 +25,7 @@
   - [What you should provide](#what-you-should-provide)
   - [When you should provide the what](#when-you-should-provide-the-what)
   - [How you should provide the what](#how-you-should-provide-the-what)
-- [Other Useful Info](#other-useful-info)
+- [Other useful information](#other-useful-information)
 - [TODOs on my end](#todos-on-my-end)
 - [P.S.](#ps)
 
@@ -45,8 +45,10 @@ Each group of students, composed at maximum of 3 students $\left(|\text{group}|\
 
 General assumptions are:
 
-- The robots move at constant speed, i.e., use Dubins manoeuvres; the speed of the robot cannot be decreased or increased at any time, you have to plan with constant velocity in mind. 
+- The robots move at constant speed, i.e., use Dubins manoeuvres;
 - Touching the borders of the map and/or the obstacle will decrease the point obtained by completely the task successfully.  
+- The robots (except for the pursuer in the evasion scenario) must reach the center of the gate and with the angle provided in the topic.
+- Obstacles may have different shapes, so do not assume they are polygons.
 
 ## Coordinate Evacuation
 
@@ -117,7 +119,7 @@ You will lose points for:
 - While victims are circles of radius 0.5m, the robot must pass though the center of the circle in order to rescue them. 
 - The robot does not need to stop to rescue e victim.
 - The robot and the victims are initially deployed in random positions.
-- Since robots move at constant velocity, they should not stop.
+- Since robots move at constant velocity, they _must not_ stop or slow down.
 
 ## Pursuit-Evasion
 
@@ -129,7 +131,7 @@ The project is about capturing an evader robot (evader) using a pursuer robot. B
 
 The map can have one or more exit points and the project has different levels of difficulty, as detailed below.
 
-While the evader will be provided, the students will have to code the behaviour of the pursuer so that it can catch the evader.
+The students will have to code the behaviour of both the pursuer and the evader.
 
 
 ### Evaluation
@@ -151,9 +153,10 @@ Also the points will be given based on the difficulty of the scenario: catching 
 
 - The robots are initially deployed at random positions.
 - The evader _is controller by the computer_ but it HAS to move following the same roadmap computed by the pursuer. The students will have to publish said roadmap on a topic so that it can be used by the evader algorithm to compute the path.
-- You can assume that once the evader takes a link, it has to complete the movement and cannot back-off or stop.
-- Since robots move at constant velocity, they _should_ not stop.
+- You can assume that once the evader takes a link of the graph, it has to complete the movement and cannot back-off or stop.
+- Since robots move at constant velocity, they _must_ not stop or slow down.
 - The pursuer does not know the evader's future path, hence you cannot read from the evader topic to get the path it will follow. 
+- Once the evader has chosen a gate to reach, it will follow the shortest path to the gate without considering other smarter policies to avoid the pursuer(s).
 
 ### Level of complexity
 
@@ -251,12 +254,17 @@ You should write C++ (standard 17) nodes that allow the robots to complete their
 ## What you should provide
 
 - A PDF report describing the approach followed, the reason why you decided to follow said approach and the difficulties encountered. You should also, but it's not mandatory, include possible results that you have obtained, for example, statistics on the times it takes to compute a solution and/or the length of the solutions it finds. Any information that you think may be interesting regarding the project should be included.
-- An archive containing all the software to allow reproducing the approach written in the report.
-- Optionally, one or more videos showing how your code works and showing a few simulations completed successfully. This does NOT replace the exam, i.e., the simulations run on the day of the exam, in any way or form, but may be used to your advantage. 
+- An archive containing all the software to allow reproducing the approach written in the report. 
 
 ## When you should provide the what
 
 You should deliver the report and the code at least **1 week** before the date of the exam. Exam dates will be released in the near future and this document will be updated with them.
+
+| Date of exam | Delivery date          |
+|--------------|------------------------|
+| 12/01/2024   | 11/01/2024 12:00 (CET) |
+| 16/02/2024   | 14/02/2024 23:59 (CET) |
+| TBD          | One week before        |
 
 ## How you should provide the what 
 
@@ -268,13 +276,10 @@ In any case, for the delivery you will have to provide an archive containing the
 
 You should send the archive and the pdf to me as an email and wait for my ACK on the reception of the email. Also, in the email you should state the group components, and a name for the group (if you have chosen one). 
 
-# Other Useful Info
+# Other useful information
 
-Since many of you have asked, we are going to provide a computer in the robotics laboratory at DISI. Please, to use it coordinate with me for the creation of your account. After this step, you'll be able to book timeslots to work on the projects, through a portal that I'll set up.
-
-The exams of January and (likely) February are going to be simulation-based, i.e., the mark will be given on how your code will work with the simulation. The exams during the summer exam session will be also graded on how the code works on the real robots, until further notice.
-
-While you are allowed to use external libraries, you must show in the report that you fully understand what you are doing and provide good reasons for the usage and choice of that particular library. 
+- You can use any C++ standard from C++14 and above. Mind though that the last standard for which ROS2 has complete support is C++17, while for above stanrdard there may be problems when compiling.
+- AFAIC, using Nav2 FollowPath is the best course of actions. In this case, you should create your path using Dubins, split it in segments with the same lengths and then make a request to the Nav2 FollowPat action server to follow the points that you passed. The only part of this that is implemented is the Nav2 FollowPath server, but both the Dubins planner and the action client must be coded by you. 
 
 # TODOs on my end
 

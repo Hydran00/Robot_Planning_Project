@@ -109,8 +109,10 @@ bool overlaps(obstacle obs1, std::vector<obstacle> obstacles){
 bool is_inside_map(obstacle obs, std::string map, double dx, double dy){
   bool inside = false;
 
-  std::cout << "Checking obstacle " << obs.x << ", " << obs.y << ", " << obs.radius << ", " << obs.dx << ", " << obs.dy 
-            << " in map " << map << " dx: " << dx << " dy: " << dy << std::endl;
+  RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),
+    "Checking obstacle %f, %f, %f, %f, %f, in map %s dx: %f  dy: %f", 
+    obs.x, obs.y, obs.radius, obs.dx, obs.dy, map.c_str(), dx, dy
+  );
 
   h2d::CPolyline map_poly;
   if (map == "rectangle"){
@@ -149,7 +151,88 @@ bool is_inside_map(obstacle obs, std::string map, double dx, double dy){
     inside = false;
   }  
 
-  std::cout << "Result: " << (inside ? "inside" : "NOT inside") << std::endl;
+  RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Result: %s", (inside ? "inside" : "NOT inside"));
   return inside;
 }
 
+
+geometry_msgs::msg::Polygon create_hexagon(double dx){
+        geometry_msgs::msg::Polygon pol;
+        geometry_msgs::msg::Point32 point;
+        std::vector<geometry_msgs::msg::Point32> points_temp;
+        double f = 0.866;  // fixed number for apothem of hexagon calculation
+        point.x = -dx/2;
+        point.y = dx*f;
+        point.z = 0;
+        points_temp.push_back(point);
+        point.x = dx/2;
+        point.y = dx*f;
+        point.z = 0;
+        points_temp.push_back(point);
+        point.x = dx;
+        point.y = 0;
+        point.z = 0;
+        points_temp.push_back(point);
+        point.x = dx/2;
+        point.y = -dx*f;
+        point.z = 0;
+        points_temp.push_back(point);
+        point.x = -dx/2;
+        point.y = -dx*f;
+        point.z = 0;
+        points_temp.push_back(point);
+        point.x = -dx;
+        point.y = 0;
+        point.z = 0;
+        points_temp.push_back(point);
+        pol.points = points_temp;
+        return pol;
+}
+
+
+geometry_msgs::msg::Polygon create_rectangle(double dx, double dy){
+        geometry_msgs::msg::Polygon pol;
+        geometry_msgs::msg::Point32 point;
+        std::vector<geometry_msgs::msg::Point32> points_temp;
+        point.x = -dx/2; 
+        point.y = -dy/2;
+        point.z = 0;
+        points_temp.push_back(point);
+        point.x = -dx/2; 
+        point.y = dy/2;
+        point.z = 0;
+        points_temp.push_back(point);
+        point.x = dx/2;
+        point.y = dy/2; 
+        point.z = 0;
+        points_temp.push_back(point);
+        point.x = dx/2;
+        point.y = -dy/2; 
+        point.z = 0;
+        points_temp.push_back(point);
+        pol.points = points_temp;
+        return pol;
+}
+
+/**
+ * @brief Checks if the obstacle overlaps with any other obstacle in the vector
+ * 
+ * @param obs The obstacle to check
+ * @param obstacles The vector of obstacles
+ * @param map The type of the map (rectangle or hexagon)
+ * @param dx x dimension of the map
+ * @param dy y dimension of the map
+ * @return true If the obstacle does not overlap and is inside the map
+ * @return false If the obstacle overlaps or is outside the map
+ */
+bool valid_position(
+  std::string map, double dx, double dy,
+  const obstacle & obs, std::vector<std::vector<obstacle>> others 
+)
+{
+  bool res = is_inside_map(obs, map, dx, dy);
+  for (auto other : others) {
+    res &= !overlaps(obs, other);
+  }
+  return res;
+}
