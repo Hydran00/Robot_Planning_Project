@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <vector>
+#include <tuple>
 
 class DubinsPath
 {
@@ -17,6 +18,8 @@ public:
 
     std::vector<std::vector<std::vector<double>>> calc_paths();
     std::vector<std::vector<double>> get_shortest_path();
+    std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> gen_path(
+        const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r, bool section);
 
 private:
     std::vector<double> calc_end();

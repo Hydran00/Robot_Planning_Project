@@ -137,6 +137,7 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   scripts/plot.py
   scripts/map_publisher.py
+  scripts/visualise_dubins.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
