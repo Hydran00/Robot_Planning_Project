@@ -1,11 +1,16 @@
-#include "planner/dubins/dubins.h"
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
+#include "planner/dubins/dubins.h"
+
 
 DubinsPath::DubinsPath(std::vector<double> start, std::vector<double> end, double r)
     : _s({start}), _e({end}), _r(r) {}
 
 std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> DubinsPath::gen_path(
-    const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r = 1.0, bool section = true)
+    const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r = 1.0, double step = 0.1, bool section = true)
 {
 
     auto calc_TurnCenter = [](const std::vector<double> &point, char dir, double r) -> std::tuple<double, double>
@@ -42,6 +47,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> D
         {
             for (double l = 0.0; l < p[1]; l += 0.5)
             {
+                std::cout << "l: " << l << std::endl;
                 ps_x.push_back(start[0] + std::cos(yaw) * l);
                 ps_y.push_back(start[1] + std::sin(yaw) * l);
             }
@@ -52,7 +58,9 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> D
                 r_x.push_back(ps_x);
                 r_y.push_back(ps_y);
             }
-            // else {
+            else {
+                std::cout << "section false" << std::endl;
+            }
             //     r_x.insert(r_x.end(), ps_x.begin(), ps_x.end());
             //     r_y.insert(r_y.end(), ps_y.begin(), ps_y.end());
 
@@ -63,7 +71,6 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> D
             auto center = calc_TurnCenter(start, static_cast<char>(p[0]), r);
             double ang_start = std::atan2(start[1] - std::get<1>(center), start[0] - std::get<0>(center));
             double ang_end = ang_start + p[1] * (p[0] == 'l' ? 1 : -1);
-            double step = 0.5 / r;
             for (double ang = ang_start; (p[0] == 'l' ? ang <= ang_end : ang >= ang_end); ang += (p[0] == 'l' ? step : -step))
             {
                 ps_x.push_back(std::get<0>(center) + std::cos(ang) * r);
@@ -75,6 +82,9 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> D
             {
                 r_x.push_back(ps_x);
                 r_y.push_back(ps_y);
+            }
+            else{
+                std::cout << "section false" << std::endl;
             }
             // else
             // {
@@ -241,10 +251,13 @@ int main()
     }
 
     // Generate the full Dubins path
-    auto full_dubins_path = dubins_path.gen_path(start, shortest_path);
+    double r = 1.0;
+    double step = 0.1/r;
+    auto full_dubins_path = dubins_path.gen_path(start, shortest_path, r ,step);
 
     // // Print the full Dubins path
     std::cout << "\nFull Dubins Path:" << std::endl;
+
     for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i) {
         // std::cout << "Section " << i + 1 << ":" << std::endl;
         for (size_t j = 0; j < std::get<0>(full_dubins_path)[i].size(); ++j) {
@@ -252,6 +265,13 @@ int main()
         }
         // std::cout << std::endl;
     }
-
+    // save on file
+    std::string path = ament_index_cpp::get_package_share_directory("planner") + "/data/dubins_path.txt";
+    std::ofstream fout(path);
+    for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i) {
+        for (size_t j = 0; j < std::get<0>(full_dubins_path)[i].size(); ++j) {
+            fout << std::get<0>(full_dubins_path)[i][j] << ", " << std::get<1>(full_dubins_path)[i][j] << std::endl;
+        }
+    }
     return 0;
 }
