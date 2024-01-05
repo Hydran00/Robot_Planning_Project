@@ -1,4 +1,4 @@
-#include "planner/rrt_star/rrt.hpp"
+#include "planner/rrt/utils/rrt.hpp"
 
 void RRT::set_root(KDPoint &p)
 {

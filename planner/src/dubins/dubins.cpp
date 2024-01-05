@@ -47,7 +47,6 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> D
         {
             for (double l = 0.0; l < p[1]; l += 0.5)
             {
-                std::cout << "l: " << l << std::endl;
                 ps_x.push_back(start[0] + std::cos(yaw) * l);
                 ps_y.push_back(start[1] + std::sin(yaw) * l);
             }
@@ -235,43 +234,43 @@ std::vector<std::vector<double>> DubinsPath::calc_rlr_from_origin(std::vector<do
     return path;
 }
 
-int main()
-{
-    std::vector<double> start = {-1, -2, -M_PI};
-    std::vector<double> end = {3, 4, M_PI / 2};
-    DubinsPath dubins_path(start, end);
-    auto paths = dubins_path.calc_paths();
-    auto shortest_path = dubins_path.get_shortest_path();
+// int main()
+// {
+//     std::vector<double> start = {-1, -2, -M_PI};
+//     std::vector<double> end = {3, 4, M_PI / 2};
+//     double radius = 2.0;
+//     DubinsPath dubins_path(start, end, radius);
+//     auto paths = dubins_path.calc_paths();
+//     auto shortest_path = dubins_path.get_shortest_path();
 
-    // Print the shortest path
-    std::cout << "Shortest Dubins Path:" << std::endl;
-    for (const auto &point : shortest_path)
-    {
-        std::cout << "X: " << point[0] << ", Y: " << point[1] << ", Yaw: " << point[2] << std::endl;
-    }
+//     // Print the shortest path
+//     std::cout << "Shortest Dubins Path:" << std::endl;
+//     for (const auto &point : shortest_path)
+//     {
+//         std::cout << "X: " << point[0] << ", Y: " << point[1] << ", Yaw: " << point[2] << std::endl;
+//     }
 
-    // Generate the full Dubins path
-    double r = 1.0;
-    double step = 0.1/r;
-    auto full_dubins_path = dubins_path.gen_path(start, shortest_path, r ,step);
+//     // Generate the full Dubins path
+//     double step = 0.1/radius;
+    // auto full_dubins_path = dubins_path.gen_path(start, shortest_path, radius ,step);
 
-    // // Print the full Dubins path
-    std::cout << "\nFull Dubins Path:" << std::endl;
+//     // // Print the full Dubins path
+//     std::cout << "\nFull Dubins Path:" << std::endl;
 
-    for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i) {
-        // std::cout << "Section " << i + 1 << ":" << std::endl;
-        for (size_t j = 0; j < std::get<0>(full_dubins_path)[i].size(); ++j) {
-            std::cout << std::get<0>(full_dubins_path)[i][j] << ", " << std::get<1>(full_dubins_path)[i][j] << std::endl;
-        }
-        // std::cout << std::endl;
-    }
-    // save on file
-    std::string path = ament_index_cpp::get_package_share_directory("planner") + "/data/dubins_path.txt";
-    std::ofstream fout(path);
-    for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i) {
-        for (size_t j = 0; j < std::get<0>(full_dubins_path)[i].size(); ++j) {
-            fout << std::get<0>(full_dubins_path)[i][j] << ", " << std::get<1>(full_dubins_path)[i][j] << std::endl;
-        }
-    }
-    return 0;
-}
+//     for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i) {
+//         // std::cout << "Section " << i + 1 << ":" << std::endl;
+//         for (size_t j = 0; j < std::get<0>(full_dubins_path)[i].size(); ++j) {
+//             std::cout << std::get<0>(full_dubins_path)[i][j] << ", " << std::get<1>(full_dubins_path)[i][j] << std::endl;
+//         }
+//         // std::cout << std::endl;
+//     }
+//     // save on file
+//     std::string path = ament_index_cpp::get_package_share_directory("planner") + "/data/dubins_path.txt";
+//     std::ofstream fout(path);
+//     for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i) {
+//         for (size_t j = 0; j < std::get<0>(full_dubins_path)[i].size(); ++j) {
+//             fout << std::get<0>(full_dubins_path)[i][j] << ", " << std::get<1>(full_dubins_path)[i][j] << std::endl;
+//         }
+//     }
+//     return 0;
+// }

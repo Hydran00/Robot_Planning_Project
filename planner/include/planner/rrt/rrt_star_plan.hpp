@@ -4,9 +4,9 @@
 #include <vector>
 #include <random>
 #include <chrono>
-#include "motionplanning.hpp"
-#include "kdtree.hpp"
-#include "rrt.hpp"
+#include "utils/motionplanning.hpp"
+#include "utils/kdtree.hpp"
+#include "utils/rrt.hpp"
 
 class RRTStarPlan : public MotionPlanning
 {

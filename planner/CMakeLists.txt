@@ -35,7 +35,7 @@ find_package(Boost 1.74)
 # Variables
 
 set(VORONOI_FOLDER src/voronoi)
-set(RRTSTAR_FOLDER src/rrt_star)
+set(RRTSTAR_FOLDER src/rrt)
 
 #############################################################################
 
@@ -68,14 +68,14 @@ target_include_directories(wkt_generator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/incl
 
 #############################################################################
 
-# RRT
+# RRT*
 add_executable(rrt_star 
   ${RRTSTAR_FOLDER}/main.cpp
-  ${RRTSTAR_FOLDER}/rrt.cpp 
   ${RRTSTAR_FOLDER}/rrt_plan.cpp 
   ${RRTSTAR_FOLDER}/rrt_star_plan.cpp
-  ${RRTSTAR_FOLDER}/kdtree.cpp
-  ${RRTSTAR_FOLDER}/map_info.cpp 
+  ${RRTSTAR_FOLDER}/utils/rrt.cpp 
+  ${RRTSTAR_FOLDER}/utils/kdtree.cpp
+  ${RRTSTAR_FOLDER}/utils/map_info.cpp 
 )
 
 ament_target_dependencies(rrt_star
@@ -89,21 +89,43 @@ target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
 
-
 # Dubins
 
-add_executable(dubins
-  src/dubins/dubins.cpp
-)
+# add_executable(dubins
+#   src/dubins/dubins.cpp
+# )
 
-ament_target_dependencies(dubins
-  rclcpp
-  geometry_msgs
-)
+# ament_target_dependencies(dubins
+#   rclcpp
+#   geometry_msgs
+# )
 
-target_include_directories(dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# target_include_directories(dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 #############################################################################
 
+# RRT* Dubins
+
+# RRT
+add_executable(rrt_star_dubins
+  ${RRTSTAR_FOLDER}/main_dubins.cpp
+  ${RRTSTAR_FOLDER}/rrt_plan.cpp 
+  ${RRTSTAR_FOLDER}/rrt_star_dubins_plan.cpp
+  ${RRTSTAR_FOLDER}/utils/rrt.cpp 
+  ${RRTSTAR_FOLDER}/utils/kdtree.cpp
+  ${RRTSTAR_FOLDER}/utils/map_info.cpp 
+  src/dubins/dubins.cpp
+  )
+
+ament_target_dependencies(rrt_star_dubins
+  rclcpp
+  visualization_msgs
+  geometry_msgs
+  obstacles_msgs
+)
+target_link_libraries(rrt_star_dubins Boost::headers)
+target_include_directories(rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+#############################################################################
 
 # Install folders
 
@@ -126,7 +148,8 @@ install(TARGETS
   voronoi_boost
   wkt_generator
   rrt_star
-  dubins
+  rrt_star_dubins
+  # dubins
   DESTINATION lib/${PROJECT_NAME})
 
 #############################################################################

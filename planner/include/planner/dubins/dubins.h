@@ -8,9 +8,13 @@
 class DubinsPath
 {
 private:
+    // start
     std::vector<std::vector<double>> _s;
+    // end
     std::vector<std::vector<double>> _e;
+    // radius
     double _r;
+    // paths
     std::vector<std::vector<std::vector<double>>> _paths;
 
 public:

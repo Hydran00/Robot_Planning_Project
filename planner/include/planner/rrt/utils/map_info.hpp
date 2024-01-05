@@ -34,16 +34,17 @@ typedef boost::geometry::model::linestring<point_xy> Linestring;
 typedef boost::geometry::model::polygon<point_xy> polygon;
 
 static const rmw_qos_profile_t rmw_qos_profile_custom =
-    {
-        RMW_QOS_POLICY_HISTORY_KEEP_LAST,
-        10,
-        RMW_QOS_POLICY_RELIABILITY_RELIABLE,
-        RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL,
-        RMW_QOS_DEADLINE_DEFAULT,
-        RMW_QOS_LIFESPAN_DEFAULT,
-        RMW_QOS_POLICY_LIVELINESS_SYSTEM_DEFAULT,
-        RMW_QOS_LIVELINESS_LEASE_DURATION_DEFAULT,
-        false};
+{
+  RMW_QOS_POLICY_HISTORY_KEEP_LAST,
+  10,
+  RMW_QOS_POLICY_RELIABILITY_RELIABLE,
+  RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL,
+  RMW_QOS_DEADLINE_DEFAULT,
+  RMW_QOS_LIFESPAN_DEFAULT,
+  RMW_QOS_POLICY_LIVELINESS_SYSTEM_DEFAULT,
+  RMW_QOS_LIVELINESS_LEASE_DURATION_DEFAULT,
+  false
+};
 
 class MapInfo : public rclcpp::Node
 {

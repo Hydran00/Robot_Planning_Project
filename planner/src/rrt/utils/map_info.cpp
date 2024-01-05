@@ -1,4 +1,4 @@
-#include "planner/rrt_star/map_info.hpp"
+#include "planner/rrt/utils/map_info.hpp"
 
 MapInfo::MapInfo() : Node("map"), _pub_i(0)
 {

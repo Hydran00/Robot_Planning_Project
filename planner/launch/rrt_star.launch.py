@@ -17,7 +17,7 @@ def generate_launch_description():
             Node(
                 package="planner",
                 executable="rrt_star",
-                name="RRTSTAR",
+                name="rrt_star",
                 output="screen",
                 parameters=[
                     {
