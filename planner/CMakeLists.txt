@@ -101,6 +101,7 @@ ament_target_dependencies(dubins
   geometry_msgs
 )
 
+target_include_directories(dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 #############################################################################
 
 
@@ -125,6 +126,7 @@ install(TARGETS
   voronoi_boost
   wkt_generator
   rrt_star
+  dubins
   DESTINATION lib/${PROJECT_NAME})
 
 #############################################################################
