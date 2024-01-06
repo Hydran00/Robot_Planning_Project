@@ -11,10 +11,10 @@ def test2(path):
     end = path[-1]
     plt.figure()
     # for i in range(12):
-    plt.title('{}{}{}'.format(path[0][0], path[1][0], path[2][0]))
+    plt.title("Dubins best path")
     draw_point(start)
     draw_point(end)
-    plt.plot(path[:,0], path[:,1], 'r-')
+    plt.plot(path[:,0], path[:,1], 'o')
     plt.axis("equal")
     plt.show()
 

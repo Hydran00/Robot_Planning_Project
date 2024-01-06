@@ -20,31 +20,29 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/algorithms/append.hpp> 
+#include <boost/geometry/algorithms/append.hpp>
 // well known text representation of geometry
 #include <boost/geometry/io/wkt/wkt.hpp>
 // within to check if a point is inside a polygon
 #include <boost/geometry/algorithms/within.hpp>
 // intersection
- #include <boost/geometry/algorithms/intersects.hpp> 
-
+#include <boost/geometry/algorithms/intersects.hpp>
 
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::linestring<point_xy> Linestring;
 typedef boost::geometry::model::polygon<point_xy> polygon;
 
 static const rmw_qos_profile_t rmw_qos_profile_custom =
-{
-  RMW_QOS_POLICY_HISTORY_KEEP_LAST,
-  10,
-  RMW_QOS_POLICY_RELIABILITY_RELIABLE,
-  RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL,
-  RMW_QOS_DEADLINE_DEFAULT,
-  RMW_QOS_LIFESPAN_DEFAULT,
-  RMW_QOS_POLICY_LIVELINESS_SYSTEM_DEFAULT,
-  RMW_QOS_LIVELINESS_LEASE_DURATION_DEFAULT,
-  false
-};
+    {
+        RMW_QOS_POLICY_HISTORY_KEEP_LAST,
+        10,
+        RMW_QOS_POLICY_RELIABILITY_RELIABLE,
+        RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL,
+        RMW_QOS_DEADLINE_DEFAULT,
+        RMW_QOS_LIFESPAN_DEFAULT,
+        RMW_QOS_POLICY_LIVELINESS_SYSTEM_DEFAULT,
+        RMW_QOS_LIVELINESS_LEASE_DURATION_DEFAULT,
+        false};
 
 class MapInfo : public rclcpp::Node
 {
@@ -64,6 +62,7 @@ private:
         _id_rrt = 10,
     };
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
+    // rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr _markerarray_pub;
     rclcpp::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr subscription_borders_;
     rclcpp::Subscription<obstacles_msgs::msg::ObstacleArrayMsg>::SharedPtr subscription_obstacles_;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_gates_;
@@ -113,6 +112,7 @@ public:
     void set_rand_points(std::vector<KDPoint> &points);
     void set_roadmap(std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
     void set_rrt(RRT &rrt, int n, KDPoint &rand);
+    void set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>> path, int n);
     bool Collision(KDPoint &point);
     bool Collision(KDPoint &p1, KDPoint &p2);
     void ShowMap(void);

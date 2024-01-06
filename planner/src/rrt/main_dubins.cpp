@@ -32,12 +32,17 @@ int main(int argc, char **argv)
 
     auto m = std::make_shared<MapInfo>();
 
-    sleep(1);
+    sleep(1.5);
     RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
     while (!m->obstacles_received_ || !m->borders_received_ || !m->gates_received_)
     {
         rclcpp::spin_some(m);
     }
+    // string wkt = "";
+    // Linestring p;
+    // boost::geometry::read_wkt(wkt, p);
+    // std::cout << "WITHIN: " << (boost::geometry::within(p, m->_map) ? "YES" : "NO") << std::endl;
+
     KDPoint point = {0, 0, 0};
     while (m->Collision(point))
     {

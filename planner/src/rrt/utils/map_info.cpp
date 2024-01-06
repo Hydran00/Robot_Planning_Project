@@ -3,6 +3,7 @@
 MapInfo::MapInfo() : Node("map"), _pub_i(0)
 {
     this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 1000);
+    // this->_markerarray_pub = create_publisher<visualization_msgs::msg::MarkerArray>("visualization_marker_array", 1000);
     this->declare_parameter("show_graphics", true);
     this->_show_graphics = this->get_parameter("show_graphics").as_bool();
     RCLCPP_INFO(this->get_logger(), "show_graphics: %s", this->_show_graphics ? "true" : "false");
@@ -108,7 +109,7 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
     // close ring
     _map.outer().push_back(_map.outer().front());
     // print polygon in wkt
-    // std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
+    std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
 
     // set the min and max values of the map for sampling
     for (auto p : points)
@@ -134,7 +135,7 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
 
 void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
 {
-    int i = 100;
+    int i = 11;
     int obs_counter = 0;
     _map.inners().resize(msg.obstacles.size());
     RCLCPP_INFO(this->get_logger(), "Found %d obstacles", (int)msg.obstacles.size());
@@ -194,7 +195,9 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
             obs_counter++;
         }
     }
-    // std::cout << "Polygon with obstacles: " << boost::geometry::wkt(_map) << std::endl;
+    rclcpp::sleep_for(std::chrono::milliseconds(1000));
+    std::cout << "Polygon with obstacles: \n"
+              << boost::geometry::wkt(_map) << std::endl;
 }
 
 void MapInfo::set_start(KDPoint &point)
@@ -284,7 +287,7 @@ void MapInfo::set_dubins_path(std::tuple<std::vector<double>, std::vector<double
     _m_path.type = visualization_msgs::msg::Marker::LINE_STRIP;
     _m_path.pose.orientation.w = 1.0;
     // show path map on top (avoid graphical glitches)
-    _m_path.pose.position.z += 0.05;
+    _m_path.pose.position.z = 0.05;
     _m_path.scale.x = 0.1;
     _m_path.scale.y = 0.1;
     _m_path.color.r = 1.0;
@@ -482,6 +485,50 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
     }
     _marker_pub->publish(_m_rand_point);
     _marker_pub->publish(_m_rrt);
+    _pub_i = (_pub_i + 1) % 10;
+    if (_pub_i == 0)
+    {
+        // rclcpp::sleep_for(std::chrono::milliseconds(10));
+        return;
+    }
+}
+
+// void MapInfo::set_rrt_dubins(std::vector<std::tuple<std::vector<double>,std::vector<double>>> paths)
+void MapInfo::set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>> path, int n)
+{
+    visualization_msgs::msg::Marker branch;
+    branch.header.frame_id = "map";
+    branch.header.stamp = now();
+    branch.action = visualization_msgs::msg::Marker::ADD;
+    branch.ns = "map";
+    // change id to avoid overwriting
+    branch.id = _id_rrt + 100 + n;
+    branch.type = visualization_msgs::msg::Marker::LINE_LIST;
+    branch.pose.orientation.w = 1.0;
+    branch.scale.x = 0.1;
+    branch.scale.y = 0.1;
+    branch.scale.y = 0.1;
+    branch.color.b = 0.5;
+    branch.color.g = 0.5;
+    branch.color.a = 1.0;
+
+    branch.points.clear();
+    for (size_t i = 0; i < std::get<0>(path).size() - 1; ++i)
+    {
+        geometry_msgs::msg::Point p1, p2;
+        p1.x = std::get<0>(path)[i];
+        p1.y = std::get<1>(path)[i];
+        p1.z = 0;
+
+        p2.x = std::get<0>(path)[i + 1];
+        p2.y = std::get<1>(path)[i + 1];
+        p2.z = 0;
+        branch.points.push_back(p1);
+        branch.points.push_back(p2);
+    }
+    _marker_pub->publish(branch);
+    // _m_rrt.points.clear();
+
     _pub_i = (_pub_i + 1) % 10;
     if (_pub_i == 0)
     {

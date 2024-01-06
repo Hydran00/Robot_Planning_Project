@@ -16,7 +16,7 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(void)
     if (dis_s(generator) < 2)
     {
         return MotionPlanning::_pt_end;
-        // std::uniform_int_distribution<int> dis_s; ???????
+        // std::uniform_int_distribution<int> dis_s; TODO wtf ???????
     }
     else
     {
@@ -54,13 +54,11 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(void)
 
 std::vector<KDPoint> RRTStarDubinsPlan::run(void)
 {
+    int n = 0;
     while (true)
     {
         KDPoint q_rand = _GenerateRandPoint();
-        // std::cout << "q_rand: " << q_rand[0] << " " << q_rand[1] << " " << q_rand[2] << std::endl;
         KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
-        // std::cout << "q_near: " << q_near[0] << " " << q_near[1] << " " << q_near[2] << std::endl;
-        // NOT USED: dubins can reach every point KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
         std::tuple<std::vector<double>, std::vector<double>> dubins_best_path =
             get_dubins_best_path(q_near, q_rand, _radius, 0.1);
         Linestring best_path;
@@ -68,21 +66,24 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
         {
             best_path.push_back(point_xy(std::get<0>(dubins_best_path)[i], std::get<1>(dubins_best_path)[i]));
         }
-        // std::cout << "Linestring wkt: "<< boost::geometry::wkt(best_path) << std::endl;
 
         if (!boost::geometry::within(best_path, MotionPlanning::_map_info->_map))
         {
-            // std::cout << "Path not in map" << std::endl;
             continue;
         }
-
+        // TODO  probably we should redefine metric for dubins
         _rrt.Add(q_rand, q_near);
+        
         // TODO check radius->was 5.0
-        _rrt.Rewire(q_rand, 5.0, [&](KDPoint &p1, KDPoint &p2)
-                    { return MotionPlanning::_map_info->Collision(p1, p2); });
+        // _rrt.Rewire(q_rand, 5.0, [&](KDPoint &p1, KDPoint &p2)
+        //             { return MotionPlanning::_map_info->Collision(p1, p2); });
         if (MotionPlanning::_display)
         {
-            MotionPlanning::_map_info->set_rrt(_rrt, 0, q_rand);
+            // // Add the valid path to the list of paths
+            // _paths.push_back(dubins_best_path);
+            // new path already added -> just plot
+            MotionPlanning::_map_info->set_rrt_dubins(dubins_best_path,++n);
+            
         }
 
         // TODO->was 1
