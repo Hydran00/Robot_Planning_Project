@@ -79,7 +79,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
 
         if (!boost::geometry::within(best_path, MotionPlanning::_map_info->_map))
         {
-            std::cout << "Path not in map" << std::endl;
+            // std::cout << "Path not in map" << std::endl;
             continue;
         }
 

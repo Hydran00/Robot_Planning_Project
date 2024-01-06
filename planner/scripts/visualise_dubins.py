@@ -20,5 +20,4 @@ def test2(path):
 
 if __name__ == "__main__":
     path = np.loadtxt(str(get_package_share_directory('planner')) + '/data/dubins_path.txt', delimiter=',')
-    print(path)
     test2(path)

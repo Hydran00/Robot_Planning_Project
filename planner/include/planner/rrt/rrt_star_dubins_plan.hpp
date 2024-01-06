@@ -12,13 +12,13 @@ class RRTStarDubinsPlan : public MotionPlanning
 {
 private:
     RRT _rrt;
-    double _radius;
     KDPoint _GenerateRandPoint(void);
     std::vector<KDPoint> _ReconstrucPath(void);
 public:
+    double _radius;
     RRTStarDubinsPlan(std::shared_ptr<MapInfo> &map_info, double radius);
     std::vector<KDPoint> run(void);
-    std::vector<vector<double>> final_path;
+    std::vector<std::vector<double>> final_path;
 };
 
 #endif // !__RRT_STAR_DUBINS_PLAN__
