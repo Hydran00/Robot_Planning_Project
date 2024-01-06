@@ -10,7 +10,7 @@
 #include "planner/dubins/dubins.h"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
-void print_section_on_file(std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> path)
+void print_path_on_file(std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> path)
 {
     std::string file_path = ament_index_cpp::get_package_share_directory("planner") + "/data/dubins_path.txt";
     std::ofstream fout;
@@ -71,40 +71,51 @@ int main(int argc, char **argv)
     RRTStarDubinsPlan plan(m, radius);
     path = plan.run();
 
-    if (!path.empty())
-    {
-        m->set_path(path);
-    }
+    // if (!path.empty())
+    // {
+    //     m->set_path(path);
+    // }
+
+
+
+
+    // #############################################################################################################
 
     std::string file_path = ament_index_cpp::get_package_share_directory("planner") + "/data/dubins_path.txt";
     std::remove(file_path.c_str());
     // print path
-    Linestring best_path;
-    DubinsPath dubins_path(m->pt_start, path[0], plan._radius);
-    auto paths = dubins_path.calc_paths();
-    auto shortest_path = dubins_path.get_shortest_path();
-    auto full_dubins_path = dubins_path.gen_path(m->pt_start, shortest_path, plan._radius, 0.1, true);
-    // send to the file
-    print_section_on_file(full_dubins_path);
-    for (size_t i = 1; i < path.size(); i++)
+    Linestring l;
+    std::reverse(path.begin(), path.end());
+    for (auto p : path)
     {
-        // DubinsPath reconstructed_path(m->pt_start, m->pt_end, m->_radius);
-        // best_path.push_back(point_xy(path[i][0], path[i][1]));
-        // cout << "( X: " << path[i][0] << ", Y: " << path[i][1] << " YAW: " << path[i][2] << " )" << endl;
-
-        // dubins_path = DubinsPath(path[i-1], path[i], plan._radius);
-        // paths = dubins_path.calc_paths();
-        // shortest_path = dubins_path.get_shortest_path();
-        // full_dubins_path = dubins_path.gen_path(m->pt_start, shortest_path, plan._radius, 0.1, true);
-        // print_section_on_file(full_dubins_path);
-        // cout << boost::geometry::wkt(best_path) << endl;
-        // cout << "WITHIN: " << (boost::geometry::within(best_path, m->_map) ? "TRUE" : "FALSE") << endl;
-        // cout << "########################################" << endl;
+        std::cout << "( X: " << p[0] << ", Y: " << p[1] << " YAW: " << p[2] << " )" << std::endl;
     }
 
-    // print path
-    for (auto p : best_path)
+    std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> full_dubins_path;
+
+    DubinsPath dubins_path(m->pt_start, path[0], plan._radius);
+    auto paths_section = dubins_path.calc_paths();
+    auto shortest_path_section = dubins_path.get_shortest_path();
+    auto dubins_path_section = gen_path(m->pt_start,  shortest_path_section, plan._radius, 0.1);
+    full_dubins_path = dubins_path_section;
+    for (size_t i = 1; i < path.size(); i++)
     {
+        std::cout << "Inserting :" << path[i][0] << ", " << path[i][1] << std::endl;
+        l.push_back(point_xy(path[i][0], path[i][1]));
+        DubinsPath  dp (path[i-1], path[i], plan._radius);
+        paths_section = dp.calc_paths();
+        shortest_path_section = dp.get_shortest_path();
+        dubins_path_section = gen_path(path[i-1], shortest_path_section, plan._radius, 0.1);
+        std::get<0>(full_dubins_path).insert(std::get<0>(full_dubins_path).end(), std::get<0>(dubins_path_section).begin(), std::get<0>(dubins_path_section).end());
+    }
+    // print_path_on_file(full_dubins_path);
+
+    cout << "IS PATH VALID?: " << (boost::geometry::within(l, m->_map) ? "TRUE" : "FALSE") << endl;
+
+    // print path
+    if (!path.empty())
+    {
+        m->set_dubins_path(full_dubins_path);
     }
     auto time_end = rclcpp::Clock().now();
     auto time_diff = time_end - time_start;

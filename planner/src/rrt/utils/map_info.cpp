@@ -29,13 +29,19 @@ MapInfo::~MapInfo()
 
 void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
 {
+    if(this-> obstacles_received_){
+        return;
+    }
     this->set_obstacle(msg);
     this->obstacles_received_ = true;
     RCLCPP_INFO(this->get_logger(), "Obstacles received!");
 }
 void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
 {
-
+    if (this->borders_received_)
+    {
+        return;
+    }
     // read the msg and set the boundary
     std::vector<KDPoint> points;
     for (auto p : msg.polygon.points)
@@ -51,6 +57,10 @@ void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
 }
 void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
+    if (this->gates_received_)
+    {
+        return;
+    }
     KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y};
     while (this->Collision(end))
     {
@@ -259,6 +269,39 @@ void MapInfo::set_path(std::vector<KDPoint> &path)
         p_.y = p[1];
         p_.z = 0;
         _m_path.points.push_back(p_);
+    }
+    _marker_pub->publish(_m_path);
+}
+
+void MapInfo::set_dubins_path(std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> path)
+{
+    _m_path.header.frame_id = "map";
+    _m_path.header.stamp = now();
+    _m_path.action = visualization_msgs::msg::Marker::ADD;
+    _m_path.ns = "map";
+    _m_path.id = _id_path;
+    _m_path.type = visualization_msgs::msg::Marker::LINE_STRIP;
+    _m_path.pose.orientation.w = 1.0;
+    // show path map on top (avoid graphical glitches)
+    _m_path.pose.position.z += 0.05;
+    _m_path.scale.x = 0.1;
+    _m_path.scale.y = 0.1;
+    _m_path.color.r = 1.0;
+    _m_path.color.a = 1.0;
+
+    _m_path.points.clear();
+    geometry_msgs::msg::Point p_;
+    
+    for (size_t i = 0; i < std::get<0>(path).size(); ++i)
+    {
+        for (size_t j = 0; j < std::get<0>(path)[i].size(); ++j)
+        {
+            p_.x = std::get<0>(path)[i][j];
+            p_.y = std::get<1>(path)[i][j];
+            p_.z = 0;
+            _m_path.points.push_back(p_);
+            std::cout << "Point: " << p_.x << ", " << p_.y << std::endl;
+        }
     }
     _marker_pub->publish(_m_path);
 }

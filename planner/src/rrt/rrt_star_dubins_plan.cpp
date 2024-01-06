@@ -65,8 +65,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
         auto paths = dubins_path.calc_paths();
         auto shortest_path = dubins_path.get_shortest_path();
         double step = 0.1;
-        bool section = true;
-        auto full_dubins_path = dubins_path.gen_path(q_near, shortest_path, _radius, step, section);
+        auto full_dubins_path = gen_path(q_near, shortest_path, _radius, step);
         Linestring best_path;
         for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i)
         {

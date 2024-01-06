@@ -107,6 +107,7 @@ public:
     void set_start(KDPoint &point);
     void set_end(KDPoint &point);
     void set_path(std::vector<KDPoint> &path);
+    void set_dubins_path(std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> path);
     void set_openlist(std::vector<KDPoint> &points);
     void set_closelist(std::vector<KDPoint> &points);
     void set_rand_points(std::vector<KDPoint> &points);

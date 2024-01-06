@@ -9,8 +9,8 @@
 DubinsPath::DubinsPath(std::vector<double> start, std::vector<double> end, double r)
     : _s({start}), _e({end}), _r(r) {}
 
-std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> DubinsPath::gen_path(
-    const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r = 1.0, double step = 0.1, bool section = true)
+std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> gen_path(
+    const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r = 1.0, double step = 0.1)
 {
 
     auto calc_TurnCenter = [](const std::vector<double> &point, char dir, double r) -> std::tuple<double, double>
@@ -52,18 +52,11 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> D
             }
             ps_x.push_back(start[0] + std::cos(yaw) * p[1]);
             ps_y.push_back(start[1] + std::sin(yaw) * p[1]);
-            if (section)
-            {
-                r_x.push_back(ps_x);
-                r_y.push_back(ps_y);
-            }
-            else {
-                std::cout << "section false" << std::endl;
-            }
-            //     r_x.insert(r_x.end(), ps_x.begin(), ps_x.end());
-            //     r_y.insert(r_y.end(), ps_y.begin(), ps_y.end());
 
-            // }
+            r_x.push_back(ps_x);
+            r_y.push_back(ps_y);
+            
+
         }
         else
         {
@@ -77,19 +70,11 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> D
             }
             ps_x.push_back(std::get<0>(center) + std::cos(ang_end) * r);
             ps_y.push_back(std::get<1>(center) + std::sin(ang_end) * r);
-            if (section)
-            {
-                r_x.push_back(ps_x);
-                r_y.push_back(ps_y);
-            }
-            else{
-                std::cout << "section false" << std::endl;
-            }
-            // else
-            // {
-            //     r_x.insert(r_x.end(), ps_x.begin(), ps_x.end());
-            //     r_y.insert(r_y.end(), ps_y.begin(), ps_y.end());
-            // }
+
+            r_x.push_back(ps_x);
+            r_y.push_back(ps_y);
+            
+
             yaw = start[2] + p[1] * (p[0] == 'l' ? 1 : -1);
         }
         start = {ps_x.back(), ps_y.back(), yaw};
@@ -252,7 +237,7 @@ std::vector<std::vector<double>> DubinsPath::calc_rlr_from_origin(std::vector<do
 
 //     // Generate the full Dubins path
 //     double step = 0.1/radius;
-    // auto full_dubins_path = dubins_path.gen_path(start, shortest_path, radius ,step);
+    // auto full_dubins_path = gen_path(start, shortest_path, radius ,step);
 
 //     // // Print the full Dubins path
 //     std::cout << "\nFull Dubins Path:" << std::endl;
