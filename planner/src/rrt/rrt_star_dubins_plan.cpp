@@ -61,18 +61,12 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
         KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
         // std::cout << "q_near: " << q_near[0] << " " << q_near[1] << " " << q_near[2] << std::endl;
         // NOT USED: dubins can reach every point KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
-        DubinsPath dubins_path(q_near, q_rand, _radius);
-        auto paths = dubins_path.calc_paths();
-        auto shortest_path = dubins_path.get_shortest_path();
-        double step = 0.1;
-        auto full_dubins_path = gen_path(q_near, shortest_path, _radius, step);
+        std::tuple<std::vector<double>, std::vector<double>> dubins_best_path =
+            get_dubins_best_path(q_near, q_rand, _radius, 0.1);
         Linestring best_path;
-        for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i)
+        for (size_t i = 0; i < std::get<0>(dubins_best_path).size(); ++i)
         {
-            for (size_t j = 0; j < std::get<0>(full_dubins_path)[i].size(); ++j)
-            {
-                best_path.push_back(point_xy(std::get<0>(full_dubins_path)[i][j], std::get<1>(full_dubins_path)[i][j]));
-            }
+            best_path.push_back(point_xy(std::get<0>(dubins_best_path)[i], std::get<1>(dubins_best_path)[i]));
         }
         // std::cout << "Linestring wkt: "<< boost::geometry::wkt(best_path) << std::endl;
 
@@ -91,7 +85,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
             MotionPlanning::_map_info->set_rrt(_rrt, 0, q_rand);
         }
 
-        // TODO->was 1 
+        // TODO->was 1
         if (Distance(q_near, MotionPlanning::_pt_end) < 0.1)
         {
             if (q_rand != MotionPlanning::_pt_end)

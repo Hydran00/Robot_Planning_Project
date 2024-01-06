@@ -29,7 +29,8 @@ MapInfo::~MapInfo()
 
 void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
 {
-    if(this-> obstacles_received_){
+    if (this->obstacles_received_)
+    {
         return;
     }
     this->set_obstacle(msg);
@@ -273,7 +274,7 @@ void MapInfo::set_path(std::vector<KDPoint> &path)
     _marker_pub->publish(_m_path);
 }
 
-void MapInfo::set_dubins_path(std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> path)
+void MapInfo::set_dubins_path(std::tuple<std::vector<double>, std::vector<double>> path)
 {
     _m_path.header.frame_id = "map";
     _m_path.header.stamp = now();
@@ -291,18 +292,15 @@ void MapInfo::set_dubins_path(std::tuple<std::vector<std::vector<double>>, std::
 
     _m_path.points.clear();
     geometry_msgs::msg::Point p_;
-    
+
     for (size_t i = 0; i < std::get<0>(path).size(); ++i)
     {
-        for (size_t j = 0; j < std::get<0>(path)[i].size(); ++j)
-        {
-            p_.x = std::get<0>(path)[i][j];
-            p_.y = std::get<1>(path)[i][j];
-            p_.z = 0;
-            _m_path.points.push_back(p_);
-            std::cout << "Point: " << p_.x << ", " << p_.y << std::endl;
-        }
+        p_.x = std::get<0>(path)[i];
+        p_.y = std::get<1>(path)[i];
+        p_.z = 0;
+        _m_path.points.push_back(p_);
     }
+
     _marker_pub->publish(_m_path);
 }
 

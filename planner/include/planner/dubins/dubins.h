@@ -5,8 +5,10 @@
 #include <vector>
 #include <tuple>
 
-std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> gen_path(
+std::tuple<std::vector<double>, std::vector<double>> gen_path(
         const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r, double step);
+std::tuple<std::vector<double>, std::vector<double>> get_dubins_best_path(
+    std::vector<double> q_near, std::vector<double> q_rand, double _radius, double step);
 class DubinsPath
 {
 private:
