@@ -115,6 +115,7 @@ public:
     void set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>> path, int n);
     bool Collision(KDPoint &point);
     bool Collision(KDPoint &p1, KDPoint &p2);
+    bool DubinsCollision(std::tuple<std::vector<double>, std::vector<double>> &path);
     void ShowMap(void);
 };
 

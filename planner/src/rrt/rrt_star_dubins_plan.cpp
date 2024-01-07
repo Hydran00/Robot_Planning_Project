@@ -73,17 +73,23 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
         }
         // TODO  probably we should redefine metric for dubins
         _rrt.Add(q_rand, q_near);
-        
+
         // TODO check radius->was 5.0
+        // _rrt.DubinsRewire(q_near, 5.0, [&](std::tuple<std::vector<double>,std::vector<double>> &path)
+        //                   { return MotionPlanning::_map_info->DubinsCollision(path); }, _radius);        
+
+                          
         // _rrt.Rewire(q_rand, 5.0, [&](KDPoint &p1, KDPoint &p2)
         //             { return MotionPlanning::_map_info->Collision(p1, p2); });
+
+        // _rrt.DubinsRewire(q_rand, 5.0, [&](KDPoint a, path)
+        //                   { return MotionPlanning::_map_info->DubinsCollision(path); });
         if (MotionPlanning::_display)
         {
             // // Add the valid path to the list of paths
             // _paths.push_back(dubins_best_path);
             // new path already added -> just plot
-            MotionPlanning::_map_info->set_rrt_dubins(dubins_best_path,++n);
-            
+            MotionPlanning::_map_info->set_rrt_dubins(dubins_best_path, ++n);
         }
 
         // TODO->was 1

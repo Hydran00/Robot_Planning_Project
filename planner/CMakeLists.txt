@@ -76,6 +76,7 @@ add_executable(rrt_star
   ${RRTSTAR_FOLDER}/utils/rrt.cpp 
   ${RRTSTAR_FOLDER}/utils/kdtree.cpp
   ${RRTSTAR_FOLDER}/utils/map_info.cpp 
+  src/dubins/dubins.cpp 
 )
 
 ament_target_dependencies(rrt_star

@@ -570,64 +570,25 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
     std::vector<KDPoint> ps;
     ps.push_back(p1);
     ps.push_back(p2);
-    // double d = Distance(p1, p2);
-    // return false;
-    // TODO check -> was 1.3
-    // while (ps.size() < d * 1.3)
-    // {
-    //     int i = 0;
-    //     int j = 1;
-    //     while (j < (int)ps.size())
-    //     {
-    //         ps.insert(ps.begin() + j, MiddlePoint(ps[i], ps[j]));
-    //         i += 2;
-    //         j += 2;
-    //     }
-    // }
 
-    // try with within function
-
-    // create segment from p1 to p2
-    // typedef boost::geometry::model::segment<point_xy> Segment;
     point_xy p1_(p1[0], p1[1]);
     point_xy p2_(p2[0], p2[1]);
     Linestring l;
     l.push_back(p1_);
     l.push_back(p2_);
 
-    // check if the segment intersects with any obstacle
-    // bool intersects = boost::geometry::intersects(l, _map);
-    // RCLCPP_INFO(this->get_logger(), "INTERSECTS: %s between [%f, %f] and [%f, %f] and the map", (intersects ? "TRUE" : "FALSE"), p1[0], p1[1], p2[0], p2[1]);
-    bool within = boost::geometry::within(l, _map);
-    // RCLCPP_INFO(this->get_logger(), "WITHIN: %s between [%f, %f] and [%f, %f] and the map", (within ? "TRUE" : "FALSE"), p1[0], p1[1], p2[0], p2[1]);
-    // RCLCPP_INFO(this->get_logger(), "######################################");
-    if (within)
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-
-    // again check for collision but this time for every point in the path?
-    // for (auto p : ps)
-    // {
-    //     std::vector<std::pair<KDPoint, double>> result;
-    //     _okdtree.Query(p, 1, result);
-    //     if (result.begin()->second < 1.0)
-    //         return true;
-    // }
-    // for (auto p : ps)
-    // {
-    //     if (Collision(p))
-    //     {
-    //         return true;
-    //     }
-    // }
-    // return false;
+    return !boost::geometry::within(l, _map);
+    
 }
-
+bool MapInfo::DubinsCollision(std::tuple<std::vector<double>, std::vector<double>> &path)
+{
+    Linestring l;
+    for (size_t i = 0; i < std::get<0>(path).size() - 1; ++i)
+    {
+        l.push_back(point_xy(std::get<0>(path)[i], std::get<1>(path)[i]));
+    }
+    return !boost::geometry::within(l, _map);
+}
 void MapInfo::ShowMap(void)
 {
     while (_marker_pub->get_subscription_count() < 1)
