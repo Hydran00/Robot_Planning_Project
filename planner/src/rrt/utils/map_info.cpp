@@ -494,7 +494,7 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
 }
 
 // void MapInfo::set_rrt_dubins(std::vector<std::tuple<std::vector<double>,std::vector<double>>> paths)
-void MapInfo::set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>> path, int n)
+void MapInfo::set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>, double> path, int n)
 {
     visualization_msgs::msg::Marker branch;
     branch.header.frame_id = "map";

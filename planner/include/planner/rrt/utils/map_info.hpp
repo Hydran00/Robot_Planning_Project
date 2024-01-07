@@ -9,6 +9,7 @@
 
 #include "kdtree.hpp"
 #include "rrt.hpp"
+#include "rrt_dubins.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
@@ -112,7 +113,7 @@ public:
     void set_rand_points(std::vector<KDPoint> &points);
     void set_roadmap(std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
     void set_rrt(RRT &rrt, int n, KDPoint &rand);
-    void set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>> path, int n);
+    void set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>, double> path, int n);
     bool Collision(KDPoint &point);
     bool Collision(KDPoint &p1, KDPoint &p2);
     bool DubinsCollision(std::tuple<std::vector<double>, std::vector<double>> &path);

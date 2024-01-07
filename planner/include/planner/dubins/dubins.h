@@ -7,7 +7,7 @@
 
 std::tuple<std::vector<double>, std::vector<double>> gen_path(
         const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r, double step);
-std::tuple<std::vector<double>, std::vector<double>> get_dubins_best_path(
+std::tuple<std::vector<double>, std::vector<double>,double> get_dubins_best_path_and_cost(
     std::vector<double> q_near, std::vector<double> q_rand, double _radius, double step);
 class DubinsPath
 {
@@ -25,7 +25,7 @@ public:
     DubinsPath(std::vector<double> start, std::vector<double> end, double r = 1.0);
 
     std::vector<std::vector<std::vector<double>>> calc_paths();
-    std::vector<std::vector<double>> get_shortest_path();
+    std::tuple<std::vector<std::vector<double>>,double> get_shortest_path_cost();
 
 private:
     std::vector<double> calc_end();

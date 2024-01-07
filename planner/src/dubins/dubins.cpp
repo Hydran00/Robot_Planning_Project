@@ -8,6 +8,7 @@
 DubinsPath::DubinsPath(std::vector<double> start, std::vector<double> end, double r)
     : _s({start}), _e({end}), _r(r) {}
 
+
 std::tuple<std::vector<double>, std::vector<double>> gen_path(
     const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r = 1.0, double step = 0.1)
 {
@@ -34,8 +35,6 @@ std::tuple<std::vector<double>, std::vector<double>> gen_path(
 
     std::vector<double> r_x;
     std::vector<double> r_y;
-    // std::vector<std::vector<double>> r_x;
-    // std::vector<std::vector<double>> r_y;
     std::vector<double> ps_x;
     std::vector<double> ps_y;
     std::vector<double> start = s;
@@ -52,9 +51,6 @@ std::tuple<std::vector<double>, std::vector<double>> gen_path(
             }
             ps_x.push_back(start[0] + std::cos(yaw) * p[1]);
             ps_y.push_back(start[1] + std::sin(yaw) * p[1]);
-
-            // r_x.push_back(ps_x);
-            // r_y.push_back(ps_y);
             r_x.insert(r_x.end(), ps_x.begin(), ps_x.end());
             r_y.insert(r_y.end(), ps_y.begin(), ps_y.end());
         }
@@ -70,9 +66,6 @@ std::tuple<std::vector<double>, std::vector<double>> gen_path(
             }
             ps_x.push_back(std::get<0>(center) + std::cos(ang_end) * r);
             ps_y.push_back(std::get<1>(center) + std::sin(ang_end) * r);
-
-            // r_x.push_back(ps_x);
-            // r_y.push_back(ps_y);
             r_x.insert(r_x.end(), ps_x.begin(), ps_x.end());
             r_y.insert(r_y.end(), ps_y.begin(), ps_y.end());
 
@@ -105,10 +98,11 @@ std::vector<std::vector<std::vector<double>>> DubinsPath::calc_paths()
     return _paths;
 }
 
-std::vector<std::vector<double>> DubinsPath::get_shortest_path()
+std::tuple<std::vector<std::vector<double>>,double> DubinsPath::get_shortest_path_cost()
 {
-    double shortest_cost = std::numeric_limits<double>::infinity();
-    std::vector<std::vector<double>> shortest_path;
+     
+    std::tuple<std::vector<std::vector<double>>,double> shortest_path_cost;
+    std::get<1>(shortest_path_cost) = std::numeric_limits<double>::infinity();
     for (auto &path : _paths)
     {
         double cost = 0;
@@ -116,13 +110,13 @@ std::vector<std::vector<double>> DubinsPath::get_shortest_path()
         {
             cost += (p[0] == 's') ? p[1] : p[1] * _r;
         }
-        if (cost < shortest_cost)
+        if (cost < std::get<1>(shortest_path_cost))
         {
-            shortest_path = path;
-            shortest_cost = cost;
+            std::get<0>(shortest_path_cost) = path;
+            std::get<1>(shortest_path_cost) = cost;
         }
     }
-    return shortest_path;
+    return shortest_path_cost;
 }
 
 std::vector<double> DubinsPath::calc_end()
@@ -218,14 +212,24 @@ std::vector<std::vector<double>> DubinsPath::calc_rlr_from_origin(std::vector<do
     }
     return path;
 }
-
-std::tuple<std::vector<double>, std::vector<double>> get_dubins_best_path(
+// X ,Y , Cost
+std::tuple<std::vector<double>, std::vector<double>, double> get_dubins_best_path_and_cost(
     std::vector<double> q_near, std::vector<double> q_rand, double _radius, double step)
 {
     DubinsPath dubins_path(q_near, q_rand, _radius);
+    // compute every possible path
     auto paths = dubins_path.calc_paths();
-    auto shortest_path = dubins_path.get_shortest_path();
-    return gen_path(q_near, shortest_path, _radius, step);   
+    // get the shortest + cost
+    auto shortest_path_cost = dubins_path.get_shortest_path_cost();
+    // discretize the best path
+    auto full_path = gen_path(q_near, std::get<0>(shortest_path_cost), _radius, step);   
+    std::tuple<std::vector<double>, std::vector<double>, double> best_path_and_cost;
+    // set X and Y
+    std::get<0>(best_path_and_cost) = std::get<0>(full_path);
+    std::get<1>(best_path_and_cost) = std::get<1>(full_path);
+    // set cost
+    std::get<2>(best_path_and_cost) = std::get<1>(shortest_path_cost);
+    return best_path_and_cost;
 }
 
 // int main()

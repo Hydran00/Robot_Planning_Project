@@ -59,8 +59,8 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
     {
         KDPoint q_rand = _GenerateRandPoint();
         KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
-        std::tuple<std::vector<double>, std::vector<double>> dubins_best_path =
-            get_dubins_best_path(q_near, q_rand, _radius, 0.1);
+        std::tuple<std::vector<double>, std::vector<double>, double> dubins_best_path =
+            get_dubins_best_path_and_cost(q_near, q_rand, _radius, 0.1);
         Linestring best_path;
         for (size_t i = 0; i < std::get<0>(dubins_best_path).size(); ++i)
         {

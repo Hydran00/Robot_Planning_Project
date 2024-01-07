@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
     Path full_dubins_path;
 
-    auto dubins_section = get_dubins_best_path(m->pt_start, path[0], plan._radius, 0.1);
+    auto dubins_section = get_dubins_best_path_and_cost(m->pt_start, path[0], plan._radius, 0.1);
 
     // Insert first section
     std::get<0>(full_dubins_path).insert(std::get<0>(full_dubins_path).end(), std::get<0>(dubins_section).begin(), std::get<0>(dubins_section).end());
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     // Insert all other sections
     for (size_t i = 1; i < path.size(); i++)
     {
-        dubins_section = get_dubins_best_path(path[i - 1], path[i], plan._radius, 0.1);
+        dubins_section = get_dubins_best_path_and_cost(path[i - 1], path[i], plan._radius, 0.1);
         std::get<0>(full_dubins_path).insert(std::get<0>(full_dubins_path).end(), std::get<0>(dubins_section).begin(), std::get<0>(dubins_section).end());
         std::get<1>(full_dubins_path).insert(std::get<1>(full_dubins_path).end(), std::get<1>(dubins_section).begin(), std::get<1>(dubins_section).end());
     }
@@ -92,6 +92,7 @@ int main(int argc, char **argv)
         std::cout << std::get<0>(full_dubins_path)[i] << ", " << std::get<1>(full_dubins_path)[i] << std::endl;
         l.push_back(point_xy(std::get<0>(full_dubins_path)[i], std::get<1>(full_dubins_path)[i]));
     }
+    // print X Y YAW
 
     cout << "IS PATH VALID?: " << (boost::geometry::within(l, m->_map) ? "YES" : "NO") << endl;
 

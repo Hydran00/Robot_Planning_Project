@@ -1,12 +1,12 @@
-#include "planner/rrt/utils/rrt.hpp"
+#include "planner/rrt/utils/rrt_dubins.hpp"
 
-void RRT::set_root(KDPoint &p)
+void RRTDubins::set_root(KDPoint &p)
 {
     _root.assign(p.begin(), p.end());
     _rrt.push_back(std::make_pair(_root, 0));
 }
 
-KDPoint RRT::SearchNearestVertex(KDPoint &q_rand)
+KDPoint RRTDubins::SearchNearestVertex(KDPoint &q_rand)
 {
     std::vector<double> d;
     for (auto pair : _rrt)
@@ -17,7 +17,7 @@ KDPoint RRT::SearchNearestVertex(KDPoint &q_rand)
     return _rrt[i].first;
 }
 
-KDPoint RRT::CalcNewPoint(KDPoint &q_near, KDPoint &q_rand)
+KDPoint RRTDubins::CalcNewPoint(KDPoint &q_near, KDPoint &q_rand)
 {
     // TODO -> was 1 ,branch_lenght was 1
     if (Distance(q_near, q_rand) < 0.4)
@@ -32,7 +32,7 @@ KDPoint RRT::CalcNewPoint(KDPoint &q_near, KDPoint &q_rand)
     return p;
 }
 
-void RRT::Add(KDPoint &q_new, KDPoint &q_near)
+void RRTDubins::Add(KDPoint &q_new, KDPoint &q_near)
 {
     int i = std::find_if(
         _rrt.begin(), _rrt.end(),
@@ -44,7 +44,7 @@ void RRT::Add(KDPoint &q_new, KDPoint &q_near)
     _rrt.push_back(std::make_pair(q_new, i));
 }
 
-KDPoint RRT::GetParent(KDPoint &p)
+KDPoint RRTDubins::GetParent(KDPoint &p)
 {
     auto it = std::find_if(
         _rrt.begin(), _rrt.end(),
@@ -56,7 +56,7 @@ KDPoint RRT::GetParent(KDPoint &p)
     return _rrt[it->second].first;
 }
 
-double RRT::Cost(KDPoint &point)
+double RRTDubins::Cost(KDPoint &point)
 {
     double c = 0.0;
     KDPoint p = point;
@@ -69,7 +69,8 @@ double RRT::Cost(KDPoint &point)
     return c;
 }
 
-void RRT::Rewire(KDPoint &p, double r, std::function<bool (KDPoint &p1, KDPoint &p2)> Collision)
+
+void RRTDubins::DubinsRewire(KDPoint &p, double r, std::function<bool (std::tuple<std::vector<double>,std::vector<double>> &path)> DubinsCollision, double dubins_radius)
 {
     std::vector<KDPoint> nears;
     auto it_p = std::find_if(
@@ -79,11 +80,12 @@ void RRT::Rewire(KDPoint &p, double r, std::function<bool (KDPoint &p1, KDPoint 
             return (pair.first == p);
         }
     );
+    // fill nears
     std::for_each(
         _rrt.begin(), _rrt.end(),
         [&](std::pair<KDPoint, int> &pair)
         {
-            if ((pair.first != p) && (Distance(pair.first, p) < r) && (!Collision(pair.first, p)))
+            if ((pair.first != p) && (Distance(pair.first, p) < r))
             {
                 nears.push_back(pair.first);
             }
@@ -91,17 +93,21 @@ void RRT::Rewire(KDPoint &p, double r, std::function<bool (KDPoint &p1, KDPoint 
     );
     for (auto pt : nears)
     {
-        if (Cost(pt) + Distance(pt, p) < Cost(p))
-        {
-            int idx = std::find_if(
-                _rrt.begin(), _rrt.end(),
-                [&](std::pair<KDPoint, int> &pair)
-                {
-                    return (pair.first == pt);
-                }
-            ) - _rrt.begin();
-            it_p->second = idx;
-        }
+        std::tuple<std::vector<double>, std::vector<double>, double> dubins_best_path =
+            get_dubins_best_path_and_cost(p, pt, dubins_radius, 0.1);
+        
+        // if (Cost(pt) + Distance(pt, p) < Cost(p))
+        // {
+        //     int idx = std::find_if(
+        //         _rrt.begin(), _rrt.end(),
+        //         [&](std::pair<KDPoint, int> &pair)
+        //         {
+        //             return (pair.first == pt);
+        //         }
+        //     ) - _rrt.begin();
+        //     it_p->second = idx;
+        // }
+
     }
     for (auto pt : nears)
     {
@@ -118,6 +124,4 @@ void RRT::Rewire(KDPoint &p, double r, std::function<bool (KDPoint &p1, KDPoint 
         }
     }
 }
-
-
 

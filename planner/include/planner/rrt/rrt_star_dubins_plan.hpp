@@ -6,12 +6,12 @@
 #include <chrono>
 #include "utils/motionplanning.hpp"
 #include "utils/kdtree.hpp"
-#include "utils/rrt.hpp"
+#include "utils/rrt_dubins.hpp"
 
 class RRTStarDubinsPlan : public MotionPlanning
 {
 private:
-    RRT _rrt;
+    RRTDubins _rrt;
     KDPoint _GenerateRandPoint(void);
     std::vector<KDPoint> _ReconstrucPath(void);
 public:

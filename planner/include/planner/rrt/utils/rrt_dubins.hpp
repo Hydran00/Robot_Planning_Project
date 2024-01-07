@@ -1,5 +1,5 @@
-#ifndef __RRT__
-#define __RRT__
+#ifndef __RRT_DUBINS__
+#define __RRT_DUBINS__
 
 #include <vector>
 #include <tuple>
@@ -9,7 +9,8 @@
 #include <algorithm>
 #include "kdtree.hpp"
 #include "planner/dubins/dubins.h"
-class RRT
+
+class RRTDubins
 {
 private:
     KDPoint _root;
@@ -41,17 +42,15 @@ public:
     };
     // branch step length
 
-    RRT() {}
+    RRTDubins() {}
     void set_root(KDPoint &p);
     KDPoint SearchNearestVertex(KDPoint &q_rand);
     KDPoint CalcNewPoint(KDPoint &q_near, KDPoint &q_rand);
     void Add(KDPoint &q_new, KDPoint &q_near);
     KDPoint GetParent(KDPoint &p);
     double Cost(KDPoint &p);
-    void Rewire(KDPoint &p, double r, std::function<bool(KDPoint &p1, KDPoint &p2)> Collision);
-
-
-        inline int size(void)
+    void DubinsRewire(KDPoint &p, double r, std::function<bool (std::tuple<std::vector<double>,std::vector<double>> &path)> DubinsCollision, double dubins_radius);
+    inline int size(void)
     {
         return _rrt.size();
     }
@@ -65,4 +64,4 @@ public:
     }
 };
 
-#endif // !__RRT__
+#endif // !__RRT_DUBINS__
