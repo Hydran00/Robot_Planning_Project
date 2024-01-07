@@ -12,9 +12,9 @@
 
 using namespace std;
 
-typedef std::tuple<std::vector<double>, std::vector<double>> Path;
+typedef std::tuple<std::vector<double>, std::vector<double>> Paths;
 
-void print_path_on_file(Path path)
+void print_path_on_file(Paths path)
 {
     std::string file_path = ament_index_cpp::get_package_share_directory("planner") +
                             "/data/dubins_path.txt";
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
         std::cout << "( X: " << p[0] << ", Y: " << p[1] << " YAW: " << p[2] << " )" << std::endl;
     }
 
-    Path full_dubins_path;
+    Paths full_dubins_path;
 
     auto dubins_section = get_dubins_best_path_and_cost(m->pt_start, path[0], plan._radius, 0.1);
 

@@ -59,7 +59,8 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
     {
         KDPoint q_rand = _GenerateRandPoint();
         KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
-        std::tuple<std::vector<double>, std::vector<double>, double> dubins_best_path =
+        // Returns tuple with (X, Y, Cost, Symbolic Path)
+        auto dubins_best_path =
             get_dubins_best_path_and_cost(q_near, q_rand, _radius, 0.1);
         Linestring best_path;
         for (size_t i = 0; i < std::get<0>(dubins_best_path).size(); ++i)
@@ -71,8 +72,9 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
         {
             continue;
         }
+
         // TODO  probably we should redefine metric for dubins
-        _rrt.Add(q_rand, q_near);
+        _rrt.Add(q_rand, q_near, std::get<3>(dubins_best_path));
 
         // TODO check radius->was 5.0
         // _rrt.DubinsRewire(q_near, 5.0, [&](std::tuple<std::vector<double>,std::vector<double>> &path)
@@ -86,10 +88,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
         //                   { return MotionPlanning::_map_info->DubinsCollision(path); });
         if (MotionPlanning::_display)
         {
-            // // Add the valid path to the list of paths
-            // _paths.push_back(dubins_best_path);
-            // new path already added -> just plot
-            MotionPlanning::_map_info->set_rrt_dubins(dubins_best_path, ++n);
+            MotionPlanning::_map_info->set_rrt_dubins(std::get<0>(dubins_best_path),std::get<1>(dubins_best_path), ++n);
         }
 
         // TODO->was 1
@@ -97,7 +96,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
         {
             if (q_rand != MotionPlanning::_pt_end)
             {
-                _rrt.Add(MotionPlanning::_pt_end, q_rand);
+                _rrt.Add(MotionPlanning::_pt_end, q_rand, std::get<3>(dubins_best_path));
             }
             return _ReconstrucPath();
         }

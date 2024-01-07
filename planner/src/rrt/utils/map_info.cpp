@@ -494,7 +494,7 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
 }
 
 // void MapInfo::set_rrt_dubins(std::vector<std::tuple<std::vector<double>,std::vector<double>>> paths)
-void MapInfo::set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>, double> path, int n)
+void MapInfo::set_rrt_dubins(std::vector<double> X, std::vector<double> Y, int n)
 {
     visualization_msgs::msg::Marker branch;
     branch.header.frame_id = "map";
@@ -513,26 +513,24 @@ void MapInfo::set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>
     branch.color.a = 1.0;
 
     branch.points.clear();
-    for (size_t i = 0; i < std::get<0>(path).size() - 1; ++i)
+
+    geometry_msgs::msg::Point p1, p2;
+    for (size_t i = 0; i < X.size() - 1; ++i)
     {
-        geometry_msgs::msg::Point p1, p2;
-        p1.x = std::get<0>(path)[i];
-        p1.y = std::get<1>(path)[i];
+        p1.x = X[i];
+        p1.y = Y[i];
         p1.z = 0;
 
-        p2.x = std::get<0>(path)[i + 1];
-        p2.y = std::get<1>(path)[i + 1];
+        p2.x = X[i + 1];
+        p2.y = Y[i + 1];
         p2.z = 0;
         branch.points.push_back(p1);
         branch.points.push_back(p2);
     }
     _marker_pub->publish(branch);
-    // _m_rrt.points.clear();
-
     _pub_i = (_pub_i + 1) % 10;
     if (_pub_i == 0)
     {
-        // rclcpp::sleep_for(std::chrono::milliseconds(10));
         return;
     }
 }
@@ -578,7 +576,6 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
     l.push_back(p2_);
 
     return !boost::geometry::within(l, _map);
-    
 }
 bool MapInfo::DubinsCollision(std::tuple<std::vector<double>, std::vector<double>> &path)
 {

@@ -10,29 +10,33 @@
 #include "kdtree.hpp"
 #include "planner/dubins/dubins.h"
 
+typedef std::vector<std::vector<double>> Path;
+typedef std::vector<std::tuple<KDPoint, int, Path>> Tree;
 class RRTDubins
 {
 private:
     KDPoint _root;
-    std::vector<std::pair<KDPoint, int>> _rrt;
+    // [ [near, key, path type (sls, lsl, ...)],[...],...]
+    Tree _rrt;
     const double branch_lenght = 0.2;
 
 public:
     class iterator
     {
     private:
-        const std::vector<std::pair<KDPoint, int>>::iterator _it_begin;
+        const Tree::iterator _it_begin;
         int _pos;
 
     public:
-        iterator(const std::vector<std::pair<KDPoint, int>>::iterator begin, int pos) : _it_begin(begin), _pos(pos) {}
+        iterator(const Tree::iterator begin, int pos) : _it_begin(begin), _pos(pos) {}
         inline bool operator!=(iterator &it)
         {
             return (_pos != it._pos);
         }
         inline KDPoint operator*()
         {
-            return (_it_begin + _pos)->first;
+            // return (_it_begin + _pos)->first;
+            return std::get<0>(*(_it_begin + _pos));
         }
         inline iterator &operator++()
         {
@@ -46,7 +50,7 @@ public:
     void set_root(KDPoint &p);
     KDPoint SearchNearestVertex(KDPoint &q_rand);
     KDPoint CalcNewPoint(KDPoint &q_near, KDPoint &q_rand);
-    void Add(KDPoint &q_new, KDPoint &q_near);
+    void Add(KDPoint &q_new, KDPoint &q_near, Path &path);
     KDPoint GetParent(KDPoint &p);
     double Cost(KDPoint &p);
     void DubinsRewire(KDPoint &p, double r, std::function<bool (std::tuple<std::vector<double>,std::vector<double>> &path)> DubinsCollision, double dubins_radius);

@@ -100,8 +100,8 @@ std::vector<std::vector<std::vector<double>>> DubinsPath::calc_paths()
 
 std::tuple<std::vector<std::vector<double>>,double> DubinsPath::get_shortest_path_cost()
 {
-     
-    std::tuple<std::vector<std::vector<double>>,double> shortest_path_cost;
+    // FULL_PATH, TOTAL COST, SYMBOLIC PATHS
+    std::tuple<std::vector<std::vector<double>>, double> shortest_path_cost;
     std::get<1>(shortest_path_cost) = std::numeric_limits<double>::infinity();
     for (auto &path : _paths)
     {
@@ -212,8 +212,8 @@ std::vector<std::vector<double>> DubinsPath::calc_rlr_from_origin(std::vector<do
     }
     return path;
 }
-// X ,Y , Cost
-std::tuple<std::vector<double>, std::vector<double>, double> get_dubins_best_path_and_cost(
+// RETURNS X ,Y , Cost, SYMBOLIC PATHS
+std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>> get_dubins_best_path_and_cost(
     std::vector<double> q_near, std::vector<double> q_rand, double _radius, double step)
 {
     DubinsPath dubins_path(q_near, q_rand, _radius);
@@ -223,12 +223,15 @@ std::tuple<std::vector<double>, std::vector<double>, double> get_dubins_best_pat
     auto shortest_path_cost = dubins_path.get_shortest_path_cost();
     // discretize the best path
     auto full_path = gen_path(q_near, std::get<0>(shortest_path_cost), _radius, step);   
-    std::tuple<std::vector<double>, std::vector<double>, double> best_path_and_cost;
-    // set X and Y
+    std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>> best_path_and_cost;
+    // set X
     std::get<0>(best_path_and_cost) = std::get<0>(full_path);
+    // set Y
     std::get<1>(best_path_and_cost) = std::get<1>(full_path);
     // set cost
     std::get<2>(best_path_and_cost) = std::get<1>(shortest_path_cost);
+    // set symbolic path
+    std::get<3>(best_path_and_cost) = std::get<0>(shortest_path_cost);
     return best_path_and_cost;
 }
 

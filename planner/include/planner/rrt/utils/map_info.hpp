@@ -113,7 +113,7 @@ public:
     void set_rand_points(std::vector<KDPoint> &points);
     void set_roadmap(std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
     void set_rrt(RRT &rrt, int n, KDPoint &rand);
-    void set_rrt_dubins(std::tuple<std::vector<double>, std::vector<double>, double> path, int n);
+    void set_rrt_dubins(std::vector<double> X, std::vector<double> Y, int n);
     bool Collision(KDPoint &point);
     bool Collision(KDPoint &p1, KDPoint &p2);
     bool DubinsCollision(std::tuple<std::vector<double>, std::vector<double>> &path);
