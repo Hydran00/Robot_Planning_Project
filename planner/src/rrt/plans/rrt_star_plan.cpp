@@ -66,6 +66,7 @@ std::vector<KDPoint> RRTStarPlan::run(void)
         {
             continue;
         }
+        rclcpp::sleep_for(std::chrono::milliseconds(200));
         _rrt.Add(q_new, q_near);
         // TODO check radius -> was 5.0
         _rrt.Rewire(q_new, 5.0, [&](KDPoint &p1, KDPoint &p2)

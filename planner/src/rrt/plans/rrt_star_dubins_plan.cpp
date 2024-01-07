@@ -46,7 +46,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(void)
     while (p != MotionPlanning::_pt_start)
     {
         path.push_back(p);
-        p = _rrt.GetParent(p);
+        p = std::get<0>(_rrt.GetParent(p));
     }
     path.push_back(p);
     return path;
@@ -72,7 +72,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void)
         {
             continue;
         }
-
+        rclcpp::sleep_for(std::chrono::milliseconds(200));
         // TODO  probably we should redefine metric for dubins
         _rrt.Add(q_rand, q_near, std::get<3>(dubins_best_path));
 
