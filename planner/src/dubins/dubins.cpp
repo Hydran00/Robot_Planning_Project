@@ -222,7 +222,7 @@ std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::ve
     // get the shortest + cost
     auto shortest_path_cost = dubins_path.get_shortest_path_cost();
     // discretize the best path
-    auto full_path = gen_path(q_near, std::get<0>(shortest_path_cost), _radius, step);   
+    Path full_path = gen_path(q_near, std::get<0>(shortest_path_cost), _radius, step);   
     std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>> best_path_and_cost;
     // set X
     std::get<0>(best_path_and_cost) = std::get<0>(full_path);
@@ -237,11 +237,10 @@ std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::ve
 
 void test_dubins()
 {
-  vector<double> q_near = {0, 0, 0};
-  vector<double> q_rand = {-0.5, 0, 0};
+  std::vector<double> q_near = {0, 0, 0};
+  std::vector<double> q_rand = {-0.5, 0, 0};
   std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>> p =get_dubins_best_path_and_cost(q_near, q_rand, 1, 0.01);
   Path pa;
   std::get<0>(pa) = std::get<0>(p);
   std::get<1>(pa) = std::get<1>(p);
-  print_path_on_file(pa);
 }
