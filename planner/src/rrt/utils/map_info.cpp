@@ -487,21 +487,22 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n) {
   geometry_msgs::msg::Point p1, p2;
   for (std::tuple<KDPoint, int, SymbolicPath, Path> tuple : rrt_dubins._rrt) {
     
-    std::tuple<KDPoint, int, SymbolicPath, Path> leaf = rrt_dubins.GetParent(std::get<0>(tuple));
-    
-    for (size_t i = 0; i < std::get<0>(std::get<3>(tuple)).size() - 1; ++i) {
-      // p1.x = std::get<0>(std::get<3>(tuple))[i];
-      // p1.y = std::get<1>(std::get<3>(tuple))[i];
-      // p1.z = 0;
-      // branch.points.push_back(p1);
-      // p1.x = std::get<0>(std::get<3>(leaf))[i+1];
-      // p1.y = std::get<1>(std::get<3>(leaf))[i+1];
-      // p2.z = 0;
-      // branch.points.push_back(p2);
+    if(std::get<0>(std::get<3>(tuple)).size() < 2){
+      continue;
+    }
+    for (size_t i = 0; i < std::get<0>(std::get<3>(tuple)).size() - 1; i++) {
+      p1.x = std::get<0>(std::get<3>(tuple))[i];
+      p1.y = std::get<1>(std::get<3>(tuple))[i];
+      p1.z = 0;
+      branch.points.push_back(p1);
+      p2.x = std::get<0>(std::get<3>(tuple))[i+1];
+      p2.y = std::get<1>(std::get<3>(tuple))[i+1];
+      p2.z = 0;
+      branch.points.push_back(p2);
     }
 
-    p2.x = std::get<0>(leaf)[0];
-    p2.y = std::get<0>(leaf)[1];
+    p2.x = std::get<0>(tuple)[0];
+    p2.y = std::get<0>(tuple)[1];
     p2.z = 0;
     branch.points.push_back(p1);
     branch.points.push_back(p2);

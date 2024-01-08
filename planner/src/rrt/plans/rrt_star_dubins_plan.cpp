@@ -66,6 +66,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
     if (!boost::geometry::within(best_path, MotionPlanning::_map_info->_map)) {
       continue;
     }
+    std::cout << "adding new point to rrt" << std::endl;
     rclcpp::sleep_for(std::chrono::milliseconds(100));
     // TODO  probably we should redefine metric for dubins
     std::tuple<std::vector<double>, std::vector<double>> real_path =
@@ -75,7 +76,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
 
     // TODO check radius->was 5.0
     // _rrt.DubinsRewire(
-    //     q_near, 5.0,
+    //     q_near, 1.0,
     //     [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
     //       return MotionPlanning::_map_info->DubinsCollision(path);
     //     },
