@@ -21,11 +21,11 @@ typedef std::vector<std::tuple<KDPoint, int, SymbolicPath, Path>> DubinsTree;
 class RRTDubins {
  private:
   KDPoint _root;
-  DubinsTree _rrt;
   // [ [near, key, path type (sls, lsl, ...)],[...],...]
   const double branch_lenght = 0.01;
 
  public:
+  DubinsTree _rrt;
   class iterator {
    private:
     const DubinsTree::iterator _it_begin;

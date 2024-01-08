@@ -88,7 +88,8 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
   _line_boundary.id = _id_boundary;
   _line_boundary.type = visualization_msgs::msg::Marker::LINE_STRIP;
   _line_boundary.pose.orientation.w = 1.0;
-  _line_boundary.scale.x = 1;
+  _line_boundary.scale.x = 0.1;
+  // _line_boundary.scale.y = 0.1;
   _line_boundary.color.a = 1.0;
 
   _line_boundary.points.clear();
@@ -481,21 +482,30 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n) {
   branch.color.b = 0.5;
   branch.color.g = 0.5;
   branch.color.a = 1.0;
-
   branch.points.clear();
+
   geometry_msgs::msg::Point p1, p2;
-  // for (KDPoint p : rrt_dubins) {
-    KDPoint p = {1.0,2,2};
-    p1.x = p[0];
-    p1.y = p[1];
-    p1.z = 0;
-    // std::tuple<KDPoint, int, SymbolicPath, Path> f = rrt_dubins.GetParent(p);;
-    // p2.x = std::get<0>(leaf)[0];
-    // p2.y = std::get<0>(leaf)[1];
+  for (std::tuple<KDPoint, int, SymbolicPath, Path> tuple : rrt_dubins._rrt) {
+    
+    std::tuple<KDPoint, int, SymbolicPath, Path> leaf = rrt_dubins.GetParent(std::get<0>(tuple));
+    
+    for (size_t i = 0; i < std::get<0>(std::get<3>(tuple)).size() - 1; ++i) {
+      // p1.x = std::get<0>(std::get<3>(tuple))[i];
+      // p1.y = std::get<1>(std::get<3>(tuple))[i];
+      // p1.z = 0;
+      // branch.points.push_back(p1);
+      // p1.x = std::get<0>(std::get<3>(leaf))[i+1];
+      // p1.y = std::get<1>(std::get<3>(leaf))[i+1];
+      // p2.z = 0;
+      // branch.points.push_back(p2);
+    }
+
+    p2.x = std::get<0>(leaf)[0];
+    p2.y = std::get<0>(leaf)[1];
     p2.z = 0;
     branch.points.push_back(p1);
     branch.points.push_back(p2);
-  // }
+  }
   _marker_pub->publish(branch);
   _pub_i = (_pub_i + 1) % 10;
   if (_pub_i == 0) {
@@ -505,8 +515,8 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n) {
 
 bool MapInfo::Collision(KDPoint &point) {
   // exclude points out of the map
-  // if ((point[0] > 0) && (point[0] < _width) && (point[1] > 0) && (point[1] <
-  // _height))
+  // if ((point[0] > 0) && (point[0] < _width) && (point[1] > 0) && (point[1]
+  // < _height))
   bool is_inside = boost::geometry::within(point_xy(point[0], point[1]), _map);
   // RCLCPP_INFO(this->get_logger(), "Checking collision for point: %f, %f ->
   // %s", point[0], point[1], (is_inside ? "INSIDE" : "OUTSIDE"));
@@ -514,13 +524,13 @@ bool MapInfo::Collision(KDPoint &point) {
     // std::vector<std::pair<KDPoint, double>> result;
     // check if the point is inside an obstacle (?)
     // 1 is the number of nearest neighbors to return
-    // result is a vector of pairs of points and their distances to the point to
-    // check _okdtree.Query(point, 1, result); return (result.begin()->second
-    // < 1.0);
+    // result is a vector of pairs of points and their distances to the point
+    // to check _okdtree.Query(point, 1, result); return
+    // (result.begin()->second < 1.0);
     return false;
   } else {
-    // RCLCPP_INFO(this->get_logger(), "Excluding point out of the map: %f, %f",
-    // point[0], point[1]);
+    // RCLCPP_INFO(this->get_logger(), "Excluding point out of the map: %f,
+    // %f", point[0], point[1]);
     return true;
   }
 }
