@@ -235,43 +235,13 @@ std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::ve
     return best_path_and_cost;
 }
 
-// int main()
-// {
-//     std::vector<double> start = {-1, -2, -M_PI};
-//     std::vector<double> end = {3, 4, M_PI / 2};
-//     double radius = 2.0;
-//     DubinsPath dubins_path(start, end, radius);
-//     auto paths = dubins_path.calc_paths();
-//     auto shortest_path = dubins_path.get_shortest_path();
-
-//     // Print the shortest path
-//     std::cout << "Shortest Dubins Path:" << std::endl;
-//     for (const auto &point : shortest_path)
-//     {
-//         std::cout << "X: " << point[0] << ", Y: " << point[1] << ", Yaw: " << point[2] << std::endl;
-//     }
-
-//     // Generate the full Dubins path
-//     double step = 0.1/radius;
-// auto full_dubins_path = gen_path(start, shortest_path, radius ,step);
-
-//     // // Print the full Dubins path
-//     std::cout << "\nFull Dubins Path:" << std::endl;
-
-//     for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i) {
-//         // std::cout << "Section " << i + 1 << ":" << std::endl;
-//         for (size_t j = 0; j < std::get<0>(full_dubins_path)[i].size(); ++j) {
-//             std::cout << std::get<0>(full_dubins_path)[i][j] << ", " << std::get<1>(full_dubins_path)[i][j] << std::endl;
-//         }
-//         // std::cout << std::endl;
-//     }
-//     // save on file
-//     std::string path = ament_index_cpp::get_package_share_directory("planner") + "/data/dubins_path.txt";
-//     std::ofstream fout(path);
-//     for (size_t i = 0; i < std::get<0>(full_dubins_path).size(); ++i) {
-//         for (size_t j = 0; j < std::get<0>(full_dubins_path)[i].size(); ++j) {
-//             fout << std::get<0>(full_dubins_path)[i][j] << ", " << std::get<1>(full_dubins_path)[i][j] << std::endl;
-//         }
-//     }
-//     return 0;
-// }
+void test_dubins()
+{
+  vector<double> q_near = {0, 0, 0};
+  vector<double> q_rand = {-0.5, 0, 0};
+  std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>> p =get_dubins_best_path_and_cost(q_near, q_rand, 1, 0.01);
+  Path pa;
+  std::get<0>(pa) = std::get<0>(p);
+  std::get<1>(pa) = std::get<1>(p);
+  print_path_on_file(pa);
+}

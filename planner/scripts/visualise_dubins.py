@@ -14,10 +14,11 @@ def test2(path):
     plt.title("Dubins best path")
     draw_point(start)
     draw_point(end)
-    plt.plot(path[:,0], path[:,1], 'o')
+    plt.plot(path[:,0], path[:,1], 'k-')
     plt.axis("equal")
     plt.show()
 
 if __name__ == "__main__":
     path = np.loadtxt(str(get_package_share_directory('planner')) + '/data/dubins_path.txt', delimiter=',')
+    print(path)
     test2(path)

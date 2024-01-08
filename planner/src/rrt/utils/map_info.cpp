@@ -1,6 +1,7 @@
 #include "planner/rrt/utils/map_info.hpp"
 
-MapInfo::MapInfo() : Node("map"), _pub_i(0) {
+MapInfo::MapInfo() : Node("map"), _pub_i(0)
+{
   this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>(
       "visualization_marker", 1000);
   // this->_markerarray_pub =
@@ -35,21 +36,26 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
 
 MapInfo::~MapInfo() {}
 
-void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
-  if (this->obstacles_received_) {
+void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
+{
+  if (this->obstacles_received_)
+  {
     return;
   }
   this->set_obstacle(msg);
   this->obstacles_received_ = true;
   RCLCPP_INFO(this->get_logger(), "Obstacles received!");
 }
-void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg) {
-  if (this->borders_received_) {
+void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
+{
+  if (this->borders_received_)
+  {
     return;
   }
   // read the msg and set the boundary
   std::vector<KDPoint> points;
-  for (auto p : msg.polygon.points) {
+  for (auto p : msg.polygon.points)
+  {
     KDPoint pt = {p.x, p.y};
     points.push_back(pt);
   }
@@ -59,12 +65,15 @@ void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg) {
   this->borders_received_ = true;
   RCLCPP_INFO(this->get_logger(), "Map borders received!");
 }
-void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
-  if (this->gates_received_) {
+void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg)
+{
+  if (this->gates_received_)
+  {
     return;
   }
   KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y};
-  while (this->Collision(end)) {
+  while (this->Collision(end))
+  {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine generator(seed);
     std::uniform_real_distribution<> distribution(-3, 3);
@@ -80,7 +89,8 @@ void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
 
 /////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-void MapInfo::set_boundary(std::vector<KDPoint> &points) {
+void MapInfo::set_boundary(std::vector<KDPoint> &points)
+{
   _line_boundary.header.frame_id = "map";
   _line_boundary.header.stamp = now();
   _line_boundary.action = visualization_msgs::msg::Marker::ADD;
@@ -94,7 +104,8 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
 
   _line_boundary.points.clear();
   // fill the msg with the map
-  for (auto p : points) {
+  for (auto p : points)
+  {
     // ROS2 Point
     geometry_msgs::msg::Point p_ros;
     p_ros.x = p[0];
@@ -107,33 +118,40 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
   // close ring
   _map.outer().push_back(_map.outer().front());
   // print polygon in wkt
-  std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
+  // std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
 
   // set the min and max values of the map for sampling
-  for (auto p : points) {
-    if (p[0] < min_x) {
+  for (auto p : points)
+  {
+    if (p[0] < min_x)
+    {
       min_x = p[0];
     }
-    if (p[0] > max_x) {
+    if (p[0] > max_x)
+    {
       max_x = p[0];
     }
-    if (p[1] < min_y) {
+    if (p[1] < min_y)
+    {
       min_y = p[1];
     }
-    if (p[1] > max_y) {
+    if (p[1] > max_y)
+    {
       max_y = p[1];
     }
   }
 }
 
-void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
+void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
+{
   int i = 11;
   int obs_counter = 0;
   _map.inners().resize(msg.obstacles.size());
   RCLCPP_INFO(this->get_logger(), "Found %d obstacles",
               (int)msg.obstacles.size());
 
-  for (auto obs : msg.obstacles) {
+  for (auto obs : msg.obstacles)
+  {
     visualization_msgs::msg::Marker marker;
     marker.points.clear();
     marker.header.frame_id = "map";
@@ -144,7 +162,8 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
     marker.color.r = 0.0;
     marker.color.a = 1.0;
 
-    if (obs.radius != 0.0) {
+    if (obs.radius != 0.0)
+    {
       // Adding circles
       marker.type = visualization_msgs::msg::Marker::CYLINDER;
       marker.pose.position.x = obs.polygon.points[0].x;
@@ -155,7 +174,8 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
       marker.scale.z = 1;
     }
 
-    else {
+    else
+    {
       // Adding rectangles
       marker.type = visualization_msgs::msg::Marker::CUBE;
       marker.pose.position.x =
@@ -169,26 +189,32 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
     }
 
     _obstacle_array.markers.push_back(marker);
-    for (int j = 0; j < (int)obs.polygon.points.size(); j++) {
+    for (int j = 0; j < (int)obs.polygon.points.size(); j++)
+    {
       // TODO: circles
-      if (abs(obs.radius - 0.0) < EPSILON) {
+      if (abs(obs.radius - 0.0) < EPSILON)
+      {
         _map.inners()[obs_counter].push_back(
             point_xy(obs.polygon.points[j].x, obs.polygon.points[j].y));
-      } else {
+      }
+      else
+      {
       }
     }
     // close ring
-    if (abs(obs.radius - 0.0) < EPSILON) {
+    if (abs(obs.radius - 0.0) < EPSILON)
+    {
       _map.inners()[obs_counter].push_back(_map.inners()[obs_counter].front());
       obs_counter++;
     }
   }
   rclcpp::sleep_for(std::chrono::milliseconds(1000));
-  std::cout << "Polygon with obstacles: \n"
-            << boost::geometry::wkt(_map) << std::endl;
+  // std::cout << "Polygon with obstacles: \n"
+  //           << boost::geometry::wkt(_map) << std::endl;
 }
 
-void MapInfo::set_start(KDPoint &point) {
+void MapInfo::set_start(KDPoint &point)
+{
   pt_start.assign(point.begin(), point.end());
 
   _m_start.header.stamp = now();
@@ -212,7 +238,8 @@ void MapInfo::set_start(KDPoint &point) {
   _m_start.points.push_back(p);
 }
 
-void MapInfo::set_end(KDPoint &point) {
+void MapInfo::set_end(KDPoint &point)
+{
   pt_end.assign(point.begin(), point.end());
 
   _m_end.header.stamp = now();
@@ -235,7 +262,8 @@ void MapInfo::set_end(KDPoint &point) {
   _m_end.points.push_back(p);
 }
 
-void MapInfo::set_path(std::vector<KDPoint> &path) {
+void MapInfo::set_path(std::vector<KDPoint> &path)
+{
   _m_path.header.frame_id = "map";
   _m_path.header.stamp = now();
   _m_path.action = visualization_msgs::msg::Marker::ADD;
@@ -251,7 +279,8 @@ void MapInfo::set_path(std::vector<KDPoint> &path) {
   _m_path.color.a = 1.0;
 
   _m_path.points.clear();
-  for (auto p : path) {
+  for (auto p : path)
+  {
     geometry_msgs::msg::Point p_;
     p_.x = p[0];
     p_.y = p[1];
@@ -262,7 +291,8 @@ void MapInfo::set_path(std::vector<KDPoint> &path) {
 }
 
 void MapInfo::set_dubins_path(
-    std::tuple<std::vector<double>, std::vector<double>> path) {
+    std::tuple<std::vector<double>, std::vector<double>> path)
+{
   _m_path.header.frame_id = "map";
   _m_path.header.stamp = now();
   _m_path.action = visualization_msgs::msg::Marker::ADD;
@@ -280,7 +310,8 @@ void MapInfo::set_dubins_path(
   _m_path.points.clear();
   geometry_msgs::msg::Point p_;
 
-  for (size_t i = 0; i < std::get<0>(path).size(); ++i) {
+  for (size_t i = 0; i < std::get<0>(path).size(); ++i)
+  {
     p_.x = std::get<0>(path)[i];
     p_.y = std::get<1>(path)[i];
     p_.z = 0;
@@ -290,7 +321,8 @@ void MapInfo::set_dubins_path(
   _marker_pub->publish(_m_path);
 }
 
-void MapInfo::set_openlist(std::vector<KDPoint> &points) {
+void MapInfo::set_openlist(std::vector<KDPoint> &points)
+{
   _m_openlist.header.frame_id = "map";
   _m_openlist.header.stamp = now();
   _m_openlist.action = visualization_msgs::msg::Marker::ADD;
@@ -305,7 +337,8 @@ void MapInfo::set_openlist(std::vector<KDPoint> &points) {
   _m_openlist.color.a = 1.0;
 
   _m_openlist.points.clear();
-  for (auto p : points) {
+  for (auto p : points)
+  {
     geometry_msgs::msg::Point p_;
     p_.x = p[0];
     p_.y = p[1];
@@ -314,13 +347,15 @@ void MapInfo::set_openlist(std::vector<KDPoint> &points) {
   }
   _marker_pub->publish(_m_openlist);
   _pub_i = (_pub_i + 1) % 10;
-  if (_pub_i == 0) {
+  if (_pub_i == 0)
+  {
     // rclcpp::sleep_for(std::chrono::milliseconds(10));
     return;
   }
 }
 
-void MapInfo::set_closelist(std::vector<KDPoint> &points) {
+void MapInfo::set_closelist(std::vector<KDPoint> &points)
+{
   _m_closelist.header.frame_id = "map";
   _m_closelist.header.stamp = now();
   _m_closelist.action = visualization_msgs::msg::Marker::ADD;
@@ -334,7 +369,8 @@ void MapInfo::set_closelist(std::vector<KDPoint> &points) {
   _m_closelist.color.a = 1.0;
 
   _m_closelist.points.clear();
-  for (auto p : points) {
+  for (auto p : points)
+  {
     geometry_msgs::msg::Point p_;
     p_.x = p[0];
     p_.y = p[1];
@@ -343,13 +379,15 @@ void MapInfo::set_closelist(std::vector<KDPoint> &points) {
   }
   _marker_pub->publish(_m_closelist);
   _pub_i = (_pub_i + 1) % 10;
-  if (_pub_i == 0) {
+  if (_pub_i == 0)
+  {
     // rclcpp::sleep_for(std::chrono::milliseconds(10));
     return;
   }
 }
 
-void MapInfo::set_rand_points(std::vector<KDPoint> &points) {
+void MapInfo::set_rand_points(std::vector<KDPoint> &points)
+{
   _m_rand_points.header.frame_id = "map";
   _m_rand_points.header.stamp = now();
   _m_rand_points.action = visualization_msgs::msg::Marker::ADD;
@@ -364,7 +402,8 @@ void MapInfo::set_rand_points(std::vector<KDPoint> &points) {
   _m_rand_points.color.a = 1.0;
 
   _m_rand_points.points.clear();
-  for (auto p : points) {
+  for (auto p : points)
+  {
     geometry_msgs::msg::Point p_;
     p_.x = p[0];
     p_.y = p[1];
@@ -375,7 +414,8 @@ void MapInfo::set_rand_points(std::vector<KDPoint> &points) {
 }
 
 void MapInfo::set_roadmap(
-    std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map) {
+    std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map)
+{
   _m_roadmap.header.frame_id = "map";
   _m_roadmap.header.stamp = now();
   _m_roadmap.action = visualization_msgs::msg::Marker::ADD;
@@ -390,12 +430,14 @@ void MapInfo::set_roadmap(
   _m_roadmap.color.a = 1.0;
 
   _m_roadmap.points.clear();
-  for (auto rm : road_map) {
+  for (auto rm : road_map)
+  {
     geometry_msgs::msg::Point p1;
     p1.x = rm.first[0];
     p1.y = rm.first[1];
     p1.z = 0;
-    for (auto p : rm.second) {
+    for (auto p : rm.second)
+    {
       geometry_msgs::msg::Point p2;
       p2.x = p[0];
       p2.y = p[1];
@@ -407,7 +449,8 @@ void MapInfo::set_roadmap(
   _marker_pub->publish(_m_roadmap);
 }
 
-void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
+void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
+{
   _m_rand_point.header.frame_id = "map";
   _m_rand_point.header.stamp = now();
   _m_rand_point.action = visualization_msgs::msg::Marker::ADD;
@@ -442,7 +485,8 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
   _m_rrt.color.a = 1.0;
 
   _m_rrt.points.clear();
-  for (auto p : rrt) {
+  for (auto p : rrt)
+  {
     geometry_msgs::msg::Point p1, p2;
     p1.x = p[0];
     p1.y = p[1];
@@ -457,7 +501,8 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
   _marker_pub->publish(_m_rand_point);
   _marker_pub->publish(_m_rrt);
   _pub_i = (_pub_i + 1) % 10;
-  if (_pub_i == 0) {
+  if (_pub_i == 0)
+  {
     // rclcpp::sleep_for(std::chrono::milliseconds(10));
     return;
   }
@@ -466,7 +511,8 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
 // void
 // MapInfo::set_rrt_dubins(std::vector<std::tuple<std::vector<double>,std::vector<double>>>
 // paths)
-void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n) {
+void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
+{
   visualization_msgs::msg::Marker branch;
   branch.header.frame_id = "map";
   branch.header.stamp = now();
@@ -485,43 +531,62 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n) {
   branch.points.clear();
 
   geometry_msgs::msg::Point p1, p2;
-  for (std::tuple<KDPoint, int, SymbolicPath, Path> tuple : rrt_dubins._rrt) {
-    
-    if(std::get<0>(std::get<3>(tuple)).size() < 2){
-      continue;
-    }
-    for (size_t i = 0; i < std::get<0>(std::get<3>(tuple)).size() - 1; i++) {
-      p1.x = std::get<0>(std::get<3>(tuple))[i];
-      p1.y = std::get<1>(std::get<3>(tuple))[i];
-      p1.z = 0;
-      branch.points.push_back(p1);
-      p2.x = std::get<0>(std::get<3>(tuple))[i+1];
-      p2.y = std::get<1>(std::get<3>(tuple))[i+1];
-      p2.z = 0;
-      branch.points.push_back(p2);
-    }
+  for (std::tuple<KDPoint, int, SymbolicPath, Path> tuple : rrt_dubins._rrt)
+  {
 
-    p2.x = std::get<0>(tuple)[0];
-    p2.y = std::get<0>(tuple)[1];
-    p2.z = 0;
-    branch.points.push_back(p1);
-    branch.points.push_back(p2);
+    if (std::get<0>(std::get<3>(tuple)).size() >= 2)
+    {
+
+      // Plot the leaf
+      for (size_t i = 0; i < std::get<0>(std::get<3>(tuple)).size() - 1; i++)
+      {
+        p1.x = std::get<0>(std::get<3>(tuple))[i];
+        p1.y = std::get<1>(std::get<3>(tuple))[i];
+        p1.z = 0;
+        branch.points.push_back(p1);
+        p2.x = std::get<0>(std::get<3>(tuple))[i + 1];
+        p2.y = std::get<1>(std::get<3>(tuple))[i + 1];
+        p2.z = 0;
+        branch.points.push_back(p2);
+      }
+    }
+    // Plot the parent
+    std::tuple<KDPoint, int, SymbolicPath, Path> parent =
+        rrt_dubins.GetParent(std::get<0>(tuple));
+    if (std::get<0>(std::get<3>(parent)).size() >= 2)
+    {
+      for (size_t i = 0; i < std::get<0>(std::get<3>(parent)).size() - 1; i++)
+      {
+        p1.x = std::get<0>(std::get<3>(parent))[i];
+        p1.y = std::get<1>(std::get<3>(parent))[i];
+        p1.z = 0;
+        branch.points.push_back(p1);
+        p2.x = std::get<0>(std::get<3>(parent))[i + 1];
+        p2.y = std::get<1>(std::get<3>(parent))[i + 1];
+        p2.z = 0;
+        branch.points.push_back(p2);
+      }
+    }
   }
+
   _marker_pub->publish(branch);
   _pub_i = (_pub_i + 1) % 10;
-  if (_pub_i == 0) {
+  if (_pub_i == 0)
+  {
     return;
   }
 }
 
-bool MapInfo::Collision(KDPoint &point) {
+bool MapInfo::Collision(KDPoint &point)
+{
   // exclude points out of the map
   // if ((point[0] > 0) && (point[0] < _width) && (point[1] > 0) && (point[1]
   // < _height))
   bool is_inside = boost::geometry::within(point_xy(point[0], point[1]), _map);
   // RCLCPP_INFO(this->get_logger(), "Checking collision for point: %f, %f ->
   // %s", point[0], point[1], (is_inside ? "INSIDE" : "OUTSIDE"));
-  if (is_inside) {
+  if (is_inside)
+  {
     // std::vector<std::pair<KDPoint, double>> result;
     // check if the point is inside an obstacle (?)
     // 1 is the number of nearest neighbors to return
@@ -529,15 +594,19 @@ bool MapInfo::Collision(KDPoint &point) {
     // to check _okdtree.Query(point, 1, result); return
     // (result.begin()->second < 1.0);
     return false;
-  } else {
+  }
+  else
+  {
     // RCLCPP_INFO(this->get_logger(), "Excluding point out of the map: %f,
     // %f", point[0], point[1]);
     return true;
   }
 }
 
-bool MapInfo::Collision(KDPoint &p1, KDPoint &p2) {
-  if (Collision(p1) || Collision(p2)) {
+bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
+{
+  if (Collision(p1) || Collision(p2))
+  {
     return true;
   }
   std::vector<KDPoint> ps;
@@ -553,22 +622,28 @@ bool MapInfo::Collision(KDPoint &p1, KDPoint &p2) {
   return !boost::geometry::within(l, _map);
 }
 bool MapInfo::DubinsCollision(
-    std::tuple<std::vector<double>, std::vector<double>> &path) {
+    std::tuple<std::vector<double>, std::vector<double>> &path)
+{
   Linestring l;
-  for (size_t i = 0; i < std::get<0>(path).size() - 1; ++i) {
+  for (size_t i = 0; i < std::get<0>(path).size(); ++i)
+  {
     l.push_back(point_xy(std::get<0>(path)[i], std::get<1>(path)[i]));
   }
   return !boost::geometry::within(l, _map);
 }
-void MapInfo::ShowMap(void) {
-  while (_marker_pub->get_subscription_count() < 1) {
+void MapInfo::ShowMap(void)
+{
+  while (_marker_pub->get_subscription_count() < 1)
+  {
     rclcpp::sleep_for(std::chrono::milliseconds(100));
   }
 
   // force publishing
 
-  for (int i = 0; i < 10; i++) {
-    for (auto obstacle : _obstacle_array.markers) {
+  for (int i = 0; i < 10; i++)
+  {
+    for (auto obstacle : _obstacle_array.markers)
+    {
       _marker_pub->publish(obstacle);
     }
     _marker_pub->publish(_line_boundary);
