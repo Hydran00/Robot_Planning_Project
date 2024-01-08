@@ -69,24 +69,24 @@ target_include_directories(wkt_generator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/incl
 #############################################################################
 
 # RRT*
-add_executable(rrt_star 
-  ${RRTSTAR_FOLDER}/main.cpp
-  ${RRTSTAR_FOLDER}/plans/rrt_plan.cpp 
-  ${RRTSTAR_FOLDER}/plans/rrt_star_plan.cpp
-  ${RRTSTAR_FOLDER}/utils/rrt.cpp 
-  ${RRTSTAR_FOLDER}/utils/kdtree.cpp
-  ${RRTSTAR_FOLDER}/utils/map_info.cpp 
-  src/dubins/dubins.cpp 
-)
+# add_executable(rrt_star 
+#   ${RRTSTAR_FOLDER}/main.cpp
+#   ${RRTSTAR_FOLDER}/plans/rrt_plan.cpp 
+#   ${RRTSTAR_FOLDER}/utils/kdtree.cpp
+#   ${RRTSTAR_FOLDER}/plans/rrt_star_plan.cpp
+#   ${RRTSTAR_FOLDER}/utils/rrt.cpp 
+#   ${RRTSTAR_FOLDER}/utils/map_info.cpp 
+#   src/dubins/dubins.cpp 
+# )
 
-ament_target_dependencies(rrt_star
-  rclcpp
-  visualization_msgs
-  geometry_msgs
-  obstacles_msgs
-)
-target_link_libraries(rrt_star Boost::headers)
-target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# ament_target_dependencies(rrt_star
+#   rclcpp
+#   visualization_msgs
+#   geometry_msgs
+#   obstacles_msgs
+# )
+# target_link_libraries(rrt_star Boost::headers)
+# target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
 
@@ -108,13 +108,14 @@ target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # RRT
 add_executable(rrt_star_dubins
-  ${RRTSTAR_FOLDER}/main_dubins.cpp
-  ${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
-  ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
-  ${RRTSTAR_FOLDER}/utils/kdtree.cpp
-  ${RRTSTAR_FOLDER}/utils/rrt.cpp
-  ${RRTSTAR_FOLDER}/utils/map_info.cpp 
-  src/dubins/dubins.cpp
+${RRTSTAR_FOLDER}/main_dubins.cpp
+${RRTSTAR_FOLDER}/utils/map_info.cpp 
+${RRTSTAR_FOLDER}/utils/kdtree.cpp
+${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
+${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
+${RRTSTAR_FOLDER}/utils/rrt.cpp
+${RRTSTAR_FOLDER}/plans/rrt_plan.cpp 
+src/dubins/dubins.cpp
   )
 
 ament_target_dependencies(rrt_star_dubins
@@ -148,7 +149,7 @@ install(DIRECTORY
 install(TARGETS
   voronoi_boost
   wkt_generator
-  rrt_star
+  # rrt_star
   rrt_star_dubins
   # dubins
   DESTINATION lib/${PROJECT_NAME})
