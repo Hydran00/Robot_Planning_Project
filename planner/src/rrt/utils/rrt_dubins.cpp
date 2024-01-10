@@ -38,14 +38,16 @@ KDPoint RRTDubins::SearchNearestVertex(KDPoint &q_rand)
 void RRTDubins::Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
                     Path &path)
 {
-  int i =
+  auto i =
       std::find_if(_rrt.begin(), _rrt.end(),
                    [&](std::tuple<KDPoint, int, SymbolicPath, Path> &tuple)
                    {
                      return (std::get<0>(tuple) == q_near);
                    }) -
       _rrt.begin();
-    std::cout << "Parent of (" << q_new[0] << ", " << q_new[1] << ") is (" << q_near[0] << ", " << q_near[1] << ") || i = "<< i << std::endl;
+
+  std::cout << "Parent of (" << q_new[0] << ", " << q_new[1] << ") is (" << q_near[0] << ", " << q_near[1] << ") || i = " << i << std::endl;
+  // _rrt.push_back(std::make_tuple(q_new, i, sym_path, path));
   _rrt.push_back(std::make_tuple(q_new, i, sym_path, path));
 }
 
@@ -57,6 +59,7 @@ std::tuple<KDPoint, int, SymbolicPath, Path> RRTDubins::GetParent(KDPoint &p)
                    {
                      return (std::get<0>(tuple) == p);
                    });
+
   // return _rrt[it->second].first;
   return _rrt[std::get<1>(*it)];
 }

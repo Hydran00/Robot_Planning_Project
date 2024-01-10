@@ -18,29 +18,37 @@ typedef std::tuple<std::vector<double>, std::vector<double>> Path;
 typedef std::vector<std::vector<double>> SymbolicPath;
 
 typedef std::vector<std::tuple<KDPoint, int, SymbolicPath, Path>> DubinsTree;
-class RRTDubins {
- private:
+class RRTDubins
+{
+private:
   KDPoint _root;
-  // [ [near, key, path type (sls, lsl, ...)],[...],...]
-  const double branch_lenght = 0.01;
 
- public:
+public:
   DubinsTree _rrt;
-  class iterator {
-   private:
+  class iterator
+  {
+  private:
     const DubinsTree::iterator _it_begin;
     int _pos;
 
-   public:
+  public:
     iterator(const DubinsTree::iterator begin, int pos)
         : _it_begin(begin), _pos(pos) {}
-    inline bool operator!=(iterator &it) { return (_pos != it._pos); }
-    inline KDPoint operator*() {
+    inline bool operator!=(iterator &it)
+    {
+      std::cout << "!= called: " << _pos << std::endl;
+      return (_pos != it._pos);
+    }
+    inline KDPoint operator*()
+    {
       // return (_it_begin + _pos)->first;
+      std::cout << "* called: " << _pos << std::endl;
       return std::get<0>(*(_it_begin + _pos));
     }
-    inline iterator &operator++() {
+    inline iterator &operator++()
+    {
       ++_pos;
+      std::cout << "pos called: " << _pos << std::endl;
       return *this;
     }
   };
@@ -64,4 +72,4 @@ class RRTDubins {
   inline iterator end() { return iterator(_rrt.begin(), size()); }
 };
 
-#endif  // !__RRT_DUBINS__
+#endif // !__RRT_DUBINS__

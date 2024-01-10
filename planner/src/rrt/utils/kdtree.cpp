@@ -22,7 +22,7 @@ double Distance(KDPoint &p1, KDPoint &p2)
 
 bool Equal(double a, double b)
 {
-    return std::abs(a - b) < EPSILON;
+    return std::abs(a - b) < 1e-9;
 }
 
 bool Equal(KDPoint &p1, KDPoint &p2)
