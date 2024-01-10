@@ -317,7 +317,6 @@ void MapInfo::set_dubins_path(
     p_.z = 0;
     _m_path.points.push_back(p_);
   }
-
   _marker_pub->publish(_m_path);
 }
 
@@ -479,7 +478,6 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
   _m_rrt.pose.orientation.w = 1.0;
   _m_rrt.scale.x = 0.1;
   _m_rrt.scale.y = 0.1;
-  _m_rrt.scale.y = 0.1;
   _m_rrt.color.b = 0.5;
   _m_rrt.color.g = 0.5;
   _m_rrt.color.a = 1.0;
@@ -524,11 +522,25 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
   branch.pose.orientation.w = 1.0;
   branch.scale.x = 0.1;
   branch.scale.y = 0.1;
-  branch.scale.y = 0.1;
   branch.color.b = 0.5;
   branch.color.g = 0.5;
   branch.color.a = 1.0;
   branch.points.clear();
+
+  visualization_msgs::msg::Marker m_points;
+  m_points.header.frame_id = "map";
+  m_points.header.stamp = now();
+  m_points.action = visualization_msgs::msg::Marker::ADD;
+  m_points.ns = "map";
+  // change id to avoid overwriting
+  m_points.id = _id_rrt + 1000 + n;
+  m_points.type = visualization_msgs::msg::Marker::POINTS;
+  m_points.pose.orientation.w = 1.0;
+  m_points.scale.x = 0.5;
+  m_points.scale.y = 0.5;
+  m_points.color.b = 1;
+  m_points.color.a = 1.0;
+  m_points.points.clear();
 
   geometry_msgs::msg::Point p1, p2;
   for (std::tuple<KDPoint, int, SymbolicPath, Path> tuple : rrt_dubins._rrt)
@@ -536,7 +548,15 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
 
     if (std::get<0>(std::get<3>(tuple)).size() >= 2)
     {
-
+      // Push first point and last
+      p1.x = std::get<0>(std::get<3>(tuple))[0];
+      p1.y = std::get<1>(std::get<3>(tuple))[0];
+      p1.z = 0;
+      m_points.points.push_back(p1);
+      p2.x = std::get<0>(std::get<3>(tuple)).back();
+      p2.y = std::get<1>(std::get<3>(tuple)).back();
+      p2.z = 0;
+      m_points.points.push_back(p2);
       // Plot the leaf
       for (size_t i = 0; i < std::get<0>(std::get<3>(tuple)).size() - 1; i++)
       {
@@ -570,6 +590,7 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
   }
 
   _marker_pub->publish(branch);
+  _marker_pub->publish(m_points);
   _pub_i = (_pub_i + 1) % 10;
   if (_pub_i == 0)
   {

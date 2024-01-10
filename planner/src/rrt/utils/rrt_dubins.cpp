@@ -45,6 +45,7 @@ void RRTDubins::Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
                      return (std::get<0>(tuple) == q_near);
                    }) -
       _rrt.begin();
+    std::cout << "Parent of (" << q_new[0] << ", " << q_new[1] << ") is (" << q_near[0] << ", " << q_near[1] << ") || i = "<< i << std::endl;
   _rrt.push_back(std::make_tuple(q_new, i, sym_path, path));
 }
 

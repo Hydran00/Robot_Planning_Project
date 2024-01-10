@@ -235,12 +235,13 @@ std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::ve
     return best_path_and_cost;
 }
 
-void test_dubins()
+Path test_dubins()
 {
   std::vector<double> q_near = {0, 0, 0};
-  std::vector<double> q_rand = {-0.5, 0, 0};
+  std::vector<double> q_rand = {0.5, 0, 0};
   std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>> p =get_dubins_best_path_and_cost(q_near, q_rand, 1, 0.01);
   Path pa;
   std::get<0>(pa) = std::get<0>(p);
   std::get<1>(pa) = std::get<1>(p);
+  return pa;
 }

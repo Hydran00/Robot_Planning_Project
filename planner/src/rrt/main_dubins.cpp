@@ -29,7 +29,9 @@ void print_path_on_file(Path path) {
 
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
-
+  // Path p = test_dubins();
+  // print_path_on_file(p);
+  // exit(0);
   auto m = std::make_shared<MapInfo>();
 
   sleep(0.5);
@@ -47,9 +49,8 @@ int main(int argc, char **argv) {
 
   if (m->_show_graphics) {
     m->ShowMap();
-  }
+  } 
   rclcpp::sleep_for(std::chrono::seconds(1));
-  std::vector<KDPoint> path;
 
   // Monitor execution time
   auto time_start = rclcpp::Clock().now();
@@ -60,7 +61,7 @@ int main(int argc, char **argv) {
   std::string file_path =
       ament_index_cpp::get_package_share_directory("planner") +
       "/data/dubins_path.txt";
-  
+  print_path_on_file(PATH);
   // cout << "IS PATH VALID?: "
   //      << (boost::geometry::within(l, m->_map) ? "YES" : "NO") << endl;
 

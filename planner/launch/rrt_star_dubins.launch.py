@@ -30,7 +30,7 @@ def generate_launch_description():
                 package="rviz2",
                 executable="rviz2",
                 name="rviz",
-                output="screen",
+                output="log",
                 condition=IfCondition(
                     PythonExpression(["'", launch.substitutions.LaunchConfiguration("show_graphics"), "' == 'true'"])
                 ),

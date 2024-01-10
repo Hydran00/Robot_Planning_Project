@@ -15,7 +15,7 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(void)
 {
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
-  std::uniform_int_distribution<int> dis_s(0.0, 9);
+  std::uniform_int_distribution<int> dis_s(0, 9);
   // Epsilon greedy sampling
   if (dis_s(generator) < 2)
   {
@@ -79,7 +79,7 @@ Path RRTStarDubinsPlan::_run(void)
     {
       continue;
     }
-    rclcpp::sleep_for(std::chrono::milliseconds(50));
+    // rclcpp::sleep_for(std::chrono::milliseconds(20));
     // TODO  probably we should redefine metric for dubins
     std::tuple<std::vector<double>, std::vector<double>> real_path =
         std::make_tuple(std::get<0>(dubins_best_path), std::get<1>(dubins_best_path));
@@ -99,44 +99,29 @@ Path RRTStarDubinsPlan::_run(void)
     }
 
     // TODO->was 1
-    if (Distance(q_near, MotionPlanning::_pt_end) < 0.1)
+    if (Distance(q_rand, MotionPlanning::_pt_end) < 0.5)
     {
-      // if (q_rand != MotionPlanning::_pt_end) {
-      // _rrt.Add(MotionPlanning::_pt_end, q_rand,
-      //          std::get<3>(dubins_best_path));
-      // }
-      // return _ReconstrucPath();
       Path total_path;
-      // std::deque<double,double> test;
-      // Concatenating the paths from the last node to the start node
-
-      // Add the last path
-      std::get<0>(total_path).insert(std::get<0>(total_path).begin(), std::get<0>(dubins_best_path).begin(), std::get<0>(dubins_best_path).end());
-      std::get<1>(total_path).insert(std::get<1>(total_path).begin(), std::get<1>(dubins_best_path).begin(), std::get<1>(dubins_best_path).end());
-      std::vector<double> test = {1.0, 2.0, 3.0, 5.0};
-      while (q_rand != MotionPlanning::_pt_start)
+      KDPoint point = q_rand;
+      while (point != MotionPlanning::_pt_start)
       {
-        std::cout << "adding" << std::endl;
-        Path p = std::get<3>(_rrt.GetParent(q_rand));
-        // std::get<0>(total_path).insert(std::get<0>(total_path).begin(),test.begin(), test.end());
-        // std::get<1>(total_path).insert(std::get<1>(total_path).begin(),test.begin(), test.end());
-
+        std::cout << "adding point :" << point[0] << ", " << point[1] << ", " <<point[2] << std::endl;
+        auto tuple = _rrt.GetParent(point);
+        Path p = std::get<3>(tuple);
         std::get<0>(total_path).insert(std::get<0>(total_path).begin(), std::get<0>(p).begin(), std::get<0>(p).end());
         std::get<1>(total_path).insert(std::get<1>(total_path).begin(), std::get<1>(p).begin(), std::get<1>(p).end());
-        
-        // std::get<0>(total_path).insert(std::get<0>(total_path).begin(),
-        // std::get<0>(std::get<3>(_rrt.GetParent(q_rand))).begin(), std::get<0>(std::get<3>(_rrt.GetParent(q_rand))).end());
-        // std::get<1>(total_path).insert(std::get<1>(total_path).begin(),
-        // std::get<1>(std::get<3>(_rrt.GetParent(q_rand))).begin(), std::get<1>(std::get<3>(_rrt.GetParent(q_rand))).end());
-        q_rand = std::get<0>(_rrt.GetParent(q_rand));
+        point = std::get<0>(tuple);
       }
+      // Add last path
+      std::get<0>(total_path).insert(std::get<0>(total_path).end(), std::get<0>(dubins_best_path).begin(), std::get<0>(dubins_best_path).end());
+      std::get<1>(total_path).insert(std::get<1>(total_path).end(), std::get<1>(dubins_best_path).begin(), std::get<1>(dubins_best_path).end());
 
       // Print path
-      for (size_t i = 0; i < std::get<0>(total_path).size(); ++i)
-      {
-        std::cout << std::get<0>(total_path)[i] << ", "
-                  << std::get<1>(total_path)[i] << std::endl;
-      }
+      // for (size_t i = 0; i < std::get<0>(total_path).size(); ++i)
+      // {
+      //   std::cout << std::get<0>(total_path)[i] << ", "
+      //             << std::get<1>(total_path)[i] << std::endl;
+      // }
       MotionPlanning::_map_info->set_dubins_path(total_path);
       return total_path;
     }
