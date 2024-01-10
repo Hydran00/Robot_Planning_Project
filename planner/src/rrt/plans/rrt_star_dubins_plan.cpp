@@ -65,6 +65,7 @@ Path RRTStarDubinsPlan::_run(void)
   {
     KDPoint q_rand = _GenerateRandPoint();
     KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
+
     // Returns tuple with (X, Y, Cost, Symbolic Path)
     auto dubins_best_path =
         get_dubins_best_path_and_cost(q_near, q_rand, _radius, 0.1);
@@ -79,7 +80,9 @@ Path RRTStarDubinsPlan::_run(void)
     {
       continue;
     }
-    // rclcpp::sleep_for(std::chrono::milliseconds(20));
+    std::cout << "q_rand: " << q_rand[0] << ", " << q_rand[1] << ", " << q_rand[2] << "|| "<< q_rand.size() <<std::endl;
+    std::cout << "q_near: " << q_near[0] << ", " << q_near[1] << ", " << q_near[2] << "|| "<< q_near.size() <<std::endl;
+    rclcpp::sleep_for(std::chrono::milliseconds(1000));
     // TODO  probably we should redefine metric for dubins
     std::tuple<std::vector<double>, std::vector<double>> real_path =
         std::make_tuple(std::get<0>(dubins_best_path), std::get<1>(dubins_best_path));
@@ -125,5 +128,6 @@ Path RRTStarDubinsPlan::_run(void)
       MotionPlanning::_map_info->set_dubins_path(total_path);
       return total_path;
     }
+    std::cout << "----------------------------------" << std::endl;
   }
 }

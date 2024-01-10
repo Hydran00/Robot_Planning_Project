@@ -237,8 +237,8 @@ std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::ve
 
 Path test_dubins()
 {
-  std::vector<double> q_near = {0, 0, 0};
-  std::vector<double> q_rand = {0.5, 0, 0};
+  std::vector<double> q_near = {-3.14779, 2.05863, 0.719023};
+  std::vector<double> q_rand = {-2.16379, 2.3958, 1.19151};
   std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>> p =get_dubins_best_path_and_cost(q_near, q_rand, 1, 0.01);
   Path pa;
   std::get<0>(pa) = std::get<0>(p);
