@@ -82,9 +82,7 @@ Path RRTStarDubinsPlan::_run(void)
                                    std::get<1>(dubins_best_path)[i]));
     }
 
-
-
-    std::tuple<std::vector<double>, std::vector<double>> real_path =
+    Path real_path =
         std::make_tuple(std::get<0>(dubins_best_path), std::get<1>(dubins_best_path));
 
     // Check collisions
@@ -116,12 +114,12 @@ Path RRTStarDubinsPlan::_run(void)
     _rrt.Add(q_rand, q_near, std::get<3>(dubins_best_path), real_path);
 
     // TODO check radius->was 5.0
-    // _rrt.DubinsRewire(
-    //     q_near, 5 .0,
-    //     [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
-    //       return MotionPlanning::_map_info->DubinsCollision(path);
-    //     },
-    //     _radius);
+    _rrt.DubinsRewire(
+        q_near, 15.0,
+        [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
+          return MotionPlanning::_map_info->DubinsCollision(path);
+        },
+        _radius);
 
     if (MotionPlanning::_display)
     {

@@ -79,34 +79,35 @@ void RRTDubins::DubinsRewire(
                 });
 
   for (auto q : nears) {
+    // X, Y, Cost, Symbolic Path
     auto dubins_best_path =
         get_dubins_best_path_and_cost(q, q_new, dubins_radius, 0.1);
 
     // Check collision
-    Path path = std::make_tuple(std::get<0>(dubins_best_path),
+    Path new_path = std::make_tuple(std::get<0>(dubins_best_path),
                                 std::get<1>(dubins_best_path));
     bool scammed = false;
-    if (std::abs(std::get<0>(path)[0] - q[0]) > 1e-6 ||
-        std::abs(std::get<1>(path)[0] - q[1]) > 1e-6) {
+    if (std::abs(std::get<0>(new_path)[0] - q[0]) > 1e-6 ||
+        std::abs(std::get<1>(new_path)[0] - q[1]) > 1e-6) {
       std::cout << "REWIRE 1 -- SCAMMMMATO 1" << std::endl;
-      std::cout << "Start in " << std::get<0>(path)[0] << ", "
-                << std::get<1>(path)[0] << std::endl;
+      std::cout << "Start in " << std::get<0>(new_path)[0] << ", "
+                << std::get<1>(new_path)[0] << std::endl;
       scammed = true;
     }
-    if (std::abs(std::get<0>(path).back() - q_new[0]) > 1e-6 ||
-        std::abs(std::get<1>(path).back() - q_new[1]) > 1e-6) {
+    if (std::abs(std::get<0>(new_path).back() - q_new[0]) > 1e-6 ||
+        std::abs(std::get<1>(new_path).back() - q_new[1]) > 1e-6) {
       std::cout << "REWIRE 1 -- SCAMMMMATO 2" << std::endl;
-      std::cout << "End in " << std::get<0>(path).back() << ", "
-                << std::get<1>(path).back() << std::endl;
+      std::cout << "End in " << std::get<0>(new_path).back() << ", "
+                << std::get<1>(new_path).back() << std::endl;
       scammed = true;
     }
-    if (scammed || DubinsCollision(path)) {
+    if (scammed || DubinsCollision(new_path)) {
       continue;
     }
 
     // compute distance given the symbolic path
     double distance = 0.0;
-    for (std::vector<double> &p : std::get<3>(dubins_best_path)) {
+    for (auto &p : std::get<3>(dubins_best_path)) {
       if (p[0] == 's') {
         distance += p[1];
       } else {
@@ -114,11 +115,6 @@ void RRTDubins::DubinsRewire(
       }
     }
 
-    // for (auto &p : std::get<2>(dubins_best_path)) {
-    //   distance += (p[0] == 's') ? p[1] : p[1] * dubins_radius;
-    // }
-    // }
-    // TODO CHANGE DISTANCE WITH LENGTH
     if (Cost(q, dubins_radius) + distance < Cost(q_new, dubins_radius)) {
       int idx = std::find_if(
                     _rrt.begin(), _rrt.end(),
@@ -131,10 +127,7 @@ void RRTDubins::DubinsRewire(
       // Update symbolic path
       std::get<2>(*it_p) = std::get<3>(dubins_best_path);
       // Update path
-      std::tuple<std::vector<double>, std::vector<double>> path =
-          std::make_tuple(std::get<0>(dubins_best_path),
-                          std::get<1>(dubins_best_path));
-      std::get<3>(*it_p) = path;
+      std::get<3>(*it_p) = new_path;
     }
   }
   // for (auto q : nears) {
@@ -166,7 +159,7 @@ void RRTDubins::DubinsRewire(
   //   }
 
   //   double distance = 0.0;
-  //   // for (auto &p : std::get<2>(dubins_best_path)) {
+  //   // for (auto &p : std::get<3>(dubins_best_path)) {
   //   //   if (p[0] == 's') {
   //   //     distance += p[1];
   //   //   } else {

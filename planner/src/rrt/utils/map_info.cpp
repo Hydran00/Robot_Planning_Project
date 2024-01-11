@@ -4,9 +4,6 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0)
 {
   this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>(
       "visualization_marker", 1000);
-  // this->_markerarray_pub =
-  // create_publisher<visualization_msgs::msg::MarkerArray>("visualization_marker_array",
-  // 1000);
   this->declare_parameter("show_graphics", true);
   this->_show_graphics = this->get_parameter("show_graphics").as_bool();
   RCLCPP_INFO(this->get_logger(), "show_graphics: %s",
@@ -506,9 +503,6 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
   }
 }
 
-// void
-// MapInfo::set_rrt_dubins(std::vector<std::tuple<std::vector<double>,std::vector<double>>>
-// paths)
 void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
 {
   visualization_msgs::msg::Marker branch;
@@ -516,8 +510,7 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
   branch.header.stamp = now();
   branch.action = visualization_msgs::msg::Marker::ADD;
   branch.ns = "map";
-  // change id to avoid overwriting
-  branch.id = _id_rrt + 100 + n;
+  branch.id = _id_rrt;
   branch.type = visualization_msgs::msg::Marker::LINE_LIST;
   branch.pose.orientation.w = 1.0;
   branch.scale.x = 0.1;
@@ -532,8 +525,7 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
   m_points.header.stamp = now();
   m_points.action = visualization_msgs::msg::Marker::ADD;
   m_points.ns = "map";
-  // change id to avoid overwriting
-  m_points.id = _id_rrt + 1000 + n;
+  m_points.id = _id_rrt + 1000;
   m_points.type = visualization_msgs::msg::Marker::POINTS;
   m_points.pose.orientation.w = 1.0;
   m_points.scale.x = 0.1;
@@ -548,7 +540,7 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
   m_parents.action = visualization_msgs::msg::Marker::ADD;
   m_parents.ns = "map";
   // change id to avoid overwriting
-  m_parents.id = _id_rrt + 10000 + n;
+  m_parents.id = _id_rrt + 1001;
   m_parents.type = visualization_msgs::msg::Marker::LINE_LIST;
   m_parents.pose.orientation.w = 1.0;
   m_parents.scale.x = 0.05;
@@ -607,14 +599,6 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
         std::cout << "parent last :"
                   << std::get<0>(std::get<3>(parent)).back() << ", "
                   << std::get<1>(std::get<3>(parent)).back() << std::endl;
-        // print_path_on_file(std::get<3>(parent)[0],std::get<3>(parent));
-        // print_path_on_file(std::get<3>(tuple));
-        // Print path
-        // std::cout << "Bugged path: "<< std::endl;
-        // for (size_t i = 0; i < std::get<0>(std::get<3>(parent)).size(); i++) {
-        //   std::cout << "(" << std::get<0>(std::get<3>(parent))[i] << ", "
-        //             << std::get<1>(std::get<3>(parent))[i] << ") ";
-        // }
         std::cout << "---------------------------" << std::endl;
         bug = true;
       }
@@ -654,28 +638,7 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
 
 bool MapInfo::Collision(KDPoint &point)
 {
-  // exclude points out of the map
-  // if ((point[0] > 0) && (point[0] < _width) && (point[1] > 0) && (point[1]
-  // < _height))
-  bool is_inside = boost::geometry::within(point_xy(point[0], point[1]), _map);
-  // RCLCPP_INFO(this->get_logger(), "Checking collision for point: %f, %f ->
-  // %s", point[0], point[1], (is_inside ? "INSIDE" : "OUTSIDE"));
-  if (is_inside)
-  {
-    // std::vector<std::pair<KDPoint, double>> result;
-    // check if the point is inside an obstacle (?)
-    // 1 is the number of nearest neighbors to return
-    // result is a vector of pairs of points and their distances to the point
-    // to check _okdtree.Query(point, 1, result); return
-    // (result.begin()->second < 1.0);
-    return false;
-  }
-  else
-  {
-    // RCLCPP_INFO(this->get_logger(), "Excluding point out of the map: %f,
-    // %f", point[0], point[1]);
-    return true;
-  }
+  return !boost::geometry::within(point_xy(point[0], point[1]), _map);
 }
 
 bool MapInfo::Collision(KDPoint &p1, KDPoint &p2)
