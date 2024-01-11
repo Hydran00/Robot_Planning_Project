@@ -62,6 +62,7 @@ Path RRTStarDubinsPlan::_run(void)
 {
   int n = 0;
   Linestring best_path;
+  int iteration = 0;
   while (true)
   {
     best_path.clear();
@@ -105,7 +106,6 @@ Path RRTStarDubinsPlan::_run(void)
       std::cout << "SCAMMMMATO 2" << std::endl;
       std::cout << "End in " << std::get<0>(real_path).back() << ", " << std::get<1>(real_path).back() << std::endl;
       scammed = true;
-
     }
     if(scammed){
       std::cout << "----------------------------------" << std::endl;
@@ -116,12 +116,12 @@ Path RRTStarDubinsPlan::_run(void)
     _rrt.Add(q_rand, q_near, std::get<3>(dubins_best_path), real_path);
 
     // TODO check radius->was 5.0
-    // _rrt.DubinsRewire(
-    //     q_near, 3.0,
-    //     [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
-    //       return MotionPlanning::_map_info->DubinsCollision(path);
-    //     },
-    //     _radius);
+    _rrt.DubinsRewire(
+        q_near, 3.0,
+        [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
+          return MotionPlanning::_map_info->DubinsCollision(path);
+        },
+        _radius);
 
     if (MotionPlanning::_display)
     {
@@ -129,8 +129,9 @@ Path RRTStarDubinsPlan::_run(void)
     }
 
     // TODO->was 1
-    if (Distance(q_rand, MotionPlanning::_pt_end) < 0.5)
+    if (Distance(q_rand, MotionPlanning::_pt_end) < 0.1)
     {
+      iteration += 1;
       Path total_path;
       KDPoint point = q_rand;
       while (point != MotionPlanning::_pt_start)
@@ -153,6 +154,9 @@ Path RRTStarDubinsPlan::_run(void)
       //             << std::get<1>(total_path)[i] << std::endl;
       // }
       MotionPlanning::_map_info->set_dubins_path(total_path);
+      if(iteration<10){
+        continue;
+      }
       return total_path;
     }
     std::cout << "----------------------------------" << std::endl;

@@ -37,7 +37,7 @@ std::tuple<std::vector<double>, std::vector<double>> gen_path(
 
   for (const auto &p : path) {
     if (p[0] == 's') {
-      for (double l = 0.0; l < p[1]; l += 0.5) {
+      for (double l = 0.0; l < p[1]; l += 0.05) {
         ps_x.push_back(start[0] + std::cos(yaw) * l);
         ps_y.push_back(start[1] + std::sin(yaw) * l);
       }
@@ -218,24 +218,29 @@ get_dubins_best_path_and_cost(std::vector<double> q_near,
   return best_path_and_cost;
 }
 
-Path test_dubins() {
-  std::vector<double> q_near = {-8.04211, 1.90891, 4.33687};
-  std::vector<double> q_rand = {-7.81085, 1.40944, 6.16405};
+Path test_dubins(std::vector<double> start, std::vector<double> end) {
   std::tuple<std::vector<double>, std::vector<double>, double,
              std::vector<std::vector<double>>>
-      p = get_dubins_best_path_and_cost(q_near, q_rand, 1, 0.01);
+      p = get_dubins_best_path_and_cost(start, end, 1, 0.001);
+  std::cout << "Start: " << start[0] << ", " << start[1] << ", " << start[2]
+            << std::endl;
+  std::cout << "End: " << end[0] << ", " << end[1] << ", " << end[2]
+            << std::endl;
   Path pa;
   std::get<0>(pa) = std::get<0>(p);
   std::get<1>(pa) = std::get<1>(p);
   return pa;
 }
 
-void print_path_on_file(Path path) {
+void print_path_on_file(std::vector<double> start, std::vector<double> end, Path path) {
   std::string file_path =
       ament_index_cpp::get_package_share_directory("planner") +
       "/data/dubins_path.txt";
   std::ofstream fout;
   fout.open(file_path, std::ios::app);
+  fout << start[0] << ", " << start[1] << std::endl;
+  fout << end[0] << ", " << end[1] << std::endl;
+  fout << std::endl;
   for (size_t i = 0; i < std::get<0>(path).size(); i++) {
     fout << std::get<0>(path)[i] << ", " << std::get<1>(path)[i] << std::endl;
   }

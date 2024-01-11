@@ -21,9 +21,10 @@ int main(int argc, char **argv) {
       ament_index_cpp::get_package_share_directory("planner") +
       "/data/dubins_path.txt";
   std::remove(file_path.c_str());
-
-  // Path p = test_dubins();
-  // print_path_on_file(p);
+  // KDPoint test_start = {-8.04211, 1.90891, 4.33687};
+  // KDPoint test_end = {-7.81085, 1.40944, 6.16405};
+  // Path p = test_dubins(test_start, test_end);
+  // print_path_on_file(test_start, test_end, p);
   // exit(0);
   auto m = std::make_shared<MapInfo>();
 
@@ -52,7 +53,7 @@ int main(int argc, char **argv) {
   RRTStarDubinsPlan plan(m, radius);
   Path PATH = plan._run();
 
-  print_path_on_file(PATH);
+  // print_path_on_file(PATH);
   // cout << "IS PATH VALID?: "
   //      << (boost::geometry::within(l, m->_map) ? "YES" : "NO") << endl;
 

@@ -17,7 +17,6 @@ KDPoint RRTDubins::SearchNearestVertex(KDPoint &q_rand) {
   return std::get<0>(_rrt[i]);
 }
 
-
 void RRTDubins::Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
                     Path &path) {
   int i =
@@ -28,7 +27,8 @@ void RRTDubins::Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
       _rrt.begin();
 
   std::cout << "Parent of \t(" << q_new[0] << ", " << q_new[1] << ") is ("
-            << q_near[0] << ", " << q_near[1] << ") \t|| i = " << i << "\t rrt_size: "<<_rrt.size()<<std::endl;
+            << q_near[0] << ", " << q_near[1] << ") \t|| i = " << i
+            << "\t rrt_size: " << _rrt.size() << std::endl;
   // _rrt.push_back(std::make_tuple(q_new, i, sym_path, path));
   _rrt.push_back(std::make_tuple(q_new, i, sym_path, path));
 }
@@ -80,26 +80,44 @@ void RRTDubins::DubinsRewire(
 
   for (auto q : nears) {
     auto dubins_best_path =
-        get_dubins_best_path_and_cost(q_new, q, dubins_radius, 0.1);
+        get_dubins_best_path_and_cost(q, q_new, dubins_radius, 0.1);
 
     // Check collision
-    std::vector<double> x = std::get<0>(dubins_best_path);
-    std::vector<double> y = std::get<1>(dubins_best_path);
-    std::tuple<std::vector<double>, std::vector<double>> path =
-        std::make_tuple(x, y);
-    if (DubinsCollision(path)) {
+    Path path = std::make_tuple(std::get<0>(dubins_best_path),
+                                std::get<1>(dubins_best_path));
+    bool scammed = false;
+    if (std::abs(std::get<0>(path)[0] - q[0]) > 1e-6 ||
+        std::abs(std::get<1>(path)[0] - q[1]) > 1e-6) {
+      std::cout << "REWIRE 1 -- SCAMMMMATO 1" << std::endl;
+      std::cout << "Start in " << std::get<0>(path)[0] << ", "
+                << std::get<1>(path)[0] << std::endl;
+      scammed = true;
+    }
+    if (std::abs(std::get<0>(path).back() - q_new[0]) > 1e-6 ||
+        std::abs(std::get<1>(path).back() - q_new[1]) > 1e-6) {
+      std::cout << "REWIRE 1 -- SCAMMMMATO 2" << std::endl;
+      std::cout << "End in " << std::get<0>(path).back() << ", "
+                << std::get<1>(path).back() << std::endl;
+      scammed = true;
+    }
+    if (scammed || DubinsCollision(path)) {
       continue;
     }
 
     // compute distance given the symbolic path
     double distance = 0.0;
-    for (auto &p : std::get<3>(dubins_best_path)) {
+    for (std::vector<double> &p : std::get<3>(dubins_best_path)) {
       if (p[0] == 's') {
         distance += p[1];
       } else {
         distance += p[1] * dubins_radius;
       }
     }
+
+    // for (auto &p : std::get<2>(dubins_best_path)) {
+    //   distance += (p[0] == 's') ? p[1] : p[1] * dubins_radius;
+    // }
+    // }
     // TODO CHANGE DISTANCE WITH LENGTH
     if (Cost(q, dubins_radius) + distance < Cost(q_new, dubins_radius)) {
       int idx = std::find_if(
@@ -119,44 +137,59 @@ void RRTDubins::DubinsRewire(
       std::get<3>(*it_p) = path;
     }
   }
-  for (auto q : nears) {
-    auto dubins_best_path =
-        get_dubins_best_path_and_cost(q, q_new, dubins_radius, 0.1);
+  // for (auto q : nears) {
+  //   auto dubins_best_path =
+  //       get_dubins_best_path_and_cost(q_new, q, dubins_radius, 0.1);
 
-    // Check collision
-    std::vector<double> x = std::get<0>(dubins_best_path);
-    std::vector<double> y = std::get<1>(dubins_best_path);
-    std::tuple<std::vector<double>, std::vector<double>> path =
-        std::make_tuple(x, y);
-    if (DubinsCollision(path)) {
-      continue;
-    }
+  //   // Check collision
+  //   std::vector<double> x = std::get<0>(dubins_best_path);
+  //   std::vector<double> y = std::get<1>(dubins_best_path);
+  //   std::tuple<std::vector<double>, std::vector<double>> path =
+  //       std::make_tuple(x, y);
+  //   bool scammed = false;
+  //   if (std::abs(std::get<0>(path)[0] - q_new[0]) > 1e-6 ||
+  //       std::abs(std::get<1>(path)[0] - q_new[1]) > 1e-6) {
+  //     std::cout << "REWIRE 2 -- SCAMMMMATO 1" << std::endl;
+  //     std::cout << "Start in " << std::get<0>(path)[0] << ", "
+  //               << std::get<1>(path)[0] << std::endl;
+  //     scammed = true;
+  //   }
+  //   if (std::abs(std::get<0>(path).back() - q[0]) > 1e-6 ||
+  //       std::abs(std::get<1>(path).back() - q[1]) > 1e-6) {
+  //     std::cout << "REWIRE 2 -- SCAMMMMATO 2" << std::endl;
+  //     std::cout << "End in " << std::get<0>(path).back() << ", "
+  //               << std::get<1>(path).back() << std::endl;
+  //     scammed = true;
+  //   }
+  //   if (scammed || DubinsCollision(path)) {
+  //     continue;
+  //   }
 
-    double distance = 0.0;
-    for (auto &p : std::get<3>(dubins_best_path)) {
-      if (p[0] == 's') {
-        distance += p[1];
-      } else {
-        distance += p[1] * dubins_radius;
-      }
-    }
-    if (Cost(q_new, dubins_radius) + distance < Cost(q, dubins_radius)) {
-      auto it_pt = std::find_if(
-          _rrt.begin(), _rrt.end(),
-          [&](std::tuple<KDPoint, int, SymbolicPath, Path> &tuple) {
-            return (std::get<0>(tuple) == q);
-          });
-      // it_pt->second = int(it_p - _rrt.begin());
-      std::get<1>(*it_pt) = int(it_p - _rrt.begin());
+  //   double distance = 0.0;
+  //   // for (auto &p : std::get<2>(dubins_best_path)) {
+  //   //   if (p[0] == 's') {
+  //   //     distance += p[1];
+  //   //   } else {
+  //   //     distance += p[1] * dubins_radius;
+  //   //   }
+  //   // }
+  //   if (Cost(q_new, dubins_radius) + distance < Cost(q, dubins_radius)) {
+  //     auto it_pt = std::find_if(
+  //         _rrt.begin(), _rrt.end(),
+  //         [&](std::tuple<KDPoint, int, SymbolicPath, Path> &tuple) {
+  //           return (std::get<0>(tuple) == q);
+  //         });
+  //     // it_pt->second = int(it_p - _rrt.begin());
+  //     std::get<1>(*it_pt) = int(it_p - _rrt.begin());
 
-      // it_p->second = idx;
-      // Update symbolic path
-      std::get<2>(*it_p) = std::get<3>(dubins_best_path);
-      // Update path
-      std::tuple<std::vector<double>, std::vector<double>> path =
-          std::make_tuple(std::get<0>(dubins_best_path),
-                          std::get<1>(dubins_best_path));
-      std::get<3>(*it_p) = path;
-    }
-  }
+  //     // it_p->second = idx;
+  //     // Update symbolic path
+  //     std::get<2>(*it_p) = std::get<3>(dubins_best_path);
+  //     // Update path
+  //     std::tuple<std::vector<double>, std::vector<double>> path =
+  //         std::make_tuple(std::get<0>(dubins_best_path),
+  //                         std::get<1>(dubins_best_path));
+  //     std::get<3>(*it_p) = path;
+  //   }
+  // }
 }
