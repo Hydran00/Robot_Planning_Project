@@ -208,7 +208,7 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
       obs_counter++;
     }
   }
-  rclcpp::sleep_for(std::chrono::milliseconds(1000));
+  // rclcpp::sleep_for(std::chrono::milliseconds(1000));
   // std::cout << "Polygon with obstacles: \n"
   //           << boost::geometry::wkt(_map) << std::endl;
 }

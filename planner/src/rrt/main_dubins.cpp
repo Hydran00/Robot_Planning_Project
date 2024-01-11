@@ -28,11 +28,13 @@ int main(int argc, char **argv) {
   // exit(0);
   auto m = std::make_shared<MapInfo>();
 
-  sleep(0.5);
+  // sleep(0.5);
+  // rclcpp::spin(m);
   RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
   while (!m->obstacles_received_ || !m->borders_received_ ||
          !m->gates_received_) {
     rclcpp::spin_some(m);
+    rclcpp::sleep_for(std::chrono::milliseconds(100));
   }
 
   KDPoint point = {0, 0, 0};

@@ -82,33 +82,33 @@ Path RRTStarDubinsPlan::_run(void)
                                    std::get<1>(dubins_best_path)[i]));
     }
 
-    
+
 
     std::tuple<std::vector<double>, std::vector<double>> real_path =
         std::make_tuple(std::get<0>(dubins_best_path), std::get<1>(dubins_best_path));
-    
+
     // Check collisions
     if (!boost::geometry::within(best_path, MotionPlanning::_map_info->_map))
     {
       continue;
     }
 
-    std::cout << "q_rand: " << q_rand[0] << ", " << q_rand[1] << ", " << q_rand[2] << "|| "<< q_rand.size() <<std::endl;
-    std::cout << "q_near: " << q_near[0] << ", " << q_near[1] << ", " << q_near[2] << "|| "<< q_near.size() <<std::endl;
-    
+    // std::cout << "q_rand: " << q_rand[0] << ", " << q_rand[1] << ", " << q_rand[2] << "|| "<< q_rand.size() <<std::endl;
+    // std::cout << "q_near: " << q_near[0] << ", " << q_near[1] << ", " << q_near[2] << "|| "<< q_near.size() <<std::endl;
+
     bool scammed = false;
     if( std::abs(std::get<0>(real_path)[0] - q_near[0])>1e-6 || std::abs(std::get<1>(real_path)[0] - q_near[1]) > 1e-6){
-      std::cout << "SCAMMMMATO 1" << std::endl;
-      std::cout << "Start in " << std::get<0>(real_path)[0] << ", " << std::get<1>(real_path)[0] << std::endl;
+      // std::cout << "SCAMMMMATO 1" << std::endl;
+      // std::cout << "Start in " << std::get<0>(real_path)[0] << ", " << std::get<1>(real_path)[0] << std::endl;
       scammed = true;
     }
     if( std::abs(std::get<0>(real_path).back() - q_rand[0])>1e-6 || std::abs(std::get<1>(real_path).back() - q_rand[1]) > 1e-6){
-      std::cout << "SCAMMMMATO 2" << std::endl;
-      std::cout << "End in " << std::get<0>(real_path).back() << ", " << std::get<1>(real_path).back() << std::endl;
+      // std::cout << "SCAMMMMATO 2" << std::endl;
+      // std::cout << "End in " << std::get<0>(real_path).back() << ", " << std::get<1>(real_path).back() << std::endl;
       scammed = true;
     }
     if(scammed){
-      std::cout << "----------------------------------" << std::endl;
+      // std::cout << "----------------------------------" << std::endl;
       continue;
     }
     // rclcpp::sleep_for(std::chrono::milliseconds(50));
@@ -116,12 +116,12 @@ Path RRTStarDubinsPlan::_run(void)
     _rrt.Add(q_rand, q_near, std::get<3>(dubins_best_path), real_path);
 
     // TODO check radius->was 5.0
-    _rrt.DubinsRewire(
-        q_near, 3.0,
-        [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
-          return MotionPlanning::_map_info->DubinsCollision(path);
-        },
-        _radius);
+    // _rrt.DubinsRewire(
+    //     q_near, 5 .0,
+    //     [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
+    //       return MotionPlanning::_map_info->DubinsCollision(path);
+    //     },
+    //     _radius);
 
     if (MotionPlanning::_display)
     {
@@ -136,7 +136,6 @@ Path RRTStarDubinsPlan::_run(void)
       KDPoint point = q_rand;
       while (point != MotionPlanning::_pt_start)
       {
-        std::cout << "adding point :" << point[0] << ", " << point[1] << ", " <<point[2] << std::endl;
         auto tuple = _rrt.GetParent(point);
         Path p = std::get<3>(tuple);
         std::get<0>(total_path).insert(std::get<0>(total_path).begin(), std::get<0>(p).begin(), std::get<0>(p).end());
@@ -154,11 +153,12 @@ Path RRTStarDubinsPlan::_run(void)
       //             << std::get<1>(total_path)[i] << std::endl;
       // }
       MotionPlanning::_map_info->set_dubins_path(total_path);
-      if(iteration<10){
-        continue;
-      }
+      // if(iteration<10){
+      //   continue;
+      // }
       return total_path;
     }
-    std::cout << "----------------------------------" << std::endl;
+    iteration += 1;
+    std::cout << "it: " <<iteration << "----------------------------------" << std::endl;
   }
 }
