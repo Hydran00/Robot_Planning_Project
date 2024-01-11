@@ -13,6 +13,7 @@ Path gen_path(
 std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>> get_dubins_best_path_and_cost(
     std::vector<double> q_near, std::vector<double> q_rand, double _radius, double step);
 Path test_dubins();
+void print_path_on_file(Path path);
 class DubinsPath
 {
 private:

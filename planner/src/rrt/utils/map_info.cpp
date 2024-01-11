@@ -607,6 +607,8 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
         std::cout << "parent last :"
                   << std::get<0>(std::get<3>(parent)).back() << ", "
                   << std::get<1>(std::get<3>(parent)).back() << std::endl;
+        print_path_on_file(std::get<3>(parent));
+        print_path_on_file(std::get<3>(tuple));
         // Print path
         // std::cout << "Bugged path: "<< std::endl;
         // for (size_t i = 0; i < std::get<0>(std::get<3>(parent)).size(); i++) {

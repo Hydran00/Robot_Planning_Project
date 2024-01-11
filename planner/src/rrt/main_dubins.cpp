@@ -15,20 +15,13 @@ using namespace std;
 
 typedef std::tuple<std::vector<double>, std::vector<double>> Path;
 
-void print_path_on_file(Path path) {
+int main(int argc, char **argv) {
+  rclcpp::init(argc, argv);
   std::string file_path =
       ament_index_cpp::get_package_share_directory("planner") +
       "/data/dubins_path.txt";
   std::remove(file_path.c_str());
-  std::ofstream fout;
-  fout.open(file_path);
-  for (size_t i = 0; i < std::get<0>(path).size(); i++) {
-    fout << std::get<0>(path)[i] << ", " << std::get<1>(path)[i] << std::endl;
-  }
-}
 
-int main(int argc, char **argv) {
-  rclcpp::init(argc, argv);
   // Path p = test_dubins();
   // print_path_on_file(p);
   // exit(0);
@@ -45,11 +38,12 @@ int main(int argc, char **argv) {
   while (m->Collision(point)) {
     point[0] += 0.1;
   }
+  std::cout << "Start is at "<< point[0] << ", " << point[1] << std::endl;
   m->set_start(point);
 
   if (m->_show_graphics) {
     m->ShowMap();
-  } 
+  }
   rclcpp::sleep_for(std::chrono::seconds(1));
 
   // Monitor execution time
@@ -58,9 +52,6 @@ int main(int argc, char **argv) {
   RRTStarDubinsPlan plan(m, radius);
   Path PATH = plan._run();
 
-  std::string file_path =
-      ament_index_cpp::get_package_share_directory("planner") +
-      "/data/dubins_path.txt";
   print_path_on_file(PATH);
   // cout << "IS PATH VALID?: "
   //      << (boost::geometry::within(l, m->_map) ? "YES" : "NO") << endl;

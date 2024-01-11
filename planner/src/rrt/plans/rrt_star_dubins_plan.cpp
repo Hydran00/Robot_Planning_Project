@@ -81,16 +81,19 @@ Path RRTStarDubinsPlan::_run(void)
                                    std::get<1>(dubins_best_path)[i]));
     }
 
-    if (!boost::geometry::within(best_path, MotionPlanning::_map_info->_map))
-    {
-      continue;
-    }
-    std::cout << "q_rand: " << q_rand[0] << ", " << q_rand[1] << ", " << q_rand[2] << "|| "<< q_rand.size() <<std::endl;
-    std::cout << "q_near: " << q_near[0] << ", " << q_near[1] << ", " << q_near[2] << "|| "<< q_near.size() <<std::endl;
     
 
     std::tuple<std::vector<double>, std::vector<double>> real_path =
         std::make_tuple(std::get<0>(dubins_best_path), std::get<1>(dubins_best_path));
+    
+    // Check collisions
+    if (!boost::geometry::within(best_path, MotionPlanning::_map_info->_map))
+    {
+      continue;
+    }
+
+    std::cout << "q_rand: " << q_rand[0] << ", " << q_rand[1] << ", " << q_rand[2] << "|| "<< q_rand.size() <<std::endl;
+    std::cout << "q_near: " << q_near[0] << ", " << q_near[1] << ", " << q_near[2] << "|| "<< q_near.size() <<std::endl;
     
     bool scammed = false;
     if( std::abs(std::get<0>(real_path)[0] - q_near[0])>1e-6 || std::abs(std::get<1>(real_path)[0] - q_near[1]) > 1e-6){
@@ -104,22 +107,21 @@ Path RRTStarDubinsPlan::_run(void)
       scammed = true;
 
     }
-
     if(scammed){
+      std::cout << "----------------------------------" << std::endl;
       continue;
     }
-
     // rclcpp::sleep_for(std::chrono::milliseconds(50));
     // TODO  probably we should redefine metric for dubins
     _rrt.Add(q_rand, q_near, std::get<3>(dubins_best_path), real_path);
 
     // TODO check radius->was 5.0
-    _rrt.DubinsRewire(
-        q_near, 1.0,
-        [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
-          return MotionPlanning::_map_info->DubinsCollision(path);
-        },
-        _radius);
+    // _rrt.DubinsRewire(
+    //     q_near, 3.0,
+    //     [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
+    //       return MotionPlanning::_map_info->DubinsCollision(path);
+    //     },
+    //     _radius);
 
     if (MotionPlanning::_display)
     {
