@@ -117,7 +117,7 @@ class MapInfo : public rclcpp::Node {
   void set_roadmap(
       std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
   void set_rrt(RRT &rrt, int n, KDPoint &rand);
-  void set_rrt_dubins(RRTDubins &rrt_dubins, int n);
+  void set_rrt_dubins(RRTDubins &rrt_dubins);
   bool Collision(KDPoint &point);
   bool Collision(KDPoint &p1, KDPoint &p2);
   bool DubinsCollision(

@@ -33,6 +33,7 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0)
 
 MapInfo::~MapInfo() {}
 
+
 void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
 {
   if (this->obstacles_received_)
@@ -41,7 +42,7 @@ void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
   }
   this->set_obstacle(msg);
   this->obstacles_received_ = true;
-  RCLCPP_INFO(this->get_logger(), "Obstacles received!");
+  RCLCPP_INFO(this->get_logger(), "\033[1;32mObstacles received! \033[0m");
 }
 void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
 {
@@ -60,7 +61,7 @@ void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
   points.push_back(pt);
   this->set_boundary(points);
   this->borders_received_ = true;
-  RCLCPP_INFO(this->get_logger(), "Map borders received!");
+  RCLCPP_INFO(this->get_logger(), "\033[1;32mMap borders received! \033[0m");
 }
 void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
@@ -81,7 +82,7 @@ void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg)
   }
   set_end(end);
   this->gates_received_ = true;
-  RCLCPP_INFO(this->get_logger(), "Gate received!");
+  RCLCPP_INFO(this->get_logger(), "\033[1;32mGate received! \033[0m");
 }
 
 /////////////////////////////////////////////////////////////
@@ -503,7 +504,7 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand)
   }
 }
 
-void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
+void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins)
 {
   visualization_msgs::msg::Marker branch;
   branch.header.frame_id = "map";
@@ -627,7 +628,7 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins, int n)
   _marker_pub->publish(m_parents);
   if (bug)
   {
-    exit(0);
+    // exit(0);
   }
   _pub_i = (_pub_i + 1) % 10;
   if (_pub_i == 0)
