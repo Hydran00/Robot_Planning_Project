@@ -3,7 +3,7 @@
 MapInfo::MapInfo() : Node("map"), _pub_i(0)
 {
   this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>(
-      "visualization_marker", 1000);
+      "visualization_marker", 10000);
   this->declare_parameter("show_graphics", true);
   this->_show_graphics = this->get_parameter("show_graphics").as_bool();
   RCLCPP_INFO(this->get_logger(), "show_graphics: %s",
@@ -70,16 +70,16 @@ void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg)
     return;
   }
   KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y};
-  while (this->Collision(end))
-  {
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::default_random_engine generator(seed);
-    std::uniform_real_distribution<> distribution(-3, 3);
-    double x = distribution(generator);
-    double y = distribution(generator);
-    end[0] = x;
-    end[1] = y;
-  }
+  // while (this->Collision(end))
+  // {
+  //   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  //   std::default_random_engine generator(seed);
+  //   std::uniform_real_distribution<> distribution(-3, 3);
+  //   double x = distribution(generator);
+  //   double y = distribution(generator);
+  //   end[0] = x;
+  //   end[1] = y;
+  // }
   set_end(end);
   this->gates_received_ = true;
   RCLCPP_INFO(this->get_logger(), "\033[1;32mGate received! \033[0m");
