@@ -32,26 +32,21 @@ int main(int argc, char **argv)
 
   auto m = std::make_shared<MapInfo>();
 
-  auto future = std::async(std::launch::async, [&m]()
-                           {
-    while (!m->obstacles_received_ || !m->borders_received_ ||
-                            !m->gates_received_){
-      rclcpp::sleep_for(std::chrono::milliseconds(1000));
-      RCLCPP_INFO(m->get_logger(), "Map received: %d, Border: %d, Gates: %d", 
-      m->obstacles_received_, m->borders_received_, m->gates_received_); } });
-
   RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
-  // while (!m->obstacles_received_ || !m->borders_received_ ||
-  //        !m->gates_received_) {
-  //   rclcpp::spin_some(m->get_node_base_interface());
-  //   rclcpp::sleep_for(std::chrono::milliseconds(100));
-  // }
-  rclcpp::spin_until_future_complete(m->get_node_base_interface(), future);
+  while (!m->obstacles_received_ || !m->borders_received_ ||
+         !m->gates_received_) {
+      // RCLCPP_INFO(m->get_logger(), "Map received: %d, Border: %d, Gates: %d", 
+      // m->obstacles_received_, m->borders_received_, m->gates_received_);
+    rclcpp::spin_some(m->get_node_base_interface());
+    rclcpp::sleep_for(std::chrono::milliseconds(100));
+  }
   RCLCPP_INFO(m->get_logger(), "\033[1;32m Map information received!\033[0m");
 
   KDPoint point = {0, 0, 0};
   while (m->Collision(point))
   {
+    sleep(0.1);
+    RCLCPP_INFO(m->get_logger(), "Start is in collision, moving it");
     point[0] += 0.1;
   }
   std::cout << "Start is at " << point[0] << ", " << point[1] << std::endl;

@@ -36,21 +36,15 @@ MapInfo::~MapInfo() {}
 
 void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg)
 {
-  if (this->obstacles_received_)
-  {
-    return;
-  }
+
+  subscription_obstacles_.reset();
   this->set_obstacle(msg);
   this->obstacles_received_ = true;
   RCLCPP_INFO(this->get_logger(), "\033[1;32mObstacles received! \033[0m");
 }
 void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
 {
-  if (this->borders_received_)
-  {
-    return;
-  }
-  // read the msg and set the boundary
+  subscription_borders_.reset();
   std::vector<KDPoint> points;
   for (auto p : msg.polygon.points)
   {
@@ -65,21 +59,9 @@ void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg)
 }
 void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-  if (this->gates_received_)
-  {
-    return;
-  }
+  // unsubscribe
+  subscription_gates_.reset();
   KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y};
-  // while (this->Collision(end))
-  // {
-  //   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  //   std::default_random_engine generator(seed);
-  //   std::uniform_real_distribution<> distribution(-3, 3);
-  //   double x = distribution(generator);
-  //   double y = distribution(generator);
-  //   end[0] = x;
-  //   end[1] = y;
-  // }
   set_end(end);
   this->gates_received_ = true;
   RCLCPP_INFO(this->get_logger(), "\033[1;32mGate received! \033[0m");
