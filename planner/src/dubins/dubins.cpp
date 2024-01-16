@@ -292,13 +292,16 @@ void print_path_on_file(std::vector<double> start, std::vector<double> end, Path
   std::string file_path =
       ament_index_cpp::get_package_share_directory("planner") +
       "/data/dubins_path.txt";
+  std::cout << "Printing path on file: " << file_path << std::endl;
   std::ofstream fout;
   fout.open(file_path, std::ios::app);
   fout << start[0] << ", " << start[1] << std::endl;
   fout << end[0] << ", " << end[1] << std::endl;
-  fout << std::endl;
+  // fout << std::endl;
   for (size_t i = 0; i < std::get<0>(path).size(); i++)
   {
     fout << std::get<0>(path)[i] << ", " << std::get<1>(path)[i] << std::endl;
   }
+  // close
+  fout.close();
 }

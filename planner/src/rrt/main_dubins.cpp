@@ -34,11 +34,11 @@ int main(int argc, char **argv)
 
   auto future = std::async(std::launch::async, [&m]()
                            {
-    while (rclcpp::ok() && (!m->obstacles_received_ || !m->borders_received_ ||
-                            !m->gates_received_)) {
+    while (!m->obstacles_received_ || !m->borders_received_ ||
+                            !m->gates_received_){
       rclcpp::sleep_for(std::chrono::milliseconds(1000));
-      RCLCPP_INFO(m->get_logger(), "Waiting for map infos...");
-    } });
+      RCLCPP_INFO(m->get_logger(), "Map received: %d, Border: %d, Gates: %d", 
+      m->obstacles_received_, m->borders_received_, m->gates_received_); } });
 
   RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
   // while (!m->obstacles_received_ || !m->borders_received_ ||
@@ -61,7 +61,8 @@ int main(int argc, char **argv)
   map_file.open(map_path);
   // print wkt
   map_file << boost::geometry::wkt(m->_map) << std::endl;
-
+  // close
+  map_file.close();
   if (m->_show_graphics)
   {
     m->ShowMap();
