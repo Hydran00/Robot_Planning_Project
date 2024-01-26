@@ -4,16 +4,15 @@
 #include <cmath>
 #include <vector>
 #include <tuple>
-
+#include "planner/rrt/utils/kdtree.hpp"
 typedef std::tuple<std::vector<double>, std::vector<double>> Path;
 
 
 Path gen_path(
         const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r, double step);
-std::tuple<std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>> get_dubins_best_path_and_cost(
+std::tuple<std::vector<KDPoint>, double, std::vector<std::vector<double>>> get_dubins_best_path_and_cost(
     std::vector<double> q_near, std::vector<double> q_rand, double _radius, double step);
-Path test_dubins(std::vector<double> start, std::vector<double> end);
-void print_path_on_file(std::vector<double> start, std::vector<double> end, Path path);
+Path test_dubins(std::vector<KDPoint> path);
 class DubinsPath
 {
 private:

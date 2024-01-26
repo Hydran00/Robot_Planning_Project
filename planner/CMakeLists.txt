@@ -76,9 +76,9 @@ add_executable(rrt_star
   ${RRTSTAR_FOLDER}/plans/rrt_star_plan.cpp
   ${RRTSTAR_FOLDER}/utils/rrt.cpp 
   ${RRTSTAR_FOLDER}/utils/map_info.cpp 
-  ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
-  ${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
-  src/dubins/dubins.cpp 
+  # ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
+  # ${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
+  # src/dubins/dubins.cpp 
 )
 
 ament_target_dependencies(rrt_star
@@ -151,7 +151,7 @@ install(DIRECTORY
 install(TARGETS
   voronoi_boost
   wkt_generator
-  # rrt_star
+  rrt_star
   rrt_star_dubins
   # dubins
   DESTINATION lib/${PROJECT_NAME})

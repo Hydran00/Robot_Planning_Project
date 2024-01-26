@@ -17,8 +17,7 @@ def test2(start,end,path):
     plt.show()
 
 if __name__ == "__main__":
-    path = np.loadtxt(str(get_package_share_directory('planner')) + '/data/dubins_path.txt', delimiter=',')
+    path = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path.txt', delimiter=',')
     start = path[0]
     end = path[1]
-    print("Path from ",start, " to ", end)
     test2(start,end,path[2:])

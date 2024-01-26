@@ -19,13 +19,7 @@ public:
     // [( [x1a,x1b,x1c,...],[y1a,y1b,y1c,...),( [x2a,x2b,x2c,...],[y2a,y2b,y2c,...),...]
     std::vector<std::tuple<std::vector<double>,std::vector<double>>> _paths;
     RRTStarDubinsPlan(std::shared_ptr<MapInfo> &map_info, double radius);
-    // fake implementation to avoid compilation error
-    std::vector<KDPoint> run(void){
-        KDPoint a = {0, 0, 0};
-        std::vector<KDPoint> b = {a};
-        return b;
-    };
-    Path _run(void);
+    std::vector<KDPoint> run(void);
 };
 
 #endif // !__RRT_STAR_DUBINS_PLAN__

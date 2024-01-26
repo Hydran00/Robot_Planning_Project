@@ -40,71 +40,60 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(void) {
 std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(void) {
   std::vector<KDPoint> path;
   KDPoint p = MotionPlanning::_pt_end;
+  // extract last path given _pt_end
+  auto last_path = _rrt.GetPointPath(p);
+  // std::reverse(last_path.begin(), last_path.end());
+  path.insert(path.begin(), last_path.begin(), last_path.end());
   while (p != MotionPlanning::_pt_start) {
-    path.push_back(p);
-    p = std::get<0>(_rrt.GetParent(p));
+    auto parent = _rrt.GetParent(p);
+    std::vector<KDPoint> parent_path = std::get<3>(parent);
+    path.insert(path.begin(), parent_path.begin(), parent_path.end());
+    p = std::get<0>(parent);
   }
-  path.push_back(p);
+  std::reverse(path.begin(), path.end());
   return path;
 }
 
-Path RRTStarDubinsPlan::_run(void) {
-  Linestring best_path;
+std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
+  // Linestring linestring;
   int nodes_counter = 0;
-  uint improvements = 0;
+  // uint improvements = 0;
+  KDPoint p;
   while (true) {
-    best_path.clear();
+    // linestring.clear();
+    p.clear();
     KDPoint q_rand = _GenerateRandPoint();
     KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
 
-    // Returns tuple with (X, Y, Cost, Symbolic Path)
+    // Returns tuple with (vector<KDPoint>, Cost, Symbolic Path)
     auto dubins_best_path =
         get_dubins_best_path_and_cost(q_near, q_rand, _radius, 0.1);
-    if (std::get<0>(dubins_best_path).size() <= 2) {
-      continue;
-    }
+    // if (std::get<0>(dubins_best_path).size() <= 2) {
 
+    //   continue;
+    // }
+
+    std::vector<KDPoint> new_path;
     for (size_t i = 0; i < std::get<0>(dubins_best_path).size(); i++) {
-      best_path.push_back(point_xy(std::get<0>(dubins_best_path)[i],
-                                   std::get<1>(dubins_best_path)[i]));
+      p = std::get<0>(dubins_best_path)[i];
+      new_path.push_back(p);
+
+      p.clear();
     }
 
-    Path real_path = std::make_tuple(std::get<0>(dubins_best_path),
-                                     std::get<1>(dubins_best_path));
 
     // Check collisions
-    if (!boost::geometry::within(best_path, MotionPlanning::_map_info->_map)) {
+    if (MotionPlanning::_map_info->Collision(new_path)) {
       continue;
     }
 
-    // std::cout << "q_rand: " << q_rand[0] << ", " << q_rand[1] << ", " <<
-    // q_rand[2] << "|| "<< q_rand.size() <<std::endl; std::cout << "q_near: "
-    // << q_near[0] << ", " << q_near[1] << ", " << q_near[2] << "|| "<<
-    // q_near.size() <<std::endl;
-
-    bool scammed = false;
-    if (std::abs(std::get<0>(real_path)[0] - q_near[0]) > 1e-6 ||
-        std::abs(std::get<1>(real_path)[0] - q_near[1]) > 1e-6) {
-      scammed = true;
-    }
-    if (std::abs(std::get<0>(real_path).back() - q_rand[0]) > 1e-6 ||
-        std::abs(std::get<1>(real_path).back() - q_rand[1]) > 1e-6) {
-      scammed = true;
-    }
-    if (scammed) {
-      // std::cout << "----------------------------------" << std::endl;
-      std::cout << "SCAMMATO :(" << std::endl;
-
-      // exit(0);
-      continue;
-    }
-    _rrt.Add(q_rand, q_near, std::get<3>(dubins_best_path), real_path);
+    _rrt.Add(q_rand, q_near, std::get<2>(dubins_best_path), new_path);
 
     // TODO check radius->was 5.0
-    _rrt.DubinsRewire(
+    _rrt.Rewire(
         q_near, 15.0,
-        [&](std::tuple<std::vector<double>, std::vector<double>> &path) {
-          return MotionPlanning::_map_info->DubinsCollision(path);
+        [&](std::vector<KDPoint> &path) {
+          return MotionPlanning::_map_info->Collision(path);
         },
         _radius);
 
@@ -114,41 +103,20 @@ Path RRTStarDubinsPlan::_run(void) {
 
     if (Distance(q_rand, MotionPlanning::_pt_end) < 0.1) {
       nodes_counter += 1;
-      Path total_path;
-      KDPoint point = q_rand;
-      while (point != MotionPlanning::_pt_start) {
-        auto tuple = _rrt.GetParent(point);
-        Path p = std::get<3>(tuple);
-        std::get<0>(total_path)
-            .insert(std::get<0>(total_path).begin(), std::get<0>(p).begin(),
-                    std::get<0>(p).end());
-        std::get<1>(total_path)
-            .insert(std::get<1>(total_path).begin(), std::get<1>(p).begin(),
-                    std::get<1>(p).end());
-        point = std::get<0>(tuple);
+
+      if (q_rand != MotionPlanning::_pt_end) {
+        auto last_path = get_dubins_best_path_and_cost(
+            q_near, MotionPlanning::_pt_end, _radius, 0.1);
+        std::vector<KDPoint> last_segment;
+        for (size_t i = 0; i < std::get<0>(last_path).size(); i++) {
+          p = std::get<0>(last_path)[i];
+          last_segment.push_back(p);
+          p.clear();
+        }
+        _rrt.Add(MotionPlanning::_pt_end, q_near, std::get<2>(last_path),
+                 last_segment);
       }
-      // Add last path
-      std::get<0>(total_path)
-          .insert(std::get<0>(total_path).end(),
-                  std::get<0>(dubins_best_path).begin(),
-                  std::get<0>(dubins_best_path).end());
-      std::get<1>(total_path)
-          .insert(std::get<1>(total_path).end(),
-                  std::get<1>(dubins_best_path).begin(),
-                  std::get<1>(dubins_best_path).end());
-
-      MotionPlanning::_map_info->set_dubins_path(total_path);
-
-      improvements += 1;
-
-      // if (improvements < 5) {
-      //   rclcpp::sleep_for(std::chrono::milliseconds(2000));
-      //   std::cout << "Improvement: " << improvements << std::endl;
-      //   std::get<0>(total_path).clear();
-      //   std::get<1>(total_path).clear();
-      //   continue;
-      // }
-      return total_path;
+      return _ReconstrucPath();
     }
     nodes_counter += 1;
     std::cout << "Number of nodes: " << nodes_counter << std::endl;

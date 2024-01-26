@@ -12,12 +12,13 @@
 #include "planner/dubins/dubins.h"
 // # include "planner/rrt/utils/map_info.hpp"
 
-// real path is a vector in the form [ (x1,y1), (x2,y2), ...])]
-typedef std::tuple<std::vector<double>, std::vector<double>> Path;
+// real path is a vector in the form  [(x1,y1, ...), (x2,y2, ...), ...]
+// typedef std::vector<KDPoint> Path;
+
 // symbolyc path is a vector like [ (lsl), (lrl), (rsl), ...]
 typedef std::vector<std::vector<double>> SymbolicPath;
 
-typedef std::vector<std::tuple<KDPoint, int, SymbolicPath, Path>> DubinsTree;
+typedef std::vector<std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>> DubinsTree;
 class RRTDubins
 {
 private:
@@ -58,15 +59,16 @@ public:
   void set_root(KDPoint &p);
   KDPoint SearchNearestVertex(KDPoint &q_rand);
   // KDPoint CalcNewPoint(KDPoint &q_near, KDPoint &q_rand);
-  void Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path, Path &path);
+  void Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path, std::vector<KDPoint> &path);
   double Cost(KDPoint p, double radius);
-  void DubinsRewire(
-      KDPoint &p, double r,
+  void Rewire(
+      KDPoint &q_new, double r,
       std::function<
-          bool(std::tuple<std::vector<double>, std::vector<double>> &path)>
+          bool(std::vector<KDPoint> &path)>
           DubinsCollision,
       double dubins_radius);
-  std::tuple<KDPoint, int, SymbolicPath, Path> GetParent(KDPoint &p);
+  std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> GetParent(KDPoint &p);
+  std::vector<KDPoint> GetPointPath(KDPoint &p);
   inline int size(void) { return _rrt.size(); }
   inline iterator begin() { return iterator(_rrt.begin(), 0); }
   inline iterator end() { return iterator(_rrt.begin(), size()); }

@@ -1,7 +1,7 @@
 #include <iostream>
 // #include <unistd.h>
-// #include <fstream>
-
+#include <fstream>
+#include "ament_index_cpp/get_package_share_directory.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
 #include "planner/rrt/utils/rrt.hpp"
 #include "planner/rrt/utils/map_info.hpp"
@@ -9,71 +9,94 @@
 #include "planner/rrt/rrt_star_plan.hpp"
 
 using namespace std;
+
+void print_path_on_file(KDPoint start, KDPoint end, std::vector<KDPoint> path)
+{
+  std::string file_path =
+      ament_index_cpp::get_package_share_directory("planner") +
+      "/data/final_path.txt";
+  std::cout << "Printing path on file: " << file_path << std::endl;
+  std::ofstream fout;
+  fout.open(file_path, std::ios::app);
+  fout << start[0] << ", " << start[1] << std::endl;
+  fout << end[0] << ", " << end[1] << std::endl;
+  // fout << std::endl;
+  for (size_t i = 0; i < path.size(); i++)
+  {
+    fout << path[i][0] << ", " << path[i][1] << std::endl;
+  }
+  // close
+  fout.close();
+}
+
 int main(int argc, char **argv)
 {
-    rclcpp::init(argc, argv);
+  rclcpp::init(argc, argv);
 
-    auto m = std::make_shared<MapInfo>();
+  std::string file_path =
+      ament_index_cpp::get_package_share_directory("planner") +
+      "/data/final_path.txt";
+  std::remove(file_path.c_str());
 
-    // Create a MultiThreadedExecutor
-    rclcpp::executors::SingleThreadedExecutor executor;
+  std::string map_path =
+      ament_index_cpp::get_package_share_directory("planner") +
+      "/data/map.txt";
+  std::remove(file_path.c_str());
 
-    // Add your node to the executor
-    executor.add_node(m);
+  auto m = std::make_shared<MapInfo>();
 
-    // Spin the executor in a separate thread
-    std::thread([&executor]()
-                { executor.spin(); })
-        .detach();
-    RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
-    while (!m->obstacles_received_ || !m->borders_received_ || !m->gates_received_)
-    {
-        rclcpp::sleep_for(std::chrono::milliseconds(10));
-    }
-    KDPoint point = {-0.7, -1.15};
-    while (m->Collision(point))
-    {
-        point[0] += 0.1;
-    }
-    m->set_start(point);
+  RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
+  while (!m->obstacles_received_ || !m->borders_received_ ||
+         !m->gates_received_) {
+    rclcpp::spin_some(m->get_node_base_interface());
+    rclcpp::sleep_for(std::chrono::milliseconds(100));
+  }
+  RCLCPP_INFO(m->get_logger(), "\033[1;32m Map information received!\033[0m");
 
-    if (m->_show_graphics)
-    {
-        m->ShowMap();
-    }
-    rclcpp::sleep_for(std::chrono::seconds(1));
-    std::vector<KDPoint> path;
+  KDPoint point = {0, 0, 0};
+  while (m->Collision(point))
+  {
+    sleep(0.1);
+    RCLCPP_INFO(m->get_logger(), "Start is in collision, moving it");
+    point[0] += 0.1;
+  }
+  std::cout << "Start is at " << point[0] << ", " << point[1] << std::endl;
+  m->set_start(point);
+  // print map on file
+  std::ofstream map_file;
+  map_file.open(map_path);
+  // print wkt
+  map_file << boost::geometry::wkt(m->_map) << std::endl;
+  // close
+  map_file.close();
+  if (m->_show_graphics)
+  {
+    m->ShowMap();
+  }
 
-    // Monitor execution time
-    auto time_start = rclcpp::Clock().now();
-    RRTStarPlan plan(m);
-    path = plan.run();
+  rclcpp::sleep_for(std::chrono::seconds(1));
 
-    if (!path.empty())
-    {
-        m->set_path(path);
-    }
+  // Monitor execution time
+  auto time_start = rclcpp::Clock().now();
+  double radius = 0.5;
+  std::cout << "Running RRT*";
+  RRTStarPlan plan(m);
+  std::cout << "Plan completed";
 
-    // print path
-    int z = 0;
-    Linestring best_path;
-    for (auto p : path)
-    {
-        best_path.push_back(point_xy(p[0], p[1]));
-        cout << boost::geometry::wkt(best_path) << endl;
-        // RCLCPP_INFO(m->get_logger(), "(WITHIN) : %s", (boost::geometry::within(best_path, m->_map)) ? "true" : "false");
-        z++;
-        // RCLCPP_INFO(m->get_logger(), "########################################");
-        cout << "WITHIN: " << (boost::geometry::within(best_path, m->_map) ? "TRUE" : "FALSE") << endl;
-        cout << "########################################" << endl;
-    }
-    auto time_end = rclcpp::Clock().now();
-    auto time_diff = time_end - time_start;
-    cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
-    executor.cancel();
-    // executor_thread.join();
-    rclcpp::shutdown();
-    cout << "Done!" << endl;
-    return 0;
-    // iterate inner rings
+  std::vector<KDPoint> final_path = plan.run();
+
+  m->set_path(final_path);
+//   // Check path validity
+  cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
+       << endl;
+
+//   // Output path for python visualisation
+  print_path_on_file(m->pt_start, m->pt_end, final_path);
+
+//   auto time_end = rclcpp::Clock().now();
+//   auto time_diff = time_end - time_start;
+//   cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
+//   rclcpp::shutdown();
+//   cout << "Done!" << endl;
+  return 0;
 }

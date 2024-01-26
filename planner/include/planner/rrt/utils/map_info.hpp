@@ -110,7 +110,7 @@ class MapInfo : public rclcpp::Node {
   void set_end(KDPoint &point);
   void set_path(std::vector<KDPoint> &path);
   void set_dubins_path(
-      std::tuple<std::vector<double>, std::vector<double>> path);
+      std::vector<KDPoint> &path);
   void set_openlist(std::vector<KDPoint> &points);
   void set_closelist(std::vector<KDPoint> &points);
   void set_rand_points(std::vector<KDPoint> &points);
@@ -119,9 +119,10 @@ class MapInfo : public rclcpp::Node {
   void set_rrt(RRT &rrt, int n, KDPoint &rand);
   void set_rrt_dubins(RRTDubins &rrt_dubins);
   bool Collision(KDPoint &point);
-  bool Collision(KDPoint &p1, KDPoint &p2);
-  bool DubinsCollision(
-      std::tuple<std::vector<double>, std::vector<double>> &path);
+//   bool Collision(KDPoint &p1, KDPoint &p2);
+  bool Collision(std::vector<KDPoint> &path);
+//   bool DubinsCollision(
+    //   std::vector<KDPoint> &path);
   void ShowMap(void);
 };
 

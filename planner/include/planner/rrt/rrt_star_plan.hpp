@@ -10,6 +10,7 @@
 
 class RRTStarPlan : public MotionPlanning
 {
+
 private:
     RRT _rrt;
     KDPoint _GenerateRandPoint(void);

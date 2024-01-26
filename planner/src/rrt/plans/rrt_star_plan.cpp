@@ -34,13 +34,14 @@ KDPoint RRTStarPlan::_GenerateRandPoint(void) {
 
 std::vector<KDPoint> RRTStarPlan::_ReconstrucPath(void) {
   std::vector<KDPoint> path;
-  KDPoint p = MotionPlanning::_pt_end;
-  while (p != MotionPlanning::_pt_start) {
+    KDPoint p = MotionPlanning::_pt_end;
+    while (p != MotionPlanning::_pt_start)
+    {
+        path.push_back(p);
+        p = _rrt.GetParent(p);
+    }
     path.push_back(p);
-    p = _rrt.GetParent(p);
-  }
-  path.push_back(p);
-  return path;
+    return path;
 }
 
 std::vector<KDPoint> RRTStarPlan::run(void) {
@@ -48,18 +49,23 @@ std::vector<KDPoint> RRTStarPlan::run(void) {
     KDPoint q_rand = _GenerateRandPoint();
     KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
     KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
+    std::cout << "Adding q_new: " << q_new[0] << ", " << q_new[1] << std::endl;
     // TODO check
     // if (MotionPlanning::_map_info->Collision(q_new))
     // {
     //     continue;
     // }
-    if (MotionPlanning::_map_info->Collision(q_near, q_new)) {
+    std::vector<KDPoint> branch;
+    branch.push_back(q_near);
+    branch.push_back(q_new);    
+    if (MotionPlanning::_map_info->Collision(branch)) {
       continue;
     }
     _rrt.Add(q_new, q_near);
     // TODO check radius -> was 5.0
-    _rrt.Rewire(q_new, 3.0, [&](KDPoint &p1, KDPoint &p2) {
-      return MotionPlanning::_map_info->Collision(p1, p2);
+    std::cout << "Rewiring" << std::endl;
+    _rrt.Rewire(q_new, 3.0, [&](std::vector<KDPoint> &branch) {
+      return MotionPlanning::_map_info->Collision(branch);
     });
     if (MotionPlanning::_display) {
       MotionPlanning::_map_info->set_rrt(_rrt, 0, q_rand);
@@ -72,6 +78,7 @@ std::vector<KDPoint> RRTStarPlan::run(void) {
       if (q_new != MotionPlanning::_pt_end) {
         _rrt.Add(MotionPlanning::_pt_end, q_new);
       }
+      std::cout << "Found path" << std::endl;
       return _ReconstrucPath();
     }
   }

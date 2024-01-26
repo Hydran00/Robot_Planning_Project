@@ -43,7 +43,7 @@ class RRT {
   KDPoint GetParent(KDPoint &p);
   double Cost(KDPoint &p);
   void Rewire(KDPoint &p, double r,
-              std::function<bool(KDPoint &p1, KDPoint &p2)> Collision);
+              std::function<bool(std::vector<KDPoint> &branch)> Collision);
 
   inline int size(void) { return _rrt.size(); }
   inline iterator begin() { return iterator(_rrt.begin(), 0); }

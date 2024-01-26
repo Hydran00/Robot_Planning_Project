@@ -14,7 +14,25 @@
 
 using namespace std;
 
-typedef std::tuple<std::vector<double>, std::vector<double>> Path;
+void print_path_on_file(KDPoint start, KDPoint end, std::vector<KDPoint> path)
+{
+  std::string file_path =
+      ament_index_cpp::get_package_share_directory("planner") +
+      "/data/final_path.txt";
+  std::cout << "Printing path on file: " << file_path << std::endl;
+  std::ofstream fout;
+  fout.open(file_path, std::ios::app);
+  fout << start[0] << ", " << start[1] << std::endl;
+  fout << end[0] << ", " << end[1] << std::endl;
+  // fout << std::endl;
+  for (size_t i = 0; i < path.size(); i++)
+  {
+    fout << path[i][0] << ", " << path[i][1] << std::endl;
+  }
+  // close
+  fout.close();
+}
+
 
 int main(int argc, char **argv)
 {
@@ -22,7 +40,7 @@ int main(int argc, char **argv)
 
   std::string file_path =
       ament_index_cpp::get_package_share_directory("planner") +
-      "/data/dubins_path.txt";
+      "/data/final_path.txt";
   std::remove(file_path.c_str());
 
   std::string map_path =
@@ -69,10 +87,11 @@ int main(int argc, char **argv)
   auto time_start = rclcpp::Clock().now();
   double radius = 0.5;
   RRTStarDubinsPlan plan(m, radius);
-  Path final_path = plan._run();
+  std::vector<KDPoint> final_path = plan.run();
 
+  m->set_dubins_path(final_path);
   // Check path validity
-  cout << "IS PATH VALID?: " << (m->DubinsCollision(final_path) ? "NO" : "YES")
+  cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
        << endl;
 
   // Output path for python visualisation

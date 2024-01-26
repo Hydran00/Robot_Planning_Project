@@ -18,7 +18,7 @@ def generate_launch_description():
                 package="planner",
                 executable="rrt_star_dubins",
                 name="rrt_star_dubins",
-                output="screen",
+                output="both",
                 parameters=[
                     {
                         "type": launch.substitutions.LaunchConfiguration("type"),
