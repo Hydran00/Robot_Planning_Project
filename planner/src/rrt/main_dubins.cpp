@@ -14,7 +14,7 @@
 
 using namespace std;
 
-void print_path_on_file(KDPoint start, KDPoint end, std::vector<KDPoint> path)
+void print_path_on_file(std::vector<KDPoint> path)
 {
   std::string file_path =
       ament_index_cpp::get_package_share_directory("planner") +
@@ -22,8 +22,6 @@ void print_path_on_file(KDPoint start, KDPoint end, std::vector<KDPoint> path)
   std::cout << "Printing path on file: " << file_path << std::endl;
   std::ofstream fout;
   fout.open(file_path, std::ios::app);
-  fout << start[0] << ", " << start[1] << std::endl;
-  fout << end[0] << ", " << end[1] << std::endl;
   // fout << std::endl;
   for (size_t i = 0; i < path.size(); i++)
   {
@@ -95,7 +93,7 @@ int main(int argc, char **argv)
        << endl;
 
   // Output path for python visualisation
-  print_path_on_file(m->pt_start, m->pt_end, final_path);
+  print_path_on_file(final_path);
 
   auto time_end = rclcpp::Clock().now();
   auto time_diff = time_end - time_start;

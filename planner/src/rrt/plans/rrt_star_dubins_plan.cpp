@@ -50,7 +50,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(void) {
     path.insert(path.begin(), parent_path.begin(), parent_path.end());
     p = std::get<0>(parent);
   }
-  std::reverse(path.begin(), path.end());
+  // std::reverse(path.begin(), path.end());
   return path;
 }
 

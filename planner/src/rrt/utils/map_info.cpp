@@ -1,4 +1,5 @@
 #include "planner/rrt/utils/map_info.hpp"
+
 #include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
 
 MapInfo::MapInfo() : Node("map"), _pub_i(0) {
@@ -166,14 +167,11 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
         _map.inners()[obs_counter].push_back(
             point_xy(obs.polygon.points[j].x, obs.polygon.points[j].y));
       }
+      // close ring
+      _map.inners()[obs_counter].push_back(_map.inners()[obs_counter].front());
     }
-  }
-  // close ring
-  if (abs(obs.radius - 0.0) < EPSILON) {
-    _map.inners()[obs_counter].push_back(_map.inners()[obs_counter].front());
     obs_counter++;
   }
-}
 // rclcpp::sleep_for(std::chrono::milliseconds(1000));
 // std::cout << "Polygon with obstacles: \n"
 //           << boost::geometry::wkt(_map) << std::endl;
