@@ -12,7 +12,7 @@ class RRTStarDubinsPlan : public MotionPlanning
 {
 private:
     RRTDubins _rrt;
-    KDPoint _GenerateRandPoint(void);
+    KDPoint _GenerateRandPoint(int iter);
     std::vector<KDPoint> _ReconstrucPath(void);
 public:
     double _radius;

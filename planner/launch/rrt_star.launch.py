@@ -31,9 +31,9 @@ def generate_launch_description():
                 executable="rviz2",
                 name="rviz",
                 output="screen",
-                condition=IfCondition(
-                    PythonExpression(["'", launch.substitutions.LaunchConfiguration("show_graphics"), "' == 'true'"])
-                ),
+                # condition=IfCondition(
+                #     PythonExpression(["'", launch.substitutions.LaunchConfiguration("show_graphics"), "' == 'true'"])
+                # ),
                 arguments=["-d", rviz_config_dir],
             ),
         ],

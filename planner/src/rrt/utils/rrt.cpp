@@ -10,9 +10,7 @@ KDPoint RRT::SearchNearestVertex(KDPoint &q_rand) {
   std::vector<double> d;
 
   for (auto pair : _rrt) {
-    double tmp = Cost(pair.first);
-    d.push_back(Distance(pair.first, q_rand) + 0.95 * tmp);
-
+    d.push_back(Distance(pair.first, q_rand) + 0.90 * Cost(pair.first));
   }
   int i = std::min_element(d.begin(), d.end()) - d.begin();
   return _rrt[i].first;

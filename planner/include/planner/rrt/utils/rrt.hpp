@@ -12,7 +12,7 @@
 #include "planner/dubins/dubins.h"
 class RRT {
  private:
-  const double branch_lenght = 0.2;
+  const double branch_lenght = 0.6;
 
  public:
   std::vector<std::pair<KDPoint, int>> _rrt;

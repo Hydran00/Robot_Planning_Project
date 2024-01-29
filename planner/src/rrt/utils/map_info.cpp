@@ -1,5 +1,5 @@
 #include "planner/rrt/utils/map_info.hpp"
-
+#include<unistd.h>
 #include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
 
 MapInfo::MapInfo() : Node("map"), _pub_i(0) {
@@ -95,10 +95,9 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
   _line_boundary.id = _id_boundary;
   _line_boundary.type = visualization_msgs::msg::Marker::LINE_STRIP;
   _line_boundary.pose.orientation.w = 1.0;
-  _line_boundary.scale.x = 0.1;
+  _line_boundary.scale.x = 0.5;
   // _line_boundary.scale.y = 0.1;
   _line_boundary.color.a = 1.0;
-
   _line_boundary.points.clear();
   // fill the msg with the map
   for (auto p : points) {
@@ -148,7 +147,7 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
     marker.ns = "map";
     marker.id = _id_obstacle + (i++);
     marker.action = visualization_msgs::msg::Marker::ADD;
-    marker.color.r = 0.0;
+    marker.color.g = 1.0;
     marker.color.a = 1.0;
 
     if (obs.radius != 0.0) {
@@ -261,7 +260,8 @@ void MapInfo::set_start(KDPoint &point) {
 
 void MapInfo::set_end(KDPoint &point) {
   pt_end.assign(point.begin(), point.end());
-
+  std::cout << "Setting end in " << pt_end[0] << ", " << pt_end[1] << std::endl;
+  sleep(2);
   _m_end.header.stamp = now();
   _m_end.header.frame_id = "map";
   _m_end.action = visualization_msgs::msg::Marker::ADD;
@@ -269,6 +269,7 @@ void MapInfo::set_end(KDPoint &point) {
   _m_end.id = _id_end;
   _m_end.type = visualization_msgs::msg::Marker::POINTS;
   _m_end.pose.orientation.w = 1.0;
+  _m_end.pose.position.z = -1.0;
   _m_end.scale.x = 0.4;
   _m_end.scale.y = 0.4;
   _m_end.color.r = 1.0;
@@ -464,6 +465,8 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
   _m_rand_point.pose.orientation.w = 1.0;
   _m_rand_point.scale.x = 0.5;
   _m_rand_point.scale.y = 0.5;
+  _m_rand_point.color.r = 1.0;
+  _m_rand_point.color.g = 1.0;
   _m_rand_point.color.b = 1.0;
   _m_rand_point.color.a = 1.0;
 
@@ -520,8 +523,8 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {
   branch.pose.orientation.w = 1.0;
   branch.scale.x = 0.1;
   branch.scale.y = 0.1;
-  branch.color.b = 0.5;
   branch.color.g = 0.5;
+  branch.color.b = 0.5;
   branch.color.a = 1.0;
   branch.points.clear();
 

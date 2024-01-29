@@ -68,10 +68,10 @@ int main(int argc, char **argv)
   map_file << boost::geometry::wkt(m->_map) << std::endl;
   // close
   map_file.close();
-  if (m->_show_graphics)
-  {
+  // if (m->_show_graphics)
+  // {
     m->ShowMap();
-  }
+  // }
 
   rclcpp::sleep_for(std::chrono::seconds(1));
 

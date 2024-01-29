@@ -13,11 +13,11 @@ KDPoint RRTStarPlan::_GenerateRandPoint(int iter) {
   std::uniform_int_distribution<int> dis_s(0, 100);
   // Epsilon greedy sampling
   int extracted = dis_s(generator);
-  if (extracted < 80 - iter * 0.02) {
+  if (extracted < 80 - iter * 0.01) {
     int idx = std::uniform_int_distribution<int>(0, num_victims - 1)(generator);
     return std::get<0>(MotionPlanning::_map_info->_victims[idx]);
   } else {
-    if (extracted < 99.9 - iter * 0.005) {
+    if (extracted < 99.9 - iter * 0.01) {
       // sample from the square embedding the map
       std::uniform_real_distribution<> dis_x(
           (MotionPlanning::_map_info->min_x),
@@ -35,7 +35,9 @@ KDPoint RRTStarPlan::_GenerateRandPoint(int iter) {
         }
       }
     } else {
-      return MotionPlanning::_pt_end;
+      // std::cout << "Selected end point with probability "
+      //           << iter * 0.01 << std::endl;
+      return MotionPlanning::_map_info->pt_end;
     }
   }
 }
@@ -67,6 +69,7 @@ std::vector<KDPoint> RRTStarPlan::run(void) {
     iter++;
     KDPoint q_rand = _GenerateRandPoint(iter);
     KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
+    // std::cout << "Adding " << q_rand[0] << ", " << q_rand[1] << std::endl;
     KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
     if (MotionPlanning::_map_info->Collision(q_new)) {
       continue;
@@ -94,6 +97,7 @@ std::vector<KDPoint> RRTStarPlan::run(void) {
     _rrt.Rewire(q_new, 100.0, [&](std::vector<KDPoint> &branch) {
       return MotionPlanning::_map_info->Collision(branch);
     });
+
     if (MotionPlanning::_display) {
       MotionPlanning::_map_info->set_rrt(_rrt, 0, q_rand);
     }

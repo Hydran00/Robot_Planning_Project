@@ -18,36 +18,33 @@
 // symbolyc path is a vector like [ (lsl), (lrl), (rsl), ...]
 typedef std::vector<std::vector<double>> SymbolicPath;
 
-typedef std::vector<std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>> DubinsTree;
-class RRTDubins
-{
-private:
-  KDPoint _root;
+typedef std::vector<
+    std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>>
+    DubinsTree;
+class RRTDubins {
+ private:
 
-public:
+ public:
+  KDPoint _root;
   DubinsTree _rrt;
-  class iterator
-  {
-  private:
+  class iterator {
+   private:
     const DubinsTree::iterator _it_begin;
     int _pos;
 
-  public:
+   public:
     iterator(const DubinsTree::iterator begin, int pos)
         : _it_begin(begin), _pos(pos) {}
-    inline bool operator!=(iterator &it)
-    {
+    inline bool operator!=(iterator &it) {
       std::cout << "!= called: " << _pos << std::endl;
       return (_pos != it._pos);
     }
-    inline KDPoint operator*()
-    {
+    inline KDPoint operator*() {
       // return (_it_begin + _pos)->first;
       std::cout << "* called: " << _pos << std::endl;
       return std::get<0>(*(_it_begin + _pos));
     }
-    inline iterator &operator++()
-    {
+    inline iterator &operator++() {
       ++_pos;
       std::cout << "pos called: " << _pos << std::endl;
       return *this;
@@ -55,26 +52,28 @@ public:
   };
   // branch step length
 
-  RRTDubins(std::vector<std::tuple<KDPoint,double>> &victims) {
+  RRTDubins(std::vector<std::tuple<KDPoint, double>> &victims) {
     this->victims = victims;
   }
-  std::vector<std::tuple<KDPoint,double>> victims;
+  std::vector<std::tuple<KDPoint, double>> victims;
   void set_root(KDPoint &p);
-  KDPoint SearchNearestVertex(KDPoint &q_rand);
+  std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
+  SearchNearestVertex(KDPoint &q_rand, double radius);
   // KDPoint CalcNewPoint(KDPoint &q_near, KDPoint &q_rand);
-  void Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path, std::vector<KDPoint> &path);
-  double Cost(KDPoint p, double radius);
-  void Rewire(
-      KDPoint &q_new, double r,
-      std::function<
-          bool(std::vector<KDPoint> &path)>
-          DubinsCollision,
-      double dubins_radius);
-  std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> GetParent(KDPoint &p);
+  void Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
+           std::vector<KDPoint> &path);
+  double Cost(
+      std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node,
+      double radius);
+  void Rewire(std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_new, double r,
+              std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
+              double dubins_radius);
+  std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> GetParent(
+      KDPoint &p);
   std::vector<KDPoint> GetPointPath(KDPoint &p);
   inline int size(void) { return _rrt.size(); }
   inline iterator begin() { return iterator(_rrt.begin(), 0); }
   inline iterator end() { return iterator(_rrt.begin(), size()); }
 };
 
-#endif // !__RRT_DUBINS__
+#endif  // !__RRT_DUBINS__
