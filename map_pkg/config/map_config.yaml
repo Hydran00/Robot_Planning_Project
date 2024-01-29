@@ -1,7 +1,7 @@
 /**/send_obstacles:
   ros__parameters:
     n_obstacles: 10
-    no_cylinders: true
+    no_cylinders: false
     no_boxes: false
     max_size: 1.0
     min_size: 0.5

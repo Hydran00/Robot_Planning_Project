@@ -55,20 +55,16 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(void) {
 }
 
 std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
-  // Linestring linestring;
   int nodes_counter = 0;
-  // uint improvements = 0;
   KDPoint p;
   while (true) {
-    // linestring.clear();
     p.clear();
     KDPoint q_rand = _GenerateRandPoint();
     KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
 
-    // Returns tuple with (vector<KDPoint>, Cost, Symbolic Path)
     auto dubins_best_path =
         get_dubins_best_path_and_cost(q_near, q_rand, _radius, 0.1);
-    // if (std::get<0>(dubins_best_path).size() <= 2) {
+    // if (std:get<0>(dubins_best_path).size() <= 2) {
 
     //   continue;
     // }
@@ -90,12 +86,12 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
     _rrt.Add(q_rand, q_near, std::get<2>(dubins_best_path), new_path);
 
     // TODO check radius->was 5.0
-    _rrt.Rewire(
-        q_near, 15.0,
-        [&](std::vector<KDPoint> &path) {
-          return MotionPlanning::_map_info->Collision(path);
-        },
-        _radius);
+    // _rrt.Rewire(
+    //     q_near, 15.0,
+    //     [&](std::vector<KDPoint> &path) {
+    //       return MotionPlanning::_map_info->Collision(path);
+    //     },
+    //     _radius);
 
     if (MotionPlanning::_display) {
       MotionPlanning::_map_info->set_rrt_dubins(_rrt);

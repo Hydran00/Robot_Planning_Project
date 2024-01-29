@@ -12,6 +12,7 @@ DubinsPath::DubinsPath(std::vector<double> start, std::vector<double> end,
 std::tuple<std::vector<double>, std::vector<double>> gen_path(
     const std::vector<double> &s, const std::vector<std::vector<double>> &path,
     double r = 1.0, double step = 0.1) {
+
   auto calc_TurnCenter = [](const std::vector<double> &point, char dir,
                             double r) -> std::tuple<double, double> {
     double ang;
@@ -35,9 +36,12 @@ std::tuple<std::vector<double>, std::vector<double>> gen_path(
   std::vector<double> start = s;
   double yaw = s[2];
 
+  double step_lenght = 0.05;
+  double step_angle = step_lenght/r;
+
   for (const auto &p : path) {
     if (p[0] == 's') {
-      for (double l = 0.0; l < p[1]; l += 0.05) {
+      for (double l = 0.0; l < p[1]; l += step_lenght) {
         ps_x.push_back(start[0] + std::cos(yaw) * l);
         ps_y.push_back(start[1] + std::sin(yaw) * l);
       }
@@ -52,7 +56,7 @@ std::tuple<std::vector<double>, std::vector<double>> gen_path(
       double ang_end = ang_start + p[1] * (p[0] == 'l' ? 1 : -1);
       for (double ang = ang_start;
            (p[0] == 'l' ? ang <= ang_end : ang >= ang_end);
-           ang += (p[0] == 'l' ? step : -step)) {
+           ang += (p[0] == 'l' ? step_angle : -step_angle)) {
         ps_x.push_back(std::get<0>(center) + std::cos(ang) * r);
         ps_y.push_back(std::get<1>(center) + std::sin(ang) * r);
       }
@@ -236,7 +240,6 @@ get_dubins_best_path_and_cost(std::vector<double> q_near,
     // p.push_back(std::get<1>(full_path)[i]);
     // KDPoint p = ;    
     std::get<0>(best_path_and_cost).push_back({std::get<0>(full_path)[i], std::get<1>(full_path)[i]});
-    // std::cout << "ADDING: P:" << p[0] << ", " << p[1] << "it: "<< i<< std::endl;
 
   }
 

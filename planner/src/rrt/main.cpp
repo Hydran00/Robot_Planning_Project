@@ -77,12 +77,12 @@ int main(int argc, char **argv)
 
   // Monitor execution time
   auto time_start = rclcpp::Clock().now();
-  std::cout << "Running RRT*";
-  RRTStarPlan plan(m);
-  std::cout << "Plan completed";
+  std::cout << "Running RRT*" << std::endl;
+  RRTStarPlan plan(m, m->_victims);
 
   std::vector<KDPoint> final_path = plan.run();
-
+  std::cout << "Plan completed" << std::endl;
+  
   m->set_path(final_path);
 //   // Check path validity
   cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
@@ -90,6 +90,7 @@ int main(int argc, char **argv)
 
 //   // Output path for python visualisation
   print_path_on_file(final_path);
+
 
   auto time_end = rclcpp::Clock().now();
   auto time_diff = time_end - time_start;

@@ -13,6 +13,7 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   obstacles_received_ = false;
   borders_received_ = false;
   gates_received_ = false;
+  victims_received_ = false;
 
   const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_custom);
   subscription_obstacles_ =
@@ -27,6 +28,10 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
       this->create_subscription<geometry_msgs::msg::PoseArray>(
           "/gate_position", qos,
           std::bind(&MapInfo::gate_cb, this, std::placeholders::_1));
+  subscription_victims_ =
+      this->create_subscription<obstacles_msgs::msg::ObstacleArrayMsg>(
+          "/victims", qos,
+          std::bind(&MapInfo::victims_cb, this, std::placeholders::_1));
   // TODO: add subscription for start point
 
   RCLCPP_INFO(this->get_logger(), "Node started");
@@ -60,6 +65,24 @@ void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
   set_end(end);
   this->gates_received_ = true;
   RCLCPP_INFO(this->get_logger(), "\033[1;32mGate received! \033[0m");
+}
+void MapInfo::victims_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
+  // unsubscribes
+  subscription_victims_.reset();
+  if (msg.obstacles.size() == 0) {
+    this->victims_received_ = true;
+    return;
+  }
+  for (size_t i = 0; i < msg.obstacles.size(); ++i) {
+    KDPoint victim = {msg.obstacles[i].polygon.points[0].x,
+                      msg.obstacles[i].polygon.points[0].y};
+    double cost = (double)msg.obstacles[i].radius / 10;
+    Victim v = std::make_tuple(victim, cost);
+    _victims.push_back(v);
+  }
+  set_victims();
+  this->victims_received_ = true;
+  RCLCPP_INFO(this->get_logger(), "\033[1;32mVictims received! \033[0m");
 }
 
 /////////////////////////////////////////////////////////////
@@ -129,24 +152,38 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
     marker.color.a = 1.0;
 
     if (obs.radius != 0.0) {
-      // Adding circles
-      // marker.type = visualization_msgs::msg::Marker::CYLINDER;
-      // marker.pose.position.x = obs.polygon.points[0].x;
-      // marker.pose.position.y = obs.polygon.points[0].y;
-      // marker.pose.position.z = obs.polygon.points[0].z;
-      // marker.scale.x = obs.radius * 2;
-      // marker.scale.y = obs.radius * 2;
-      // marker.scale.z = 1;
-      // // Declare the point_circle strategy
-      // boost::geometry::strategy::buffer::point_circle point_strategy(360);
-      // boost::geometry::strategy::buffer::distance_symmetric<double>
-      //     distance_strategy(obs.radius);
-      // boost::geometry::strategy::buffer::join_round join_strategy;
-      // boost::geometry::strategy::buffer::end_round end_strategy;
-      // boost::geometry::strategy::buffer::side_straight side_strategy;
+      // Adds circles
+      marker.type = visualization_msgs::msg::Marker::CYLINDER;
+      marker.pose.position.x = obs.polygon.points[0].x;
+      marker.pose.position.y = obs.polygon.points[0].y;
+      marker.pose.position.z = obs.polygon.points[0].z;
+      marker.scale.x = obs.radius * 2;
+      marker.scale.y = obs.radius * 2;
+      marker.scale.z = 1;
+      _obstacle_array.markers.push_back(marker);
+      // Creates circle exploiting boost circular buffers
+      boost::geometry::strategy::buffer::point_circle point_strategy(30);
+      boost::geometry::strategy::buffer::distance_symmetric<double>
+          distance_strategy(obs.radius);
+      boost::geometry::strategy::buffer::join_round join_strategy;
+      boost::geometry::strategy::buffer::end_round end_strategy;
+      boost::geometry::strategy::buffer::side_straight side_strategy;
+      // Defines the circle center
+      boost::geometry::model::multi_point<point_xy> mp = {
+          point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)};
+      boost::geometry::model::multi_polygon<polygon> result;
+      boost::geometry::buffer(mp, result, distance_strategy, side_strategy,
+                              join_strategy, end_strategy, point_strategy);
+      // Print wkt of the circle
+      // std::cout << "Circle: " << boost::geometry::wkt(result) << std::endl;
 
-      // boost::geometry::model::multi_point<point> mp = {
-      //     point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)};
+      // Iterates over vertexes of the circle
+      for (auto p : result[0].outer()) {
+        // ROS2 Point
+        _map.inners()[obs_counter].push_back(point_xy(p.x(), p.y()));
+      }
+      // close ring
+      _map.inners()[obs_counter].push_back(_map.inners()[obs_counter].front());
 
     }
 
@@ -172,11 +209,32 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
     }
     obs_counter++;
   }
-// rclcpp::sleep_for(std::chrono::milliseconds(1000));
-// std::cout << "Polygon with obstacles: \n"
-//           << boost::geometry::wkt(_map) << std::endl;
+  // rclcpp::sleep_for(std::chrono::milliseconds(1000));
+  // std::cout << "Polygon with obstacles: \n"
+  //           << boost::geometry::wkt(_map) << std::endl;
 }
 
+void MapInfo::set_victims() {
+  _m_victims.header.stamp = now();
+  _m_victims.header.frame_id = "map";
+  _m_victims.action = visualization_msgs::msg::Marker::ADD;
+  _m_victims.ns = "map";
+  _m_victims.id = _id_victims;
+  _m_victims.type = visualization_msgs::msg::Marker::SPHERE_LIST;
+  _m_victims.pose.orientation.w = 1.0;
+  _m_victims.scale.x = 0.3;
+  _m_victims.scale.y = 0.3;
+  _m_victims.color.b = 1.0;
+  _m_victims.color.a = 1.0;
+  _m_victims.points.clear();
+  for (auto v : _victims) {
+    geometry_msgs::msg::Point p;
+    p.x = std::get<0>(v)[0];
+    p.y = std::get<0>(v)[1];
+    p.z = 0;
+    _m_victims.points.push_back(p);
+  }
+}
 void MapInfo::set_start(KDPoint &point) {
   pt_start.assign(point.begin(), point.end());
 
@@ -551,7 +609,6 @@ void MapInfo::ShowMap(void) {
   }
 
   // force publishing
-
   for (int i = 0; i < 10; i++) {
     for (auto obstacle : _obstacle_array.markers) {
       _marker_pub->publish(obstacle);
@@ -559,6 +616,9 @@ void MapInfo::ShowMap(void) {
     _marker_pub->publish(_line_boundary);
     _marker_pub->publish(_m_start);
     _marker_pub->publish(_m_end);
-    rclcpp::sleep_for(std::chrono::milliseconds(200));
+    _m_victims.header.stamp = now();
+    _m_victims.header.frame_id = "map";
+    _marker_pub->publish(_m_victims);
+    rclcpp::sleep_for(std::chrono::milliseconds(50));
   }
 }

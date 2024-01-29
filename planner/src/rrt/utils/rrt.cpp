@@ -1,5 +1,6 @@
 #include "planner/rrt/utils/rrt.hpp"
 
+#include <unistd.h>
 void RRT::set_root(KDPoint &p) {
   _root.assign(p.begin(), p.end());
   _rrt.push_back(std::make_pair(_root, 0));
@@ -7,16 +8,18 @@ void RRT::set_root(KDPoint &p) {
 
 KDPoint RRT::SearchNearestVertex(KDPoint &q_rand) {
   std::vector<double> d;
+
   for (auto pair : _rrt) {
-    d.push_back(Distance(pair.first, q_rand));
+    double tmp = Cost(pair.first);
+    d.push_back(Distance(pair.first, q_rand) + 0.95 * tmp);
+
   }
   int i = std::min_element(d.begin(), d.end()) - d.begin();
   return _rrt[i].first;
 }
 
 KDPoint RRT::CalcNewPoint(KDPoint &q_near, KDPoint &q_rand) {
-  // TODO -> was 1 ,branch_lenght was 1
-  if (Distance(q_near, q_rand) < 1) {
+  if (Distance(q_near, q_rand) < branch_lenght) {
     return q_rand;
   }
 
@@ -44,14 +47,26 @@ KDPoint RRT::GetParent(KDPoint &p) {
 }
 
 double RRT::Cost(KDPoint &point) {
-  double c = 0.0;
+  std::vector<std::tuple<KDPoint, double>> victims_list = victims;
   KDPoint p = point;
+  double cost = 0.0;
+  int i = 0;
   while (p != _root) {
+    // checks if p is a victim
+    auto it = std::find_if(victims_list.begin(), victims_list.end(),
+                           [&](std::tuple<KDPoint, double> &victim) {
+                             return (std::get<0>(victim) == p);
+                           });
+    if (it != victims_list.end()) {
+      cost -= std::get<1>(*it);
+      victims_list.erase(it);
+    }
     KDPoint f = GetParent(p);
-    c += Distance(p, f);
+    cost += Distance(p, f);
     p = f;
+    i++;
   }
-  return c;
+  return cost;
 }
 
 void RRT::Rewire(KDPoint &p, double r,
@@ -77,12 +92,13 @@ void RRT::Rewire(KDPoint &p, double r,
       it_p->second = idx;
     }
   }
-  for (auto pt : nears) {
-    if (Cost(p) + Distance(pt, p) < Cost(pt)) {
-      auto it_pt = std::find_if(
-          _rrt.begin(), _rrt.end(),
-          [&](std::pair<KDPoint, int> &pair) { return (pair.first == pt); });
-      it_pt->second = int(it_p - _rrt.begin());
-    }
-  }
+  // for (auto pt : nears) {
+  //   if (Cost(p) + Distance(pt, p) < Cost(pt)) {
+  //     auto it_pt = std::find_if(
+  //         _rrt.begin(), _rrt.end(),
+  //         [&](std::pair<KDPoint, int> &pair) { return (pair.first == pt);
+  //         });
+  //     it_pt->second = int(it_p - _rrt.begin());
+  //   }
+  // }
 }

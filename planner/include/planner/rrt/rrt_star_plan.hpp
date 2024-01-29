@@ -13,10 +13,10 @@ class RRTStarPlan : public MotionPlanning
 
 private:
     RRT _rrt;
-    KDPoint _GenerateRandPoint(void);
+    KDPoint _GenerateRandPoint(int iter);
     std::vector<KDPoint> _ReconstrucPath(void);
 public:
-    RRTStarPlan(std::shared_ptr<MapInfo> &map_info);
+    RRTStarPlan(std::shared_ptr<MapInfo> &map_info, std::vector<std::tuple<KDPoint,double>> &victims);
     std::vector<KDPoint> run(void);
 };
 

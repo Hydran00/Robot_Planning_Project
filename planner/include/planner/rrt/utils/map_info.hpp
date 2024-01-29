@@ -5,7 +5,19 @@
 #include <tuple>
 #include <vector>
 
-// #include <boost/geometry.hpp>
+// Boost geometry primitives
+#include <boost/geometry.hpp>
+#include <boost/geometry/algorithms/append.hpp>
+#include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+// well known text representation of geometry
+#include <boost/geometry/io/wkt/wkt.hpp>
+// within to check if a point is inside a polygon
+#include <boost/geometry/algorithms/within.hpp>
+// intersection
+#include <boost/geometry/algorithms/intersects.hpp>
 
 #include "geometry_msgs/msg/polygon_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
@@ -17,22 +29,10 @@
 #include "rrt_dubins.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
-// Boost geometry primitives
-#include <boost/geometry/algorithms/append.hpp>
-#include <boost/geometry/geometries/linestring.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-// well known text representation of geometry
-#include <boost/geometry/io/wkt/wkt.hpp>
-// within to check if a point is inside a polygon
-#include <boost/geometry/algorithms/within.hpp>
-// intersection
-#include <boost/geometry/algorithms/intersects.hpp>
 
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::linestring<point_xy> Linestring;
 typedef boost::geometry::model::polygon<point_xy> polygon;
-
 
 static const rmw_qos_profile_t rmw_qos_profile_custom = {
     RMW_QOS_POLICY_HISTORY_KEEP_LAST,
@@ -59,6 +59,7 @@ class MapInfo : public rclcpp::Node {
     _id_roadmap = 8,
     _id_rand_point = 9,
     _id_rrt = 10,
+    _id_victims = 11
   };
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
   // rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
@@ -69,6 +70,8 @@ class MapInfo : public rclcpp::Node {
       subscription_obstacles_;
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr
       subscription_gates_;
+  rclcpp::Subscription<obstacles_msgs::msg::ObstacleArrayMsg>::SharedPtr
+      subscription_victims_;
   // geometry_msgs::msg::PolygonStamped borders_;
   // obstacles_msgs::msg::ObstacleArrayMsg obstacles_;
 
@@ -84,6 +87,7 @@ class MapInfo : public rclcpp::Node {
   visualization_msgs::msg::Marker _m_roadmap;
   visualization_msgs::msg::Marker _m_rand_point;
   visualization_msgs::msg::Marker _m_rrt;
+  visualization_msgs::msg::Marker _m_victims;
   KDTree _okdtree;
 
   int _pub_i;
@@ -93,9 +97,12 @@ class MapInfo : public rclcpp::Node {
   bool obstacles_received_;
   bool borders_received_;
   bool gates_received_;
+  bool victims_received_;
   double min_x, max_x, min_y, max_y;
   KDPoint pt_start;
   KDPoint pt_end;
+  typedef std::tuple<KDPoint, double> Victim;
+  std::vector<Victim> _victims;
   bool _show_graphics;
   MapInfo();
   ~MapInfo();
@@ -103,14 +110,14 @@ class MapInfo : public rclcpp::Node {
   void obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg);
   void borders_cb(const geometry_msgs::msg::PolygonStamped &msg);
   void gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg);
+  void victims_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg);
   void set_boundary(std::vector<KDPoint> &points);
   void set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg);
-
+  void set_victims();
   void set_start(KDPoint &point);
   void set_end(KDPoint &point);
   void set_path(std::vector<KDPoint> &path);
-  void set_dubins_path(
-      std::vector<KDPoint> &path);
+  void set_dubins_path(std::vector<KDPoint> &path);
   void set_openlist(std::vector<KDPoint> &points);
   void set_closelist(std::vector<KDPoint> &points);
   void set_rand_points(std::vector<KDPoint> &points);
@@ -119,10 +126,10 @@ class MapInfo : public rclcpp::Node {
   void set_rrt(RRT &rrt, int n, KDPoint &rand);
   void set_rrt_dubins(RRTDubins &rrt_dubins);
   bool Collision(KDPoint &point);
-//   bool Collision(KDPoint &p1, KDPoint &p2);
+  //   bool Collision(KDPoint &p1, KDPoint &p2);
   bool Collision(std::vector<KDPoint> &path);
-//   bool DubinsCollision(
-    //   std::vector<KDPoint> &path);
+  //   bool DubinsCollision(
+  //   std::vector<KDPoint> &path);
   void ShowMap(void);
 };
 

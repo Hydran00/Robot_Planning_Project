@@ -1,79 +1,104 @@
 #include "planner/rrt/rrt_star_plan.hpp"
 
-RRTStarPlan::RRTStarPlan(std::shared_ptr<MapInfo> &map_info)
-    : MotionPlanning(map_info) {
+RRTStarPlan::RRTStarPlan(std::shared_ptr<MapInfo> &map_info,
+                         std::vector<std::tuple<KDPoint, double>> &victims)
+    : MotionPlanning(map_info), _rrt(victims) {
   _display = map_info->_show_graphics;
   _rrt.set_root(MotionPlanning::_pt_start);
 }
 
-KDPoint RRTStarPlan::_GenerateRandPoint(void) {
+KDPoint RRTStarPlan::_GenerateRandPoint(int iter) {
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
-  std::uniform_int_distribution<int> dis_s(0, 9);
+  int num_victims = MotionPlanning::_map_info->_victims.size();
+  std::uniform_int_distribution<int> dis_s(0, 100);
   // Epsilon greedy sampling
-  if (dis_s(generator) < 2) {
-    return MotionPlanning::_pt_end;
-    // std::uniform_int_distribution<int> dis_s; ???????
+  int extracted = dis_s(generator);
+  if (extracted < 80 - iter * 0.02) {
+    int idx = std::uniform_int_distribution<int>(0, num_victims - 1)(generator);
+    return std::get<0>(MotionPlanning::_map_info->_victims[idx]);
   } else {
-    // sample from the square embedding the map
-    std::uniform_real_distribution<> dis_x((MotionPlanning::_map_info->min_x),
-                                           (MotionPlanning::_map_info->max_x));
-    std::uniform_real_distribution<> dis_y((MotionPlanning::_map_info->min_y),
-                                           (MotionPlanning::_map_info->max_y));
-    while (true) {
-      // TODO: check if double sampling works
-      double x = dis_x(generator);
-      double y = dis_y(generator);
-      KDPoint p = {double(x), double(y)};
-      if (!MotionPlanning::_map_info->Collision(p)) {
-        return p;
+    if (extracted < 99.9 - iter * 0.005) {
+      // sample from the square embedding the map
+      std::uniform_real_distribution<> dis_x(
+          (MotionPlanning::_map_info->min_x),
+          (MotionPlanning::_map_info->max_x));
+      std::uniform_real_distribution<> dis_y(
+          (MotionPlanning::_map_info->min_y),
+          (MotionPlanning::_map_info->max_y));
+      while (true) {
+        // TODO: check if double sampling works
+        double x = dis_x(generator);
+        double y = dis_y(generator);
+        KDPoint p = {double(x), double(y)};
+        if (!MotionPlanning::_map_info->Collision(p)) {
+          return p;
+        }
       }
+    } else {
+      return MotionPlanning::_pt_end;
     }
   }
 }
 
 std::vector<KDPoint> RRTStarPlan::_ReconstrucPath(void) {
   std::vector<KDPoint> path;
-    KDPoint p = MotionPlanning::_pt_end;
-    while (p != MotionPlanning::_pt_start)
-    {
-        path.push_back(p);
-        p = _rrt.GetParent(p);
-    }
+  KDPoint p = MotionPlanning::_pt_end;
+  while (p != MotionPlanning::_pt_start) {
     path.push_back(p);
-    return path;
+    p = _rrt.GetParent(p);
+  }
+  path.push_back(p);
+
+  // print the cost of every node
+  for (size_t i = 0; i < _rrt._rrt.size(); i++) {
+    KDPoint p = _rrt._rrt[i].first;
+    std::cout << "Cost of " << p[0] << ", " << p[1] << " is " << _rrt.Cost(p)
+              << std::endl;
+  }
+  std::cout << "BEST PATH COST IS " << _rrt.Cost(MotionPlanning::_pt_end)
+            << std::endl;
+
+  return path;
 }
 
 std::vector<KDPoint> RRTStarPlan::run(void) {
+  int iter = 0;
   while (true) {
-    KDPoint q_rand = _GenerateRandPoint();
+    iter++;
+    KDPoint q_rand = _GenerateRandPoint(iter);
     KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
     KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
-    std::cout << "Adding q_new: " << q_new[0] << ", " << q_new[1] << std::endl;
-    // TODO check
-    // if (MotionPlanning::_map_info->Collision(q_new))
-    // {
-    //     continue;
-    // }
+    if (MotionPlanning::_map_info->Collision(q_new)) {
+      continue;
+    }
+    // check that the new point is not already in the tree
+    KDPoint p = q_near;
+    bool already_visited = false;
+    while (p != _rrt._root) {
+      if (p == q_new) {
+        already_visited = true;
+        break;
+      }
+      p = _rrt.GetParent(p);
+    }
+    if (already_visited) {
+      continue;
+    }
     std::vector<KDPoint> branch;
     branch.push_back(q_near);
-    branch.push_back(q_new);    
+    branch.push_back(q_new);
     if (MotionPlanning::_map_info->Collision(branch)) {
       continue;
     }
     _rrt.Add(q_new, q_near);
-    // TODO check radius -> was 5.0
-    std::cout << "Rewiring" << std::endl;
-    _rrt.Rewire(q_new, 3.0, [&](std::vector<KDPoint> &branch) {
+    _rrt.Rewire(q_new, 100.0, [&](std::vector<KDPoint> &branch) {
       return MotionPlanning::_map_info->Collision(branch);
     });
     if (MotionPlanning::_display) {
       MotionPlanning::_map_info->set_rrt(_rrt, 0, q_rand);
     }
 
-    // IDEA -> when we found a solution we sample from the path
-    // to decrease the cost
-    // TODO -> was 1
     if (Distance(q_new, MotionPlanning::_pt_end) < 0.1) {
       if (q_new != MotionPlanning::_pt_end) {
         _rrt.Add(MotionPlanning::_pt_end, q_new);

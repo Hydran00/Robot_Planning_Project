@@ -12,7 +12,7 @@ def test2(start,end,path):
     plt.title("Dubins best path")
     draw_point(start)
     draw_point(end)
-    plt.plot(path[:,0], path[:,1], 'k-')
+    plt.plot(path[:,0], path[:,1], 'ok-')
     plt.axis("equal")
     plt.show()
 

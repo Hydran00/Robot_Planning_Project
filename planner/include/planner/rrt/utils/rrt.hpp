@@ -12,16 +12,15 @@
 #include "planner/dubins/dubins.h"
 class RRT {
  private:
-  KDPoint _root;
-  std::vector<std::pair<KDPoint, int>> _rrt;
   const double branch_lenght = 0.2;
 
  public:
+  std::vector<std::pair<KDPoint, int>> _rrt;
+  KDPoint _root;
   class iterator {
    private:
     const std::vector<std::pair<KDPoint, int>>::iterator _it_begin;
     int _pos;
-
    public:
     iterator(const std::vector<std::pair<KDPoint, int>>::iterator begin,
              int pos)
@@ -35,7 +34,11 @@ class RRT {
   };
   // branch step length
 
-  RRT() {}
+  RRT(std::vector<std::tuple<KDPoint,double>> &victims) {
+    this->victims = victims;
+  }
+  // RRT(){};  
+  std::vector<std::tuple<KDPoint,double>> victims;
   void set_root(KDPoint &p);
   KDPoint SearchNearestVertex(KDPoint &q_rand);
   KDPoint CalcNewPoint(KDPoint &q_near, KDPoint &q_rand);

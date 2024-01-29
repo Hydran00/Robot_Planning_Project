@@ -15,7 +15,7 @@ private:
     KDPoint _GenerateRandPoint(void);
     std::vector<KDPoint> _ReconstrucPath(void);
 public:
-    RRTPlan(std::shared_ptr<MapInfo> &map_info);
+    RRTPlan(std::shared_ptr<MapInfo> &map_info, std::vector<std::tuple<KDPoint,double>> &victims);
     std::vector<KDPoint> run(void);
 };
 
