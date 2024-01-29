@@ -1,8 +1,7 @@
 #include "planner/rrt/rrt_star_plan.hpp"
 
-RRTStarPlan::RRTStarPlan(std::shared_ptr<MapInfo> &map_info,
-                         std::vector<std::tuple<KDPoint, double>> &victims)
-    : MotionPlanning(map_info), _rrt(victims) {
+RRTStarPlan::RRTStarPlan(std::shared_ptr<MapInfo> &map_info)
+    : MotionPlanning(map_info), _rrt(map_info->_victims) {
   _display = map_info->_show_graphics;
   _rrt.set_root(MotionPlanning::_pt_start);
 }

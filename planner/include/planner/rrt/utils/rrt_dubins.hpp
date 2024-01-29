@@ -55,7 +55,10 @@ public:
   };
   // branch step length
 
-  RRTDubins() {}
+  RRTDubins(std::vector<std::tuple<KDPoint,double>> &victims) {
+    this->victims = victims;
+  }
+  std::vector<std::tuple<KDPoint,double>> victims;
   void set_root(KDPoint &p);
   KDPoint SearchNearestVertex(KDPoint &q_rand);
   // KDPoint CalcNewPoint(KDPoint &q_near, KDPoint &q_rand);

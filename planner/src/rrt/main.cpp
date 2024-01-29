@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
   RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
   while (!m->obstacles_received_ || !m->borders_received_ ||
-         !m->gates_received_) {
+         !m->gates_received_ || !m->victims_received_) {
     rclcpp::spin_some(m->get_node_base_interface());
     rclcpp::sleep_for(std::chrono::milliseconds(100));
   }
@@ -78,7 +78,7 @@ int main(int argc, char **argv)
   // Monitor execution time
   auto time_start = rclcpp::Clock().now();
   std::cout << "Running RRT*" << std::endl;
-  RRTStarPlan plan(m, m->_victims);
+  RRTStarPlan plan(m);
 
   std::vector<KDPoint> final_path = plan.run();
   std::cout << "Plan completed" << std::endl;

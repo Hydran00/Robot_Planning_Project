@@ -4,7 +4,7 @@
 
 RRTStarDubinsPlan::RRTStarDubinsPlan(std::shared_ptr<MapInfo> &map_info,
                                      double radius)
-    : MotionPlanning(map_info) {
+    : MotionPlanning(map_info), _rrt(map_info->_victims) {
   _display = map_info->_show_graphics;
   _rrt.set_root(MotionPlanning::_pt_start);
   _radius = radius;
@@ -76,7 +76,6 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
 
       p.clear();
     }
-
 
     // Check collisions
     if (MotionPlanning::_map_info->Collision(new_path)) {
