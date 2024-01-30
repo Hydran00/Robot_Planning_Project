@@ -88,6 +88,7 @@ ament_target_dependencies(rrt_star
   obstacles_msgs
   tf2
   tf2_ros
+  nav_msgs
 )
 target_link_libraries(rrt_star Boost::headers)
 target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -129,6 +130,7 @@ ament_target_dependencies(rrt_star_dubins
   obstacles_msgs
   tf2
   tf2_ros
+  nav_msgs
 )
 target_link_libraries(rrt_star_dubins Boost::headers)
 target_include_directories(rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

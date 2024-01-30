@@ -94,9 +94,10 @@ int main(int argc, char **argv) {
   // Output path for python visualisation
   print_path_on_file(final_path);
 
-  while (true) {
+  int i = 0;
+  while (i < 100) {
     m->publish_path(final_path);
-    rclcpp::sleep_for(std::chrono::milliseconds(100));
+    rclcpp::sleep_for(std::chrono::milliseconds(10));
   }
 
   rclcpp::shutdown();

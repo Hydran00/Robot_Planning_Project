@@ -1,28 +1,25 @@
-#include <chrono>
-#include <functional>
-#include <memory>
-#include <string>
 #include <unistd.h>
 
+#include <chrono>
+#include <functional>
 #include <iostream>
+#include <memory>
+#include <string>
 
-#include "std_msgs/msg/string.hpp"
-#include "nav_msgs/msg/path.hpp"
 #include "geometry_msgs/msg/point.hpp"
+#include "geometry_msgs/msg/pose.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
-#include "geometry_msgs/msg/pose.hpp"
-
 #include "geometry_msgs/msg/transform_stamped.hpp"
-#include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/twist.hpp"
-#include "tf2/exceptions.h"
-#include "tf2_ros/buffer.h"
-
 #include "nav2_msgs/action/follow_path.hpp"
-
+#include "nav_msgs/msg/path.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
+#include "std_msgs/msg/string.hpp"
+#include "tf2/exceptions.h"
+#include "tf2_ros/buffer.h"
 
 using FollowPath = nav2_msgs::action::FollowPath;
 
@@ -62,22 +59,25 @@ RPY fromQuaternion(tf2::Quaternion q) {
 }
 
 class PathPublisher : public rclcpp::Node {
-public:
-  PathPublisher()
-    : Node("Nav2Client") {
-    const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_sensor_data);
-    subscription1 = this->create_subscription<geometry_msgs::msg::PoseArray>(
-      "final_path", qos, std::bind(&PathPublisher::store_path, this, std::placeholders::_1));
+ public:
+  PathPublisher() : Node("Nav2Client") {
+    client_ptr_ =
+        rclcpp_action::create_client<FollowPath>(this, "shelfino0/follow_path");
 
-    publisher_ = this->create_publisher<nav_msgs::msg::Path>("plan", 10);
+    _path_subscription = this->create_subscription<nav_msgs::msg::Path>(
+        "shelfino0/plan1", 10,
+        std::bind(&PathPublisher::store_path, this, std::placeholders::_1));
 
-    client_ptr_ = rclcpp_action::create_client<FollowPath>(this, "follow_path");
-
-    RCLCPP_INFO(this->get_logger(), "Node started");
+    if (!this->client_ptr_->wait_for_action_server()) {
+      RCLCPP_ERROR(this->get_logger(),
+                   "Action server not available after waiting");
+      rclcpp::shutdown();
+    }
+    std::cout << "Action client ready" << std::endl;
   }
-
+  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr _path_subscription;
   geometry_msgs::msg::TransformStamped t;
-  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr publisher_;
+
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription1;
   rclcpp_action::Client<FollowPath>::SharedPtr client_ptr_;
   // geometry_msgs::msg::PoseArray waypoints;
@@ -86,26 +86,12 @@ public:
   bool waypoints_received = false;
   bool already_received = false;
 
-  void store_path(const geometry_msgs::msg::PoseArray &msg) {
-    std::cout << "Storing path"<< std::endl;
+  void store_path(const nav_msgs::msg::Path& msg) {
     if (already_received) {
       return;
     }
-    full_path.header.stamp = now();
-    full_path.header.frame_id = "map";
-    geometry_msgs::msg::PoseStamped pose;
-    for (size_t i = 0; i < msg.poses.size(); i++) {
-      pose.header.stamp = now();
-      pose.header.frame_id = "map";
-      pose.pose.position.x = msg.poses[i].position.x;
-      pose.pose.position.y = msg.poses[i].position.y;
-      pose.pose.orientation.x = msg.poses[i].orientation.x;
-      pose.pose.orientation.y = msg.poses[i].orientation.y;
-      pose.pose.orientation.z = msg.poses[i].orientation.z;
-      pose.pose.orientation.w = msg.poses[i].orientation.w;
-      // waypoints.poses.push_back(pose);
-      full_path.poses.push_back(pose);
-    }
+    std::cout << "Storing path" << std::endl;
+    full_path = msg;
     waypoints_received = true;
     already_received = true;
     return;
@@ -119,42 +105,36 @@ public:
   //   store_path(msg);
   //   return;
   // }
-
 };
 
 int main(int argc, char* argv[]) {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<PathPublisher>();
-
   while (rclcpp::ok()) {
     if (node->waypoints_received) {
       std::cout << "\033[1;32mSending path to controller\033[0m" << std::endl;
       // nav_msgs::msg::Path full_path;
       node->full_path.header.stamp = node->get_clock()->now();
       node->full_path.header.frame_id = "map";
-      std::cout <<"1" << std::endl;
-      if (!node->client_ptr_->wait_for_action_server()) {
-        RCLCPP_ERROR(node->get_logger(), "Action server not available after waiting");
-        rclcpp::shutdown();
-      }
+      std::cout << "1" << std::endl;
 
-      std::cout <<"2" << std::endl;
-      node->publisher_->publish(node->full_path);
       auto goal_msg = FollowPath::Goal();
       goal_msg.path = node->full_path;
+      for(size_t i = 0; i < goal_msg.path.poses.size(); i++) {
+        std::cout << goal_msg.path.poses[i].pose.position.x << ", " << goal_msg.path.poses[i].pose.position.y << std::endl;
+      }
       goal_msg.controller_id = "FollowPath";
-      
-      std::cout <<"3" << std::endl;
+
+      std::cout << "2" << std::endl;
 
       node->client_ptr_->async_send_goal(goal_msg);
 
       node->waypoints_received = false;
-      std::cout <<"4" << std::endl;
-
+      std::cout << "3" << std::endl;
     }
-
     rclcpp::spin_some(node);
   }
+
   rclcpp::shutdown();
 
   return 0;

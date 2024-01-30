@@ -34,8 +34,8 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
           "victims", qos,
           std::bind(&MapInfo::victims_cb, this, std::placeholders::_1));
   // TODO: add subscription for start point
-  _final_path_pub = this->create_publisher<geometry_msgs::msg::PoseArray>(
-      "final_path", 10);
+  _final_path_pub = this->create_publisher<nav_msgs::msg::Path>(
+      "shelfino0/plan1", 10);
   RCLCPP_INFO(this->get_logger(), "Node started");
 }
 
@@ -624,31 +624,31 @@ void MapInfo::ShowMap(void) {
 
   void MapInfo::publish_path(std::vector<KDPoint> final_path) {
   // create path message
-  geometry_msgs::msg::PoseArray final_path_msg;
+  nav_msgs::msg::Path final_path_msg;
   final_path_msg.header.frame_id = "map";
   final_path_msg.header.stamp = now();
   // convert final_path (KDPoint vector) to final_path_msg (PoseArray message)
+  geometry_msgs::msg::PoseStamped point_pose_msg;
   for(auto p : final_path) {
     // create point message
-    geometry_msgs::msg::Pose point_pose_msg;
-    
+    point_pose_msg.header.frame_id = "map";
+    point_pose_msg.header.stamp = now();
     // populate point message with position
-    point_pose_msg.position.x = p[0];
-    point_pose_msg.position.y = p[1];
-    point_pose_msg.position.z = 0;
+    point_pose_msg.pose.position.x = p[0];
+    point_pose_msg.pose.position.y = p[1];
+    point_pose_msg.pose.position.z = 0;
     // convert pose rpy to quaternion
     tf2::Quaternion q;
     q.setRPY(0, 0, p[2]);
     // populate point message with orientation
-    point_pose_msg.orientation.x = q.getX();
-    point_pose_msg.orientation.y = q.getY();
-    point_pose_msg.orientation.z = q.getZ();
-    point_pose_msg.orientation.w = q.getW();
+    point_pose_msg.pose.orientation.x = q.getX();
+    point_pose_msg.pose.orientation.y = q.getY();
+    point_pose_msg.pose.orientation.z = q.getZ();
+    point_pose_msg.pose.orientation.w = q.getW();
     // insert point message into path message
     final_path_msg.poses.push_back(point_pose_msg);
   }
   _final_path_pub->publish(final_path_msg);
 
   std::cout << "Path published" << std::endl;
-  sleep(1);
 }
