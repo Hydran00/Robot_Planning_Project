@@ -1,5 +1,5 @@
 #include "planner/rrt/utils/map_info.hpp"
-#include<unistd.h>
+#include <unistd.h>
 #include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
 
 MapInfo::MapInfo() : Node("map"), _pub_i(0) {
@@ -76,7 +76,7 @@ void MapInfo::victims_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
   for (size_t i = 0; i < msg.obstacles.size(); ++i) {
     KDPoint victim = {msg.obstacles[i].polygon.points[0].x,
                       msg.obstacles[i].polygon.points[0].y};
-    double cost = (double)msg.obstacles[i].radius / 10;
+    double cost = (double)msg.obstacles[i].radius / 100;
     Victim v = std::make_tuple(victim, cost);
     _victims.push_back(v);
   }
@@ -260,8 +260,6 @@ void MapInfo::set_start(KDPoint &point) {
 
 void MapInfo::set_end(KDPoint &point) {
   pt_end.assign(point.begin(), point.end());
-  std::cout << "Setting end in " << pt_end[0] << ", " << pt_end[1] << std::endl;
-  sleep(2);
   _m_end.header.stamp = now();
   _m_end.header.frame_id = "map";
   _m_end.action = visualization_msgs::msg::Marker::ADD;
@@ -309,8 +307,6 @@ void MapInfo::set_path(std::vector<KDPoint> &path) {
   _marker_pub->publish(_m_path);
 }
 
-// void MapInfo::set_dubins_path(
-//     std::tuple<std::vector<double>, std::vector<double>> path)
 void MapInfo::set_dubins_path(std::vector<KDPoint> &path) {
   _m_path.header.frame_id = "map";
   _m_path.header.stamp = now();
@@ -338,122 +334,122 @@ void MapInfo::set_dubins_path(std::vector<KDPoint> &path) {
   _marker_pub->publish(_m_path);
 }
 
-void MapInfo::set_openlist(std::vector<KDPoint> &points) {
-  _m_openlist.header.frame_id = "map";
-  _m_openlist.header.stamp = now();
-  _m_openlist.action = visualization_msgs::msg::Marker::ADD;
-  _m_openlist.ns = "map";
-  _m_openlist.id = _id_openlist;
-  _m_openlist.type = visualization_msgs::msg::Marker::POINTS;
-  _m_openlist.pose.orientation.w = 1.0;
-  _m_openlist.scale.x = 0.3;
-  _m_openlist.scale.y = 0.3;
-  _m_openlist.color.b = 0.5;
-  _m_openlist.color.g = 0.5;
-  _m_openlist.color.a = 1.0;
+// void MapInfo::set_openlist(std::vector<KDPoint> &points) {
+//   _m_openlist.header.frame_id = "map";
+//   _m_openlist.header.stamp = now();
+//   _m_openlist.action = visualization_msgs::msg::Marker::ADD;
+//   _m_openlist.ns = "map";
+//   _m_openlist.id = _id_openlist;
+//   _m_openlist.type = visualization_msgs::msg::Marker::POINTS;
+//   _m_openlist.pose.orientation.w = 1.0;
+//   _m_openlist.scale.x = 0.3;
+//   _m_openlist.scale.y = 0.3;
+//   _m_openlist.color.b = 0.5;
+//   _m_openlist.color.g = 0.5;
+//   _m_openlist.color.a = 1.0;
 
-  _m_openlist.points.clear();
-  for (auto p : points) {
-    geometry_msgs::msg::Point p_;
-    p_.x = p[0];
-    p_.y = p[1];
-    p_.z = 0;
-    _m_openlist.points.push_back(p_);
-  }
-  _marker_pub->publish(_m_openlist);
-  _pub_i = (_pub_i + 1) % 10;
-  if (_pub_i == 0) {
-    // rclcpp::sleep_for(std::chrono::milliseconds(10));
-    return;
-  }
-}
+//   _m_openlist.points.clear();
+//   for (auto p : points) {
+//     geometry_msgs::msg::Point p_;
+//     p_.x = p[0];
+//     p_.y = p[1];
+//     p_.z = 0;
+//     _m_openlist.points.push_back(p_);
+//   }
+//   _marker_pub->publish(_m_openlist);
+//   _pub_i = (_pub_i + 1) % 10;
+//   if (_pub_i == 0) {
+//     // rclcpp::sleep_for(std::chrono::milliseconds(10));
+//     return;
+//   }
+// }
 
-void MapInfo::set_closelist(std::vector<KDPoint> &points) {
-  _m_closelist.header.frame_id = "map";
-  _m_closelist.header.stamp = now();
-  _m_closelist.action = visualization_msgs::msg::Marker::ADD;
-  _m_closelist.ns = "map";
-  _m_closelist.id = _id_closelist;
-  _m_closelist.type = visualization_msgs::msg::Marker::POINTS;
-  _m_closelist.pose.orientation.w = 1.0;
-  _m_closelist.scale.x = 0.3;
-  _m_closelist.scale.y = 0.3;
-  _m_closelist.color.b = 1.0;
-  _m_closelist.color.a = 1.0;
+// void MapInfo::set_closelist(std::vector<KDPoint> &points) {
+//   _m_closelist.header.frame_id = "map";
+//   _m_closelist.header.stamp = now();
+//   _m_closelist.action = visualization_msgs::msg::Marker::ADD;
+//   _m_closelist.ns = "map";
+//   _m_closelist.id = _id_closelist;
+//   _m_closelist.type = visualization_msgs::msg::Marker::POINTS;
+//   _m_closelist.pose.orientation.w = 1.0;
+//   _m_closelist.scale.x = 0.3;
+//   _m_closelist.scale.y = 0.3;
+//   _m_closelist.color.b = 1.0;
+//   _m_closelist.color.a = 1.0;
 
-  _m_closelist.points.clear();
-  for (auto p : points) {
-    geometry_msgs::msg::Point p_;
-    p_.x = p[0];
-    p_.y = p[1];
-    p_.z = 0;
-    _m_closelist.points.push_back(p_);
-  }
-  _marker_pub->publish(_m_closelist);
-  _pub_i = (_pub_i + 1) % 10;
-  if (_pub_i == 0) {
-    // rclcpp::sleep_for(std::chrono::milliseconds(10));
-    return;
-  }
-}
+//   _m_closelist.points.clear();
+//   for (auto p : points) {
+//     geometry_msgs::msg::Point p_;
+//     p_.x = p[0];
+//     p_.y = p[1];
+//     p_.z = 0;
+//     _m_closelist.points.push_back(p_);
+//   }
+//   _marker_pub->publish(_m_closelist);
+//   _pub_i = (_pub_i + 1) % 10;
+//   if (_pub_i == 0) {
+//     // rclcpp::sleep_for(std::chrono::milliseconds(10));
+//     return;
+//   }
+// }
 
-void MapInfo::set_rand_points(std::vector<KDPoint> &points) {
-  _m_rand_points.header.frame_id = "map";
-  _m_rand_points.header.stamp = now();
-  _m_rand_points.action = visualization_msgs::msg::Marker::ADD;
-  _m_rand_points.ns = "map";
-  _m_rand_points.id = _id_rand_points;
-  _m_rand_points.type = visualization_msgs::msg::Marker::POINTS;
-  _m_rand_points.pose.orientation.w = 1.0;
-  _m_rand_points.scale.x = 0.3;
-  _m_rand_points.scale.y = 0.3;
-  _m_rand_points.color.b = 0.8;
-  _m_rand_points.color.r = 0.8;
-  _m_rand_points.color.a = 1.0;
+// void MapInfo::set_rand_points(std::vector<KDPoint> &points) {
+//   _m_rand_points.header.frame_id = "map";
+//   _m_rand_points.header.stamp = now();
+//   _m_rand_points.action = visualization_msgs::msg::Marker::ADD;
+//   _m_rand_points.ns = "map";
+//   _m_rand_points.id = _id_rand_points;
+//   _m_rand_points.type = visualization_msgs::msg::Marker::POINTS;
+//   _m_rand_points.pose.orientation.w = 1.0;
+//   _m_rand_points.scale.x = 0.3;
+//   _m_rand_points.scale.y = 0.3;
+//   _m_rand_points.color.b = 0.8;
+//   _m_rand_points.color.r = 0.8;
+//   _m_rand_points.color.a = 1.0;
 
-  _m_rand_points.points.clear();
-  for (auto p : points) {
-    geometry_msgs::msg::Point p_;
-    p_.x = p[0];
-    p_.y = p[1];
-    p_.z = 0;
-    _m_rand_points.points.push_back(p_);
-  }
-  _marker_pub->publish(_m_rand_points);
-}
+//   _m_rand_points.points.clear();
+//   for (auto p : points) {
+//     geometry_msgs::msg::Point p_;
+//     p_.x = p[0];
+//     p_.y = p[1];
+//     p_.z = 0;
+//     _m_rand_points.points.push_back(p_);
+//   }
+//   _marker_pub->publish(_m_rand_points);
+// }
 
-void MapInfo::set_roadmap(
-    std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map) {
-  _m_roadmap.header.frame_id = "map";
-  _m_roadmap.header.stamp = now();
-  _m_roadmap.action = visualization_msgs::msg::Marker::ADD;
-  _m_roadmap.ns = "map";
-  _m_roadmap.id = _id_roadmap;
-  _m_roadmap.type = visualization_msgs::msg::Marker::LINE_LIST;
-  _m_roadmap.pose.orientation.w = 1.0;
-  _m_roadmap.scale.x = 0.1;
-  _m_roadmap.scale.y = 0.1;
-  _m_roadmap.color.b = 0.3;
-  _m_roadmap.color.r = 0.1;
-  _m_roadmap.color.a = 1.0;
+// void MapInfo::set_roadmap(
+//     std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map) {
+//   _m_roadmap.header.frame_id = "map";
+//   _m_roadmap.header.stamp = now();
+//   _m_roadmap.action = visualization_msgs::msg::Marker::ADD;
+//   _m_roadmap.ns = "map";
+//   _m_roadmap.id = _id_roadmap;
+//   _m_roadmap.type = visualization_msgs::msg::Marker::LINE_LIST;
+//   _m_roadmap.pose.orientation.w = 1.0;
+//   _m_roadmap.scale.x = 0.1;
+//   _m_roadmap.scale.y = 0.1;
+//   _m_roadmap.color.b = 0.3;
+//   _m_roadmap.color.r = 0.1;
+//   _m_roadmap.color.a = 1.0;
 
-  _m_roadmap.points.clear();
-  for (auto rm : road_map) {
-    geometry_msgs::msg::Point p1;
-    p1.x = rm.first[0];
-    p1.y = rm.first[1];
-    p1.z = 0;
-    for (auto p : rm.second) {
-      geometry_msgs::msg::Point p2;
-      p2.x = p[0];
-      p2.y = p[1];
-      p2.z = 0;
-      _m_roadmap.points.push_back(p1);
-      _m_roadmap.points.push_back(p2);
-    }
-  }
-  _marker_pub->publish(_m_roadmap);
-}
+//   _m_roadmap.points.clear();
+//   for (auto rm : road_map) {
+//     geometry_msgs::msg::Point p1;
+//     p1.x = rm.first[0];
+//     p1.y = rm.first[1];
+//     p1.z = 0;
+//     for (auto p : rm.second) {
+//       geometry_msgs::msg::Point p2;
+//       p2.x = p[0];
+//       p2.y = p[1];
+//       p2.z = 0;
+//       _m_roadmap.points.push_back(p1);
+//       _m_roadmap.points.push_back(p2);
+//     }
+//   }
+//   _marker_pub->publish(_m_roadmap);
+// }
 
 void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
   _m_rand_point.header.frame_id = "map";
@@ -461,21 +457,16 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
   _m_rand_point.action = visualization_msgs::msg::Marker::ADD;
   _m_rand_point.ns = "map";
   _m_rand_point.id = _id_rand_point;
-  _m_rand_point.type = visualization_msgs::msg::Marker::POINTS;
-  _m_rand_point.pose.orientation.w = 1.0;
+  _m_rand_point.type = visualization_msgs::msg::Marker::SPHERE;
   _m_rand_point.scale.x = 0.5;
   _m_rand_point.scale.y = 0.5;
+  _m_rand_point.scale.z = 0.5;
   _m_rand_point.color.r = 1.0;
-  _m_rand_point.color.g = 1.0;
-  _m_rand_point.color.b = 1.0;
+  _m_rand_point.color.g = 0.4;
   _m_rand_point.color.a = 1.0;
-
-  _m_rand_point.points.clear();
-  geometry_msgs::msg::Point p;
-  p.x = rand[0];
-  p.y = rand[1];
-  p.z = 0;
-  _m_rand_point.points.push_back(p);
+  _m_rand_point.pose.position.x = rand[0];
+  _m_rand_point.pose.position.y = rand[1];
+  _m_rand_point.pose.position.z = 0;
 
   _m_rrt.header.frame_id = "map";
   _m_rrt.header.stamp = now();
@@ -503,8 +494,8 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
     _m_rrt.points.push_back(p1);
     _m_rrt.points.push_back(p2);
   }
-  _marker_pub->publish(_m_rand_point);
   _marker_pub->publish(_m_rrt);
+  _marker_pub->publish(_m_rand_point);
   _pub_i = (_pub_i + 1) % 10;
   if (_pub_i == 0) {
     // rclcpp::sleep_for(std::chrono::milliseconds(10));
@@ -583,11 +574,11 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {
       }
     }
   }
-
+  
   _marker_pub->publish(branch);
   _marker_pub->publish(m_points);
   _marker_pub->publish(m_parents);
-
+  
   // _pub_i = (_pub_i + 1) % 10;
   // if (_pub_i == 0) {
   //   return;

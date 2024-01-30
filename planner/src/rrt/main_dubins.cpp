@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
   m->ShowMap();
   // }
 
-  rclcpp::sleep_for(std::chrono::seconds(1));
+  // rclcpp::sleep_for(std::chrono::seconds(1));
 
   // Monitor execution time
   double radius = 0.5;

@@ -1,6 +1,6 @@
+#include <unistd.h>
 #include "planner/rrt/utils/rrt.hpp"
 
-#include <unistd.h>
 void RRT::set_root(KDPoint &p) {
   _root.assign(p.begin(), p.end());
   _rrt.push_back(std::make_pair(_root, 0));

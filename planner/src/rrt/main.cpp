@@ -54,8 +54,6 @@ int main(int argc, char **argv)
   KDPoint point = {0, 0, 0};
   while (m->Collision(point))
   {
-    sleep(0.1);
-    RCLCPP_INFO(m->get_logger(), "Start is in collision, moving it");
     point[0] += 0.1;
   }
   std::cout << "Start is at " << point[0] << ", " << point[1] << std::endl;
@@ -70,10 +68,10 @@ int main(int argc, char **argv)
   map_file.close();
   // if (m->_show_graphics)
   // {
-    m->ShowMap();
+  m->ShowMap();
   // }
 
-  rclcpp::sleep_for(std::chrono::seconds(1));
+  // rclcpp::sleep_for(std::chrono::milliseconds(100));
 
   // Monitor execution time
   auto time_start = rclcpp::Clock().now();

@@ -118,11 +118,11 @@ class MapInfo : public rclcpp::Node {
   void set_end(KDPoint &point);
   void set_path(std::vector<KDPoint> &path);
   void set_dubins_path(std::vector<KDPoint> &path);
-  void set_openlist(std::vector<KDPoint> &points);
-  void set_closelist(std::vector<KDPoint> &points);
-  void set_rand_points(std::vector<KDPoint> &points);
-  void set_roadmap(
-      std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
+//   void set_openlist(std::vector<KDPoint> &points);
+//   void set_closelist(std::vector<KDPoint> &points);
+//   void set_rand_points(std::vector<KDPoint> &points);
+//   void set_roadmap(
+//       std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
   void set_rrt(RRT &rrt, int n, KDPoint &rand);
   void set_rrt_dubins(RRTDubins &rrt_dubins);
   bool Collision(KDPoint &point);
