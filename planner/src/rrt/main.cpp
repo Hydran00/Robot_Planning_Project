@@ -79,6 +79,8 @@ int main(int argc, char **argv)
   RRTStarPlan plan(m);
 
   std::vector<KDPoint> final_path = plan.run();
+  auto time_end = rclcpp::Clock().now();
+  auto time_diff = time_end - time_start;
   std::cout << "Plan completed" << std::endl;
   
   m->set_path(final_path);
@@ -86,12 +88,11 @@ int main(int argc, char **argv)
   cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
        << endl;
 
-//   // Output path for python visualisation
   print_path_on_file(final_path);
+//   // Output path for python visualisation
 
 
-  auto time_end = rclcpp::Clock().now();
-  auto time_diff = time_end - time_start;
+  m->publish_path(final_path);
   cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
   rclcpp::shutdown();
   cout << "Done!" << endl;

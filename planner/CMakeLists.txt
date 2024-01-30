@@ -55,16 +55,16 @@ ament_target_dependencies(voronoi_boost
 )
 target_link_libraries(voronoi_boost Boost::headers)
 
-add_executable(wkt_generator
-  ${VORONOI_FOLDER}/wkt_generator.cpp
-)
-ament_target_dependencies(wkt_generator
-  rclcpp
-  obstacles_msgs
-  geometry_msgs
-  ament_index_cpp
-)
-target_include_directories(wkt_generator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# add_executable(wkt_generator
+#   ${VORONOI_FOLDER}/wkt_generator.cpp
+# )
+# ament_target_dependencies(wkt_generator
+#   rclcpp
+#   obstacles_msgs
+#   geometry_msgs
+#   ament_index_cpp
+# )
+# target_include_directories(wkt_generator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
 
@@ -86,6 +86,8 @@ ament_target_dependencies(rrt_star
   visualization_msgs
   geometry_msgs
   obstacles_msgs
+  tf2
+  tf2_ros
 )
 target_link_libraries(rrt_star Boost::headers)
 target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -125,9 +127,32 @@ ament_target_dependencies(rrt_star_dubins
   visualization_msgs
   geometry_msgs
   obstacles_msgs
+  tf2
+  tf2_ros
 )
 target_link_libraries(rrt_star_dubins Boost::headers)
 target_include_directories(rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+#############################################################################
+
+# Path Planner
+
+add_executable(nav2_client
+src/nav2_client.cpp
+)
+
+ament_target_dependencies(nav2_client
+  rclcpp
+  rclcpp_action
+  rclcpp_components
+  geometry_msgs
+  nav_msgs
+  std_msgs
+  tf2
+  tf2_ros
+  nav2_msgs
+)
+# target_include_directories(path_planner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
 
@@ -150,10 +175,11 @@ install(DIRECTORY
 
 install(TARGETS
   voronoi_boost
-  wkt_generator
+  # wkt_generator
   rrt_star
   rrt_star_dubins
   # dubins
+  nav2_client
   DESTINATION lib/${PROJECT_NAME})
 
 #############################################################################

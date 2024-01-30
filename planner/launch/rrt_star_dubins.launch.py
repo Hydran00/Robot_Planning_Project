@@ -36,5 +36,15 @@ def generate_launch_description():
                 # ),
                 arguments=["-d", rviz_config_dir],
             ),
+            # Node(
+            #     package="rviz2",
+            #     executable="rviz2",
+            #     name="rviz",
+            #     output="log",
+            #     # condition=IfCondition(
+            #     #     PythonExpression(["'", launch.substitutions.LaunchConfiguration("show_graphics"), "' == 'true'"])
+            #     # ),
+            #     arguments=["-d", rviz_config_dir],
+            # ),
         ],
     )

@@ -1,5 +1,4 @@
 #include "planner/rrt/utils/map_info.hpp"
-
 #include <unistd.h>
 
 #include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
@@ -20,22 +19,23 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_custom);
   subscription_obstacles_ =
       this->create_subscription<obstacles_msgs::msg::ObstacleArrayMsg>(
-          "/obstacles", qos,
+          "obstacles", qos,
           std::bind(&MapInfo::obstacles_cb, this, std::placeholders::_1));
   subscription_borders_ =
       this->create_subscription<geometry_msgs::msg::PolygonStamped>(
-          "/borders", qos,
+          "borders", qos,
           std::bind(&MapInfo::borders_cb, this, std::placeholders::_1));
   subscription_gates_ =
       this->create_subscription<geometry_msgs::msg::PoseArray>(
-          "/gate_position", qos,
+          "gate_position", qos,
           std::bind(&MapInfo::gate_cb, this, std::placeholders::_1));
   subscription_victims_ =
       this->create_subscription<obstacles_msgs::msg::ObstacleArrayMsg>(
-          "/victims", qos,
+          "victims", qos,
           std::bind(&MapInfo::victims_cb, this, std::placeholders::_1));
   // TODO: add subscription for start point
-
+  _final_path_pub = this->create_publisher<geometry_msgs::msg::PoseArray>(
+      "final_path", 10);
   RCLCPP_INFO(this->get_logger(), "Node started");
 }
 
@@ -620,4 +620,35 @@ void MapInfo::ShowMap(void) {
     _marker_pub->publish(_m_victims);
     rclcpp::sleep_for(std::chrono::milliseconds(50));
   }
+}
+
+  void MapInfo::publish_path(std::vector<KDPoint> final_path) {
+  // create path message
+  geometry_msgs::msg::PoseArray final_path_msg;
+  final_path_msg.header.frame_id = "map";
+  final_path_msg.header.stamp = now();
+  // convert final_path (KDPoint vector) to final_path_msg (PoseArray message)
+  for(auto p : final_path) {
+    // create point message
+    geometry_msgs::msg::Pose point_pose_msg;
+    
+    // populate point message with position
+    point_pose_msg.position.x = p[0];
+    point_pose_msg.position.y = p[1];
+    point_pose_msg.position.z = 0;
+    // convert pose rpy to quaternion
+    tf2::Quaternion q;
+    q.setRPY(0, 0, p[2]);
+    // populate point message with orientation
+    point_pose_msg.orientation.x = q.getX();
+    point_pose_msg.orientation.y = q.getY();
+    point_pose_msg.orientation.z = q.getZ();
+    point_pose_msg.orientation.w = q.getW();
+    // insert point message into path message
+    final_path_msg.poses.push_back(point_pose_msg);
+  }
+  _final_path_pub->publish(final_path_msg);
+
+  std::cout << "Path published" << std::endl;
+  sleep(1);
 }

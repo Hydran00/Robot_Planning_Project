@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
   map_file << boost::geometry::wkt(m->_map) << std::endl;
   // close
   map_file.close();
-  
+
   // if (m->_show_graphics)
   // {
   m->ShowMap();
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
   // Monitor execution time
   double radius = 0.5;
   RRTStarDubinsPlan plan(m, radius);
-  cout<< "Planner started!" << endl;
+  cout << "Planner started!" << endl;
   auto time_start = rclcpp::Clock().now();
   std::vector<KDPoint> final_path = plan.run();
   auto time_end = rclcpp::Clock().now();
@@ -93,6 +93,11 @@ int main(int argc, char **argv) {
 
   // Output path for python visualisation
   print_path_on_file(final_path);
+
+  while (true) {
+    m->publish_path(final_path);
+    rclcpp::sleep_for(std::chrono::milliseconds(100));
+  }
 
   rclcpp::shutdown();
   cout << "Done!" << endl;

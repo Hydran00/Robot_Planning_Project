@@ -30,6 +30,10 @@
 #include "visualization_msgs/msg/marker.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
 
+#include "tf2/exceptions.h"
+#include "tf2_ros/transform_listener.h"
+#include "tf2_ros/buffer.h"
+
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::linestring<point_xy> Linestring;
 typedef boost::geometry::model::polygon<point_xy> polygon;
@@ -74,6 +78,8 @@ class MapInfo : public rclcpp::Node {
       subscription_victims_;
   // geometry_msgs::msg::PolygonStamped borders_;
   // obstacles_msgs::msg::ObstacleArrayMsg obstacles_;
+    // Dubins path publisher
+  rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr _final_path_pub;
 
   // define the map as a polygon with holes
   visualization_msgs::msg::Marker _line_boundary;
@@ -131,6 +137,9 @@ class MapInfo : public rclcpp::Node {
   //   bool DubinsCollision(
   //   std::vector<KDPoint> &path);
   void ShowMap(void);
+
+  // Publish final path
+  void publish_path(std::vector<KDPoint> final_path);
 };
 
 #endif  // MAP_INFO_HPP_
