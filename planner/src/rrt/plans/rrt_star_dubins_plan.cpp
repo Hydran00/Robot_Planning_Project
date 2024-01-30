@@ -10,35 +10,6 @@ RRTStarDubinsPlan::RRTStarDubinsPlan(std::shared_ptr<MapInfo> &map_info,
   _radius = radius;
 }
 
-// KDPoint RRTStarDubinsPlan::_GenerateRandPoint(void) {
-//   unsigned seed =
-//   std::chrono::system_clock::now().time_since_epoch().count();
-//   std::default_random_engine generator(seed);
-//   std::uniform_int_distribution<int> dis_s(0, 9);
-//   // Epsilon greedy sampling
-//   if (dis_s(generator) < 2) {
-//     return MotionPlanning::_pt_end;
-//   } else {
-//     // sample from the square embedding the map
-//     std::uniform_real_distribution<>
-//     dis_x((MotionPlanning::_map_info->min_x),
-//                                            (MotionPlanning::_map_info->max_x));
-//     std::uniform_real_distribution<>
-//     dis_y((MotionPlanning::_map_info->min_y),
-//                                            (MotionPlanning::_map_info->max_y));
-//     std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI);
-//     while (true) {
-//       // TODO: check if double sampling works
-//       double x = dis_x(generator);
-//       double y = dis_y(generator);
-//       double theta = dis_yaw(generator);
-//       KDPoint p = {double(x), double(y), double(theta)};
-//       if (!MotionPlanning::_map_info->Collision(p)) {
-//         return p;
-//       }
-//     }
-//   }
-// }
 KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
@@ -46,13 +17,14 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
   std::uniform_int_distribution<int> dis_s(0, 100);
   // Epsilon greedy sampling
   int extracted = dis_s(generator);
-  if (extracted < 80 - iter * 0.02) {
+  if (extracted < 50 - iter * 0.02) {
     int idx = std::uniform_int_distribution<int>(0, num_victims - 1)(generator);
     KDPoint p = std::get<0>(MotionPlanning::_map_info->_victims[idx]);
-    std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI);
+    std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI - EPSILON);
     p.push_back(dis_yaw(generator));
-    // std::cout << "Selected: " << p[0] << ", " << p[1] << ", " << p[2]
-    //           << std::endl;
+    // std::cout << "Selected victim: (" << p[0] << ", " << p[1] << ",  " << p[2]
+    //           << ") with cost " << std::get<1>(MotionPlanning::_map_info->_victims[idx])
+              // << std::endl;
     return p;
   } else {
     if (extracted < 99.9 - iter * 0.005) {
@@ -63,7 +35,7 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
       std::uniform_real_distribution<> dis_y(
           (MotionPlanning::_map_info->min_y),
           (MotionPlanning::_map_info->max_y));
-      std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI);
+      std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI - EPSILON);
       while (true) {
         double x = dis_x(generator);
         double y = dis_y(generator);
@@ -76,7 +48,7 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
     } else {
       // std::cout << "Sampling end point at iter " << iter
       //           << "| prob: " << iter * 0.01 << std::endl;
-      std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI);
+      std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI - EPSILON);
       KDPoint p = {MotionPlanning::_pt_end[0], MotionPlanning::_pt_end[1],
                    dis_yaw(generator)};
       return MotionPlanning::_pt_end;
@@ -113,7 +85,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
         _rrt.SearchNearestVertex(q_rand, _radius);
 
     KDPoint q_near = std::get<0>(near_node);
-    
+
     // check that the new point is not already in the tree
     KDPoint p = q_near;
     bool already_visited = false;
@@ -125,45 +97,41 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
       p = std::get<0>(_rrt.GetParent(p));
     }
     if (already_visited) {
+      // std::cout << "Already visited" << std::endl;
+      // std::cout << "---------------------" << std::endl;
       continue;
     }
 
-    auto dubins_best_path =
-        get_dubins_best_path_and_cost(q_near, q_rand, _radius, 0.1);
-    // if (std:get<0>(dubins_best_path).size() <= 2) {
+    std::tuple<std::vector<KDPoint>, double, std::vector<std::vector<double>>>
+        dubins_best_path =
+            get_dubins_best_path_and_cost(q_near, q_rand, _radius, 0.1);
 
-    //   continue;
-    // }
-
-    std::vector<KDPoint> new_path;
-    for (size_t i = 0; i < std::get<0>(dubins_best_path).size(); i++) {
-      p = std::get<0>(dubins_best_path)[i];
-      new_path.push_back(p);
-
-      p.clear();
-    }
+    std::vector<KDPoint> new_path = std::get<0>(dubins_best_path);
 
     // Check collisions
     if (MotionPlanning::_map_info->Collision(new_path)) {
+      // std::cout << "Collision" << std::endl;
+      // std::cout << "---------------------" << std::endl;
       continue;
     }
 
-    _rrt.Add(q_rand, q_near, std::get<2>(dubins_best_path), new_path);
+    std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> new_node =
+        _rrt.Add(q_rand, q_near, std::get<2>(dubins_best_path), new_path);
 
     // TODO check radius->was 5.0
     _rrt.Rewire(
-        near_node, 100.0,
+        new_node, 100,
         [&](std::vector<KDPoint> &path) {
           return MotionPlanning::_map_info->Collision(path);
         },
         _radius);
-
+    // rclcpp::sleep_for(std::chrono::milliseconds(1500));
     if (MotionPlanning::_display) {
       MotionPlanning::_map_info->set_rrt_dubins(_rrt);
     }
 
     if (sqrt(pow(q_rand[0] - MotionPlanning::_pt_end[0], 2) +
-             pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 1) {
+             pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.5) {
       nodes_counter += 1;
       if (q_rand != MotionPlanning::_pt_end) {
         auto last_path = get_dubins_best_path_and_cost(

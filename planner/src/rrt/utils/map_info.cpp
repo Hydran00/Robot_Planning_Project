@@ -1,5 +1,7 @@
 #include "planner/rrt/utils/map_info.hpp"
+
 #include <unistd.h>
+
 #include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
 
 MapInfo::MapInfo() : Node("map"), _pub_i(0) {
@@ -331,7 +333,10 @@ void MapInfo::set_dubins_path(std::vector<KDPoint> &path) {
     p_.z = 0;
     _m_path.points.push_back(p_);
   }
-  _marker_pub->publish(_m_path);
+  for (int i = 0; i < 100; i++) {
+    _marker_pub->publish(_m_path);
+    rclcpp::sleep_for(std::chrono::milliseconds(10));
+  }
 }
 
 // void MapInfo::set_openlist(std::vector<KDPoint> &points) {
@@ -574,11 +579,11 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {
       }
     }
   }
-  
+
   _marker_pub->publish(branch);
   _marker_pub->publish(m_points);
   _marker_pub->publish(m_parents);
-  
+
   // _pub_i = (_pub_i + 1) % 10;
   // if (_pub_i == 0) {
   //   return;

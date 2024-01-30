@@ -73,8 +73,8 @@ int main(int argc, char **argv) {
   // {
   m->ShowMap();
   // }
-
-  // rclcpp::sleep_for(std::chrono::seconds(1));
+  // wait for the map to be shown
+  rclcpp::sleep_for(std::chrono::milliseconds(600));
 
   // Monitor execution time
   double radius = 0.5;

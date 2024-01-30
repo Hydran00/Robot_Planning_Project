@@ -23,7 +23,6 @@ typedef std::vector<
     DubinsTree;
 class RRTDubins {
  private:
-
  public:
   KDPoint _root;
   DubinsTree _rrt;
@@ -60,14 +59,17 @@ class RRTDubins {
   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
   SearchNearestVertex(KDPoint &q_rand, double radius);
   // KDPoint CalcNewPoint(KDPoint &q_near, KDPoint &q_rand);
-  void Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
-           std::vector<KDPoint> &path);
+  std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> Add(
+      KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
+      std::vector<KDPoint> &path);
   double Cost(
       std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node,
       double radius);
-  void Rewire(std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_new, double r,
-              std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
-              double dubins_radius);
+  double GetPathLength(SymbolicPath &sym_path, double radius);
+  void Rewire(
+      std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_new,
+      double r, std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
+      double dubins_radius);
   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> GetParent(
       KDPoint &p);
   std::vector<KDPoint> GetPointPath(KDPoint &p);

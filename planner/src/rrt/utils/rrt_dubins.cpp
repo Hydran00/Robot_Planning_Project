@@ -1,5 +1,6 @@
 #include "planner/rrt/utils/rrt_dubins.hpp"
 
+#include <unistd.h>
 void RRTDubins::set_root(KDPoint &p) {
   _root.assign(p.begin(), p.end());
   _rrt.push_back(std::make_tuple(_root, 0, std::vector<std::vector<double>>(),
@@ -10,15 +11,17 @@ std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
 RRTDubins::SearchNearestVertex(KDPoint &q_rand, double radius) {
   std::vector<double> d;
   for (auto tuple : _rrt) {
-    d.push_back(Distance(std::get<0>(tuple), q_rand) +
-                0.95 * Cost(tuple, radius));
+    double distance = sqrt(pow(q_rand[0] - std::get<0>(tuple)[0], 2) +
+                           pow(q_rand[1] - std::get<0>(tuple)[1], 2));
+    d.push_back(distance + 0.95 * Cost(tuple, radius));
   }
   int i = std::min_element(d.begin(), d.end()) - d.begin();
   return _rrt[i];
 }
 
-void RRTDubins::Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
-                    std::vector<KDPoint> &path) {
+std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> RRTDubins::Add(
+    KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
+    std::vector<KDPoint> &path) {
   int i = std::find_if(
               _rrt.begin(), _rrt.end(),
               [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
@@ -30,6 +33,7 @@ void RRTDubins::Add(KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
   //           << "\t rrt_size: " << _rrt.size() << std::endl;
   // _rrt.push_back(std::make_tuple(q_new, i, sym_path, path));
   _rrt.push_back(std::make_tuple(q_new, i, sym_path, path));
+  return _rrt.back();
 }
 
 std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
@@ -53,6 +57,13 @@ std::vector<KDPoint> RRTDubins::GetPointPath(KDPoint &p) {
   return std::get<3>(*it);
 }
 
+double RRTDubins::GetPathLength(SymbolicPath &sym_path, double radius) {
+  double length = 0.0;
+  for (auto path : sym_path) {
+    length += (path[0] == 's' ? path[1] : path[1] * radius);
+  }
+  return length;
+}
 double RRTDubins::Cost(
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node,
     double radius) {
@@ -61,20 +72,15 @@ double RRTDubins::Cost(
   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> q = node;
 
   while (std::get<0>(q) != _root) {
-    for (auto path : std::get<2>(q)) {
-      cost += (path[0] == 's' ? path[1] : path[1] * radius);
-    }
+    cost += GetPathLength(std::get<2>(q), radius);
     auto it = std::find_if(victims_list.begin(), victims_list.end(),
                            [&](std::tuple<KDPoint, double> &victim) {
-                             return (std::get<0>(victim) == std::get<0>(q));
+                             return (std::get<0>(victim) == std::get<0>(q) &&
+                                     std::get<0>(victim) == std::get<0>(q));
                            });
     if (it != victims_list.end()) {
-      std::cout << "Find victims " << std::get<0>(*it)[0] << ", "
-                << std::get<0>(*it)[1] << std::endl;
-      std::cout << "that is equal to the point " << std::get<0>(q)[0] << ", "
-                << std::get<0>(q)[1] << std::endl;
       cost -= std::get<1>(*it);
-      // victims_list.erase(it);
+      victims_list.erase(it);
     }
     q = GetParent(std::get<0>(q));
   }
@@ -95,6 +101,16 @@ void RRTDubins::Rewire(
       });
 
   // // fill nears
+  // std::for_each(
+  //     _rrt.begin(), _rrt.end(),
+  //     [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node)
+  //     {
+  //       if ((std::get<0>(node) != std::get<0>(q_new)) &&
+  //           (Distance(std::get<0>(node), std::get<0>(q_new)) < r) &&
+  //           (std::get<0>(node) != _root)) {
+  //         nears.push_back(node);
+  //       }
+  //     });
   std::for_each(
       _rrt.begin(), _rrt.end(),
       [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node) {
@@ -103,19 +119,31 @@ void RRTDubins::Rewire(
           nears.push_back(node);
         }
       });
-
   for (auto q : nears) {
     // X, Y, Cost, Symbolic Path
+    // std::cout << "Rewiring: (" << std::get<0>(q)[0] << ", " << std::get<0>(q)[1]
+    //           << " , " << std::get<0>(q)[2] << ") against ("
+    //           << std::get<0>(q_new)[0] << ", " << std::get<0>(q_new)[1] << " , "
+    //           << std::get<0>(q_new)[2] << ")"<<std::endl;
     auto dubins_best_path = get_dubins_best_path_and_cost(
-        std::get<0>(q_new), std::get<0>(q), dubins_radius, 0.1);
+        std::get<0>(q), std::get<0>(q_new), dubins_radius, 0.1);
 
     std::vector<KDPoint> new_path = std::get<0>(dubins_best_path);
 
     // compute distance given the symbolic path
-    double distance = 0.0;
-    for (auto &p : std::get<2>(dubins_best_path)) {
-      distance += (p[0] == 's' ? p[1] : p[1] * dubins_radius);
+    double distance =
+        GetPathLength(std::get<2>(dubins_best_path), dubins_radius);
+
+    // check if q_new is victim
+    auto it = std::find_if(victims.begin(), victims.end(),
+                           [&](std::tuple<KDPoint, double> &victim) {
+                             return (std::get<0>(victim) == std::get<0>(q_new));
+                           });
+    if (it != victims.end()) {
+      distance -= std::get<1>(*it);
     }
+    // double c1 = Cost(q, dubins_radius) + distance;
+    // double c2 = Cost(q_new, dubins_radius);
     // Check cost improvement
     if (Cost(q, dubins_radius) + distance < Cost(q_new, dubins_radius)) {
       // Check collision of the new path
@@ -129,7 +157,12 @@ void RRTDubins::Rewire(
                                return (std::get<0>(tuple) == std::get<0>(q));
                              }) -
                 _rrt.begin();
-      // it_p->second = idx;
+      // std::cout << "New cost for (" << std::get<0>(q)[0] << ", "
+      //           << std::get<0>(q)[1] << ") is " << c1 << " instead of " << c2
+      //           << std::endl;
+      // std::cout << "New parent is (" << std::get<0>(q_new)[0] << ", "
+      //           << std::get<0>(q_new)[1] << ")" << std::endl;
+      // Update parent
       std::get<1>(*it_p) = idx;
       // Update symbolic path
       std::get<2>(*it_p) = std::get<2>(dubins_best_path);
@@ -164,8 +197,8 @@ void RRTDubins::Rewire(
   //       distance += p[1] * dubins_radius;
   //     }
   //   }
-  //   if (abs(Cost(q_new, dubins_radius) + distance - Cost(q, dubins_radius))
-  //   > 1e-6)
+  //   if (abs(Cost(q_new, dubins_radius) + distance - Cost(q,
+  //   dubins_radius)) > 1e-6)
   //   {
   //     std::cout << "SERVE A QUALCOSA" << std::endl;
   //     auto it_pt = std::find_if(
