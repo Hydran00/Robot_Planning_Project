@@ -27,7 +27,7 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
               // << std::endl;
     return p;
   } else {
-    if (extracted < 99.9 - iter * 0.005) {
+    if (extracted < 99.9 - iter * 0.02) {
       // sample from the square embedding the map
       std::uniform_real_distribution<> dis_x(
           (MotionPlanning::_map_info->min_x),
@@ -63,13 +63,12 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(void) {
   auto last_path = _rrt.GetPointPath(p);
   // std::reverse(last_path.begin(), last_path.end());
   path.insert(path.begin(), last_path.begin(), last_path.end());
-  while (p != MotionPlanning::_pt_start) {
+  while (MotionPlanning::_pt_start != p) {
     auto parent = _rrt.GetParent(p);
     std::vector<KDPoint> parent_path = std::get<3>(parent);
     path.insert(path.begin(), parent_path.begin(), parent_path.end());
     p = std::get<0>(parent);
   }
-  // std::reverse(path.begin(), path.end());
   return path;
 }
 
@@ -135,14 +134,14 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
       nodes_counter += 1;
       if (q_rand != MotionPlanning::_pt_end) {
         auto last_path = get_dubins_best_path_and_cost(
-            q_near, MotionPlanning::_pt_end, _radius, 0.1);
+            q_rand, MotionPlanning::_pt_end, _radius, 0.1);
         std::vector<KDPoint> last_segment;
         for (size_t i = 0; i < std::get<0>(last_path).size(); i++) {
           p = std::get<0>(last_path)[i];
           last_segment.push_back(p);
           p.clear();
         }
-        _rrt.Add(MotionPlanning::_pt_end, q_near, std::get<2>(last_path),
+        _rrt.Add(MotionPlanning::_pt_end, q_rand, std::get<2>(last_path),
                  last_segment);
       }
       return _ReconstrucPath();

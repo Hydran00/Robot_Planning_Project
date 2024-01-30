@@ -44,8 +44,9 @@ int main(int argc, char **argv) {
   auto m = std::make_shared<MapInfo>();
 
   RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
-  while (!m->obstacles_received_ || !m->borders_received_ ||
-         !m->gates_received_ || !m->victims_received_) {
+  while (!m->start_received_ || !m->obstacles_received_ ||
+         !m->borders_received_ || !m->gates_received_ ||
+         !m->victims_received_) {
     // RCLCPP_INFO(m->get_logger(), "Map received: %d, Border: %d, Gates: %d",
     // m->obstacles_received_, m->borders_received_, m->gates_received_);
     rclcpp::spin_some(m->get_node_base_interface());
@@ -53,14 +54,14 @@ int main(int argc, char **argv) {
   }
   RCLCPP_INFO(m->get_logger(), "\033[1;32m Map information received!\033[0m");
 
-  KDPoint point = {0, 0, 0};
-  while (m->Collision(point)) {
-    sleep(0.1);
-    RCLCPP_INFO(m->get_logger(), "Start is in collision, moving it");
-    point[0] += 0.1;
-  }
-  std::cout << "Start is at " << point[0] << ", " << point[1] << std::endl;
-  m->set_start(point);
+  // KDPoint point = {0, 0, 0};
+  // while (m->Collision(point)) {
+  //   sleep(0.1);
+  //   RCLCPP_INFO(m->get_logger(), "Start is in collision, moving it");
+  //   point[0] += 0.1;
+  // }
+  // std::cout << "Start is at " << point[0] << ", " << point[1] << std::endl;
+  // m->set_start(point);
   // print map on file
   std::ofstream map_file;
   map_file.open(map_path);
@@ -98,7 +99,9 @@ int main(int argc, char **argv) {
   while (i < 100) {
     m->publish_path(final_path);
     rclcpp::sleep_for(std::chrono::milliseconds(10));
+    i++;
   }
+  std::cout << "Path published" << std::endl;
 
   rclcpp::shutdown();
   cout << "Done!" << endl;

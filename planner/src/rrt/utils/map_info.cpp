@@ -1,4 +1,5 @@
 #include "planner/rrt/utils/map_info.hpp"
+
 #include <unistd.h>
 
 #include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
@@ -11,12 +12,16 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   RCLCPP_INFO(this->get_logger(), "show_graphics: %s",
               this->_show_graphics ? "true" : "false");
 
+  start_received_ = false;
   obstacles_received_ = false;
   borders_received_ = false;
   gates_received_ = false;
   victims_received_ = false;
 
   const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_custom);
+  subscription_start_ = this->create_subscription<nav_msgs::msg::Odometry>(
+      "shelfino0/odom", 10,
+      std::bind(&MapInfo::start_cb, this, std::placeholders::_1));
   subscription_obstacles_ =
       this->create_subscription<obstacles_msgs::msg::ObstacleArrayMsg>(
           "obstacles", qos,
@@ -34,12 +39,28 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
           "victims", qos,
           std::bind(&MapInfo::victims_cb, this, std::placeholders::_1));
   // TODO: add subscription for start point
-  _final_path_pub = this->create_publisher<nav_msgs::msg::Path>(
-      "shelfino0/plan1", 10);
+  _final_path_pub =
+      this->create_publisher<nav_msgs::msg::Path>("shelfino0/plan1", 10);
   RCLCPP_INFO(this->get_logger(), "Node started");
 }
 
 MapInfo::~MapInfo() {}
+
+void MapInfo::start_cb(const nav_msgs::msg::Odometry &msg) {
+  subscription_start_.reset();
+  tf2::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y,
+                    msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
+  // extract yaw
+  double roll, pitch, yaw;
+  tf2::Matrix3x3 m(q);
+  m.getRPY(roll, pitch, yaw);
+
+  KDPoint start = {msg.pose.pose.position.x, msg.pose.pose.position.y, yaw};
+  set_start(start);
+  RCLCPP_INFO(this->get_logger(),
+              "\033[1;32mInitial position received! \033[0m");
+  start_received_ = true;
+}
 
 void MapInfo::obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
   subscription_obstacles_.reset();
@@ -63,7 +84,7 @@ void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg) {
 void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
   // unsubscribe
   subscription_gates_.reset();
-  KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y};
+  KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y, -1.57};
   set_end(end);
   this->gates_received_ = true;
   RCLCPP_INFO(this->get_logger(), "\033[1;32mGate received! \033[0m");
@@ -622,33 +643,44 @@ void MapInfo::ShowMap(void) {
   }
 }
 
-  void MapInfo::publish_path(std::vector<KDPoint> final_path) {
+void MapInfo::publish_path(std::vector<KDPoint> final_path) {
   // create path message
-  nav_msgs::msg::Path final_path_msg;
-  final_path_msg.header.frame_id = "map";
-  final_path_msg.header.stamp = now();
-  // convert final_path (KDPoint vector) to final_path_msg (PoseArray message)
+  nav_msgs::msg::Path nav_final_path;
+  nav_final_path.header.frame_id = "map";
+  nav_final_path.header.stamp = now();
+  // convert final_path (KDPoint vector) to nav_final_path (PoseStamped array
+  // message)
+  auto compute_yaw = [](KDPoint &p1, KDPoint &p2) {
+    return atan2(p2[1] - p1[1], p2[0] - p1[0]);
+  };
+  double yaw = 0.0;
+  tf2::Quaternion quat;
+
   geometry_msgs::msg::PoseStamped point_pose_msg;
-  for(auto p : final_path) {
+  for (size_t i = 0; i < final_path.size(); ++i) {
     // create point message
     point_pose_msg.header.frame_id = "map";
-    point_pose_msg.header.stamp = now();
+    // point_pose_msg.header.stamp = now();
     // populate point message with position
-    point_pose_msg.pose.position.x = p[0];
-    point_pose_msg.pose.position.y = p[1];
+    point_pose_msg.pose.position.x = final_path[i][0];
+    point_pose_msg.pose.position.y = final_path[i][1];
     point_pose_msg.pose.position.z = 0;
+    if (i == final_path.size() - 1) {
+      yaw = compute_yaw(final_path[i - 1], final_path[i]);
+    } else {
+      yaw = compute_yaw(final_path[i], final_path[i + 1]);
+    }
     // convert pose rpy to quaternion
-    tf2::Quaternion q;
-    q.setRPY(0, 0, p[2]);
+    std::cout << "Adding point: " << final_path[i][0] << ", "
+              << final_path[i][1] << ", " << yaw << std::endl;
+    quat.setRPY(0, 0, yaw);
     // populate point message with orientation
-    point_pose_msg.pose.orientation.x = q.getX();
-    point_pose_msg.pose.orientation.y = q.getY();
-    point_pose_msg.pose.orientation.z = q.getZ();
-    point_pose_msg.pose.orientation.w = q.getW();
+    point_pose_msg.pose.orientation.x = quat.getX();
+    point_pose_msg.pose.orientation.y = quat.getY();
+    point_pose_msg.pose.orientation.z = quat.getZ();
+    point_pose_msg.pose.orientation.w = quat.getW();
     // insert point message into path message
-    final_path_msg.poses.push_back(point_pose_msg);
+    nav_final_path.poses.push_back(point_pose_msg);
   }
-  _final_path_pub->publish(final_path_msg);
-
-  std::cout << "Path published" << std::endl;
+  _final_path_pub->publish(nav_final_path);
 }

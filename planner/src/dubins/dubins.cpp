@@ -36,12 +36,11 @@ std::tuple<std::vector<double>, std::vector<double>> gen_path(
   std::vector<double> start = s;
   double yaw = s[2];
 
-  double step_lenght = 0.05;
-  double step_angle = step_lenght/r;
+  double step_angle = step/r;
 
   for (const auto &p : path) {
     if (p[0] == 's') {
-      for (double l = 0.0; l < p[1]; l += step_lenght) {
+      for (double l = 0.0; l < p[1]; l += step) {
         ps_x.push_back(start[0] + std::cos(yaw) * l);
         ps_y.push_back(start[1] + std::sin(yaw) * l);
       }
@@ -229,6 +228,7 @@ get_dubins_best_path_and_cost(std::vector<double> q_near,
   auto paths = dubins_path.calc_paths();
   // get the shortest + cost
   auto shortest_path_cost = dubins_path.get_shortest_path_cost();
+  step = 0.3;
   // discretize the best path
   Path full_path =
       gen_path(q_near, std::get<0>(shortest_path_cost), _radius, step);

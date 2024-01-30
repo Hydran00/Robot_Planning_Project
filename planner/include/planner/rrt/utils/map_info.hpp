@@ -22,19 +22,18 @@
 #include "geometry_msgs/msg/polygon_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "kdtree.hpp"
+#include "nav_msgs/msg/odometry.hpp"
+#include "nav_msgs/msg/path.hpp"
 #include "obstacles_msgs/msg/obstacle_array_msg.hpp"
 #include "obstacles_msgs/msg/obstacle_msg.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rrt.hpp"
 #include "rrt_dubins.hpp"
+#include "tf2/exceptions.h"
+#include "tf2_ros/buffer.h"
+#include "tf2_ros/transform_listener.h"
 #include "visualization_msgs/msg/marker.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
-
-#include "tf2/exceptions.h"
-#include "tf2_ros/transform_listener.h"
-#include "tf2_ros/buffer.h"
-
-#include "nav_msgs/msg/path.hpp"
 
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::linestring<point_xy> Linestring;
@@ -70,6 +69,8 @@ class MapInfo : public rclcpp::Node {
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
   // rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
   // _markerarray_pub;
+
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_start_;
   rclcpp::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr
       subscription_borders_;
   rclcpp::Subscription<obstacles_msgs::msg::ObstacleArrayMsg>::SharedPtr
@@ -78,9 +79,10 @@ class MapInfo : public rclcpp::Node {
       subscription_gates_;
   rclcpp::Subscription<obstacles_msgs::msg::ObstacleArrayMsg>::SharedPtr
       subscription_victims_;
+
   // geometry_msgs::msg::PolygonStamped borders_;
   // obstacles_msgs::msg::ObstacleArrayMsg obstacles_;
-    // Dubins path publisher
+  // Dubins path publisher
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr _final_path_pub;
 
   // define the map as a polygon with holes
@@ -102,6 +104,7 @@ class MapInfo : public rclcpp::Node {
 
  public:
   polygon _map;
+  bool start_received_;
   bool obstacles_received_;
   bool borders_received_;
   bool gates_received_;
@@ -115,6 +118,7 @@ class MapInfo : public rclcpp::Node {
   MapInfo();
   ~MapInfo();
 
+  void start_cb(const nav_msgs::msg::Odometry &msg);
   void obstacles_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg);
   void borders_cb(const geometry_msgs::msg::PolygonStamped &msg);
   void gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg);
@@ -126,11 +130,11 @@ class MapInfo : public rclcpp::Node {
   void set_end(KDPoint &point);
   void set_path(std::vector<KDPoint> &path);
   void set_dubins_path(std::vector<KDPoint> &path);
-//   void set_openlist(std::vector<KDPoint> &points);
-//   void set_closelist(std::vector<KDPoint> &points);
-//   void set_rand_points(std::vector<KDPoint> &points);
-//   void set_roadmap(
-//       std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
+  //   void set_openlist(std::vector<KDPoint> &points);
+  //   void set_closelist(std::vector<KDPoint> &points);
+  //   void set_rand_points(std::vector<KDPoint> &points);
+  //   void set_roadmap(
+  //       std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
   void set_rrt(RRT &rrt, int n, KDPoint &rand);
   void set_rrt_dubins(RRTDubins &rrt_dubins);
   bool Collision(KDPoint &point);

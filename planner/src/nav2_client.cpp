@@ -120,8 +120,16 @@ int main(int argc, char* argv[]) {
 
       auto goal_msg = FollowPath::Goal();
       goal_msg.path = node->full_path;
-      for(size_t i = 0; i < goal_msg.path.poses.size(); i++) {
-        std::cout << goal_msg.path.poses[i].pose.position.x << ", " << goal_msg.path.poses[i].pose.position.y << std::endl;
+      for (size_t i = 0; i < goal_msg.path.poses.size(); i++) {
+        std::cout << "Position: " << goal_msg.path.poses[i].pose.position.x
+                  << ", " << goal_msg.path.poses[i].pose.position.y
+                  << std::endl;
+        std::cout << "Orientation: "
+                  << goal_msg.path.poses[i].pose.orientation.x << ", "
+                  << goal_msg.path.poses[i].pose.orientation.y << ", "
+                  << goal_msg.path.poses[i].pose.orientation.z << ", "
+                  << goal_msg.path.poses[i].pose.orientation.w << std::endl;
+        std::cout << "---------------------" << std::endl;
       }
       goal_msg.controller_id = "FollowPath";
 
