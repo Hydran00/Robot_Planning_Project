@@ -60,30 +60,12 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
 
 std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(KDPoint p) {
   std::vector<KDPoint> path;
-  // KDPoint p = MotionPlanning::_pt_end;
-  // extract last path given _pt_end
   auto last_path = _rrt.GetPointPath(p);
-  // std::reverse(last_path.begin(), last_path.end());
   path.insert(path.begin(), last_path.begin(), last_path.end());
-  // for (size_t i = 0; i < last_path.size(); i++) {
-  //   std::cout << "LAST: Adding point " << last_path[i][0] << ", "
-  //             << last_path[i][1] << std::endl;
-  // }
-  // std::cout << "Buildin path from "<< p[0] << ", " << p[1] << std::endl;
   KDPoint p_copy = p;
-  // std::cout << "Start is " << MotionPlanning::_pt_start[0] << ", "
-            // << MotionPlanning::_pt_start[1] << std::endl;
   while (MotionPlanning::_pt_start != p_copy) {
     auto parent = _rrt.GetParent(p_copy);
-    std::cout << "Parent is " << std::get<0>(parent)[0] << ", "
-              << std::get<0>(parent)[1] << std::endl;
     std::vector<KDPoint> parent_path = std::get<3>(parent);
-    // std::cout << "Analyzing " << std::get<0>(parent)[0] << ", "
-    //           << std::get<0>(parent)[1] << std::endl;
-    for (size_t i = 0; i < parent_path.size(); i++) {
-      std::cout << "Adding point " << parent_path[i][0] << ", "
-                << parent_path[i][1] << std::endl;
-    }
     path.insert(path.begin(), parent_path.begin(), parent_path.end());
     p_copy = std::get<0>(parent);
   }
@@ -136,12 +118,12 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
         _rrt.Add(q_rand, near_node, std::get<2>(dubins_best_path), new_path);
 
     // The rewire function is the difference between RRT and RRT*
-    // _rrt.Rewire(
-    //     new_node, 100,
-    //     [&](std::vector<KDPoint> &path) {
-    //       return MotionPlanning::_map_info->Collision(path);
-    //     },
-    //     _radius);
+    _rrt.Rewire(
+        new_node, 100,
+        [&](std::vector<KDPoint> &path) {
+          return MotionPlanning::_map_info->Collision(path);
+        },
+        _radius);
 
     // Display the tree in Rviz2
     if (MotionPlanning::_display) {

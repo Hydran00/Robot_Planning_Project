@@ -154,10 +154,11 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
 
   geometry_msgs::msg::Point p_ros;
   for (auto p : result[0].outer()) {
+    _map.outer().push_back(point_xy(p.x(), p.y()));
     p_ros.x = p.x();
     p_ros.y = p.y();
     p_ros.z = 0;
-    _map.outer().push_back(point_xy(p.x(), p.y()));
+    _line_boundary.points.push_back(p_ros);
   }
   // close ring
   _map.outer().push_back(_map.outer().front());
