@@ -135,18 +135,33 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
   _line_boundary.color.a = 1.0;
   _line_boundary.points.clear();
   // fill the msg with the map
-  for (auto p : points) {
-    // ROS2 Point
-    geometry_msgs::msg::Point p_ros;
-    p_ros.x = p[0];
-    p_ros.y = p[1];
-    p_ros.z = 0;
-    _line_boundary.points.push_back(p_ros);
 
-    _map.outer().push_back(point_xy(p[0], p[1]));
+  // Offsetting strategies and parameters
+  boost::geometry::strategy::buffer::distance_symmetric<double>
+      offsetting_distance_strategy(-OFFSET);
+  boost::geometry::model::multi_polygon<polygon> result;
+  boost::geometry::model::multi_polygon<polygon> mp;
+  mp.resize(1);
+  for (auto p : points) {
+    mp[0].outer().push_back(point_xy(p[0], p[1]));
+  }
+  // close ring
+  mp[0].outer().push_back(mp[0].outer().front());
+  // Offset the polygon and store it in result
+  boost::geometry::buffer(mp, result, offsetting_distance_strategy,
+                          side_strategy_, offsetting_join_strategy_,
+                          end_strategy_, offsetting_point_strategy_);
+
+  geometry_msgs::msg::Point p_ros;
+  for (auto p : result[0].outer()) {
+    p_ros.x = p.x();
+    p_ros.y = p.y();
+    p_ros.z = 0;
+    _map.outer().push_back(point_xy(p.x(), p.y()));
   }
   // close ring
   _map.outer().push_back(_map.outer().front());
+
   // print polygon in wkt
   // std::cout << "polygon: " << boost::geometry::wkt(_map) << std::endl;
 
@@ -174,19 +189,14 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
   RCLCPP_INFO(this->get_logger(), "Found %d obstacles",
               (int)msg.obstacles.size());
 
-  // Defines strategies for the circles creation
+  // offsetting strategies
+  // Circle creation
   boost::geometry::strategy::buffer::point_circle circle_point_strategy(30);
-  boost::geometry::strategy::buffer::join_round circle_join_strategy;
-  boost::geometry::strategy::buffer::end_round end_strategy;
-  boost::geometry::strategy::buffer::side_straight side_strategy;
-  boost::geometry::model::multi_polygon<polygon> result;
 
-  // Other strategies for polygons' offsetting
-  double offset = SHELFINO_WIDTH / 2 + 0.07;
-  boost::geometry::strategy::buffer::point_square offsetting_point_strategy;
-  boost::geometry::strategy::buffer::join_miter offsetting_join_strategy;
+  // Polygon offsetting
   boost::geometry::strategy::buffer::distance_symmetric<double>
-      offsetting_distance_strategy(offset);
+      offsetting_distance_strategy(OFFSET);
+  boost::geometry::model::multi_polygon<polygon> result;
 
   for (auto obs : msg.obstacles) {
     visualization_msgs::msg::Marker marker;
@@ -206,20 +216,20 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
       marker.pose.position.x = obs.polygon.points[0].x;
       marker.pose.position.y = obs.polygon.points[0].y;
       marker.pose.position.z = obs.polygon.points[0].z;
-      marker.scale.x = obs.radius * 2;
-      marker.scale.y = obs.radius * 2;
+      marker.scale.x = obs.radius * 2 + OFFSET;
+      marker.scale.y = obs.radius * 2 + OFFSET;
       marker.scale.z = 1.1;
       _obstacle_array.markers.push_back(marker);
 
       // Defines the circle center
       boost::geometry::model::multi_point<point_xy> mp = {
           point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)};
-
-      // Creates the circle and stores it in result
       boost::geometry::strategy::buffer::distance_symmetric<double>
-          distance_strategy(obs.radius + offset);
-      boost::geometry::buffer(mp, result, distance_strategy, side_strategy,
-                              circle_join_strategy, end_strategy,
+          distance_strategy(obs.radius + OFFSET);
+      // Creates the circle and stores it in result
+
+      boost::geometry::buffer(mp, result, distance_strategy, side_strategy_,
+                              circle_join_strategy_, end_strategy_,
                               circle_point_strategy);
 
       // Iterates over vertexes of the circle
@@ -239,24 +249,26 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
       marker.pose.position.z = 0;
 
       marker.scale.x =
-          abs(obs.polygon.points[0].x - obs.polygon.points[2].x) + offset;
+          abs(obs.polygon.points[0].x - obs.polygon.points[2].x) +
+          OFFSET / abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
       marker.scale.y =
-          abs(obs.polygon.points[0].y - obs.polygon.points[2].y) + offset;
+          abs(obs.polygon.points[0].y - obs.polygon.points[2].y) +
+          OFFSET / abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
       marker.scale.z = 1.1;
       _obstacle_array.markers.push_back(marker);
 
       // OFFSETTING
-      boost::geometry::model::multi_polygon<polygon> mp = {
-          {{{point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)},
-            {point_xy(obs.polygon.points[1].x, obs.polygon.points[1].y)},
-            {point_xy(obs.polygon.points[2].x, obs.polygon.points[2].y)},
-            {point_xy(obs.polygon.points[3].x, obs.polygon.points[3].y)},
-            {point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)}}}};
-
+      boost::geometry::model::multi_polygon<polygon> mp;
+      mp.resize(1);
+      for (auto p : obs.polygon.points) {
+        mp[0].outer().push_back(point_xy(p.x, p.y));
+      }
+      // close ring
+      mp[0].outer().push_back(mp[0].outer().front());
       // Offset the polygon and store it in result
       boost::geometry::buffer(mp, result, offsetting_distance_strategy,
-                              side_strategy, offsetting_join_strategy, end_strategy,
-                              offsetting_point_strategy);
+                              side_strategy_, offsetting_join_strategy_,
+                              end_strategy_, offsetting_point_strategy_);
 
       for (auto p : result[0].outer()) {
         _map.inners()[obs_counter].push_back(point_xy(p.x(), p.y()));

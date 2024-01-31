@@ -35,7 +35,9 @@
 #include "visualization_msgs/msg/marker.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
 
-#define SHELFINO_WIDTH 0.5 
+
+// Offsetting parameters and utils
+#define OFFSET 0.25 + 0.07 // half-shelfino width + epsilon
 
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::linestring<point_xy> Linestring;
@@ -105,6 +107,16 @@ class MapInfo : public rclcpp::Node {
   int _pub_i;
 
  public:
+  // circle creation
+  boost::geometry::strategy::buffer::join_round circle_join_strategy_;
+
+  // Polygon offsetting
+  boost::geometry::strategy::buffer::point_square offsetting_point_strategy_;
+  boost::geometry::strategy::buffer::join_miter offsetting_join_strategy_;
+
+  boost::geometry::strategy::buffer::end_round end_strategy_;
+  boost::geometry::strategy::buffer::side_straight side_strategy_;
+
   polygon _map;
   bool start_received_;
   bool obstacles_received_;

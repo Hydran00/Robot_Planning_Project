@@ -2,8 +2,8 @@
 // #include <limits>
 #include <unistd.h>
 
-#define VELOCITY 0.5
-#define TIME_LIMIT 60.0
+#define VELOCITY 0.2
+#define TIME_LIMIT 30.0
 
 void RRTDubins::set_root(KDPoint &p) {
   _root.assign(p.begin(), p.end());
