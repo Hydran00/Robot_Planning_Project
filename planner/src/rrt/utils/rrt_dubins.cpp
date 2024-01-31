@@ -44,13 +44,13 @@ std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> RRTDubins::Add(
     KDPoint &q_new,
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_near,
     SymbolicPath &sym_path, std::vector<KDPoint> &path) {
-  // int i = std::find_if(
-  //             _rrt.begin(), _rrt.end(),
-  //             [&](std::tuple<KDPoint, int, SymbolicPath,
-  //             std::vector<KDPoint>>
-  //                     &tuple) { return (std::get<0>(tuple) == q_near); }) -
-  //         _rrt.begin();
-  _rrt.push_back(std::make_tuple(q_new, std::get<1>(q_near), sym_path, path));
+  int i = std::find_if(_rrt.begin(), _rrt.end(),
+                       [&](std::tuple<KDPoint, int, SymbolicPath,
+                                      std::vector<KDPoint>> &tuple) {
+                         return (std::get<0>(tuple) == std::get<0>(q_near));
+                       }) -
+          _rrt.begin();
+  _rrt.push_back(std::make_tuple(q_new, i, sym_path, path));
   return _rrt.back();
 }
 

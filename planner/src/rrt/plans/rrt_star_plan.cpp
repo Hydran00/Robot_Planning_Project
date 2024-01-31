@@ -50,6 +50,7 @@ std::vector<KDPoint> RRTStarPlan::_ReconstrucPath(void) {
     p = _rrt.GetParent(p);
   }
   path.push_back(p);
+  std::reverse(path.begin(), path.end());
 
   // print the cost of every node
   for (size_t i = 0; i < _rrt._rrt.size(); i++) {

@@ -58,18 +58,34 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
   }
 }
 
-std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(void) {
+std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(KDPoint p) {
   std::vector<KDPoint> path;
-  KDPoint p = MotionPlanning::_pt_end;
+  // KDPoint p = MotionPlanning::_pt_end;
   // extract last path given _pt_end
   auto last_path = _rrt.GetPointPath(p);
   // std::reverse(last_path.begin(), last_path.end());
   path.insert(path.begin(), last_path.begin(), last_path.end());
-  while (MotionPlanning::_pt_start != p) {
-    auto parent = _rrt.GetParent(p);
+  // for (size_t i = 0; i < last_path.size(); i++) {
+  //   std::cout << "LAST: Adding point " << last_path[i][0] << ", "
+  //             << last_path[i][1] << std::endl;
+  // }
+  // std::cout << "Buildin path from "<< p[0] << ", " << p[1] << std::endl;
+  KDPoint p_copy = p;
+  // std::cout << "Start is " << MotionPlanning::_pt_start[0] << ", "
+            // << MotionPlanning::_pt_start[1] << std::endl;
+  while (MotionPlanning::_pt_start != p_copy) {
+    auto parent = _rrt.GetParent(p_copy);
+    std::cout << "Parent is " << std::get<0>(parent)[0] << ", "
+              << std::get<0>(parent)[1] << std::endl;
     std::vector<KDPoint> parent_path = std::get<3>(parent);
+    // std::cout << "Analyzing " << std::get<0>(parent)[0] << ", "
+    //           << std::get<0>(parent)[1] << std::endl;
+    for (size_t i = 0; i < parent_path.size(); i++) {
+      std::cout << "Adding point " << parent_path[i][0] << ", "
+                << parent_path[i][1] << std::endl;
+    }
     path.insert(path.begin(), parent_path.begin(), parent_path.end());
-    p = std::get<0>(parent);
+    p_copy = std::get<0>(parent);
   }
   return path;
 }
@@ -120,12 +136,12 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
         _rrt.Add(q_rand, near_node, std::get<2>(dubins_best_path), new_path);
 
     // The rewire function is the difference between RRT and RRT*
-    _rrt.Rewire(
-        new_node, 100,
-        [&](std::vector<KDPoint> &path) {
-          return MotionPlanning::_map_info->Collision(path);
-        },
-        _radius);
+    // _rrt.Rewire(
+    //     new_node, 100,
+    //     [&](std::vector<KDPoint> &path) {
+    //       return MotionPlanning::_map_info->Collision(path);
+    //     },
+    //     _radius);
 
     // Display the tree in Rviz2
     if (MotionPlanning::_display) {
@@ -137,22 +153,24 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
              pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.2) {
       nodes_counter += 1;
       // if we did not extract the end point, we add it to the tree
-      if (q_rand != MotionPlanning::_pt_end) {
-        // compute the last path from the last node to the end point
-        auto last_path = get_dubins_best_path_and_cost(
-            q_rand, MotionPlanning::_pt_end, _radius, 0.1);
-        // get the last node
-        std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> end_node =
-            _rrt.Add(MotionPlanning::_pt_end, new_node, std::get<2>(last_path),
-                     std::get<0>(last_path));
-        std::cout << "Final cost is " << _rrt.Cost(end_node, _radius, true)
-                  << std::endl;
-      } else {
-        std::cout << "Final cost is " << _rrt.Cost(new_node, _radius, true)
-                  << std::endl;
-      }
+      // if (q_rand != MotionPlanning::_pt_end) {
+      //   // compute the last path from the last node to the end point
+      //   auto last_path = get_dubins_best_path_and_cost(
+      //       q_rand, MotionPlanning::_pt_end, _radius, 0.1);
+      //   // get the last node
+      //   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> end_node
+      //   =
+      //       _rrt.Add(MotionPlanning::_pt_end, new_node,
+      //       std::get<2>(last_path),
+      //                std::get<0>(last_path));
+      //   std::cout << "Final cost is " << _rrt.Cost(end_node, _radius, true)
+      //             << std::endl;
+      // } else {
+      //   std::cout << "Final cost is " << _rrt.Cost(new_node, _radius, true)
+      //             << std::endl;
+      // }
       // compute the final cost
-      return _ReconstrucPath();
+      return _ReconstrucPath(std::get<0>(new_node));
     }
     nodes_counter += 1;
     std::cout << "Number of nodes: " << nodes_counter
