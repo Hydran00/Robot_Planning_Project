@@ -228,7 +228,6 @@ get_dubins_best_path_and_cost(std::vector<double> q_near,
   auto paths = dubins_path.calc_paths();
   // get the shortest + cost
   auto shortest_path_cost = dubins_path.get_shortest_path_cost();
-  step = 0.3;
   // discretize the best path
   Path full_path =
       gen_path(q_near, std::get<0>(shortest_path_cost), _radius, step);

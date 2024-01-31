@@ -41,6 +41,7 @@ int main(int argc, char **argv) {
       ament_index_cpp::get_package_share_directory("planner") + "/data/map.txt";
   std::remove(file_path.c_str());
 
+  // Monitor execution time
   auto m = std::make_shared<MapInfo>();
 
   RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
@@ -77,9 +78,7 @@ int main(int argc, char **argv) {
   // wait for the map to be shown
   rclcpp::sleep_for(std::chrono::milliseconds(600));
 
-  // Monitor execution time
-  double radius = 0.5;
-  RRTStarDubinsPlan plan(m, radius);
+  RRTStarDubinsPlan plan(m, m->dubins_radius);
   cout << "Planner started!" << endl;
   auto time_start = rclcpp::Clock().now();
   std::vector<KDPoint> final_path = plan.run();

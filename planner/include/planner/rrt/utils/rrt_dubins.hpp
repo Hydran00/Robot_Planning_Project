@@ -2,18 +2,16 @@
 #define __RRT_DUBINS__
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <functional>
+#include <random>
 #include <tuple>
 #include <utility>
 #include <vector>
 
 #include "kdtree.hpp"
 #include "planner/dubins/dubins.h"
-// # include "planner/rrt/utils/map_info.hpp"
-
-// real path is a vector in the form  [(x1,y1, ...), (x2,y2, ...), ...]
-// typedef std::vector<KDPoint> Path;
 
 // symbolyc path is a vector like [ (lsl), (lrl), (rsl), ...]
 typedef std::vector<std::vector<double>> SymbolicPath;
@@ -60,11 +58,12 @@ class RRTDubins {
   SearchNearestVertex(KDPoint &q_rand, double radius);
   // KDPoint CalcNewPoint(KDPoint &q_near, KDPoint &q_rand);
   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> Add(
-      KDPoint &q_new, KDPoint &q_near, SymbolicPath &sym_path,
-      std::vector<KDPoint> &path);
+      KDPoint &q_new,
+      std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_near,
+      SymbolicPath &sym_path, std::vector<KDPoint> &path);
   double Cost(
       std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node,
-      double radius);
+      double radius, bool consider_victims);
   double GetPathLength(SymbolicPath &sym_path, double radius);
   void Rewire(
       std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_new,

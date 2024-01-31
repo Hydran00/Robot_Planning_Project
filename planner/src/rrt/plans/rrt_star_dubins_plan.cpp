@@ -22,9 +22,11 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
     KDPoint p = std::get<0>(MotionPlanning::_map_info->_victims[idx]);
     std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI - EPSILON);
     p.push_back(dis_yaw(generator));
-    // std::cout << "Selected victim: (" << p[0] << ", " << p[1] << ",  " << p[2]
-    //           << ") with cost " << std::get<1>(MotionPlanning::_map_info->_victims[idx])
-              // << std::endl;
+    // std::cout << "Selected victim: (" << p[0] << ", " << p[1] << ",  " <<
+    // p[2]
+    //           << ") with cost " <<
+    //           std::get<1>(MotionPlanning::_map_info->_victims[idx])
+    // << std::endl;
     return p;
   } else {
     if (extracted < 99.9 - iter * 0.02) {
@@ -107,43 +109,49 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
 
     std::vector<KDPoint> new_path = std::get<0>(dubins_best_path);
 
-    // Check collisions
+    // Checks collisions
     if (MotionPlanning::_map_info->Collision(new_path)) {
       // std::cout << "Collision" << std::endl;
       // std::cout << "---------------------" << std::endl;
       continue;
     }
-
+    // Gets the new node
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> new_node =
-        _rrt.Add(q_rand, q_near, std::get<2>(dubins_best_path), new_path);
+        _rrt.Add(q_rand, near_node, std::get<2>(dubins_best_path), new_path);
 
-    // TODO check radius->was 5.0
+    // The rewire function is the difference between RRT and RRT*
     _rrt.Rewire(
         new_node, 100,
         [&](std::vector<KDPoint> &path) {
           return MotionPlanning::_map_info->Collision(path);
         },
         _radius);
-    // rclcpp::sleep_for(std::chrono::milliseconds(1500));
+
+    // Display the tree in Rviz2
     if (MotionPlanning::_display) {
       MotionPlanning::_map_info->set_rrt_dubins(_rrt);
     }
 
+    // check if we are close to the end
     if (sqrt(pow(q_rand[0] - MotionPlanning::_pt_end[0], 2) +
-             pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.5) {
+             pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.2) {
       nodes_counter += 1;
+      // if we did not extract the end point, we add it to the tree
       if (q_rand != MotionPlanning::_pt_end) {
+        // compute the last path from the last node to the end point
         auto last_path = get_dubins_best_path_and_cost(
             q_rand, MotionPlanning::_pt_end, _radius, 0.1);
-        std::vector<KDPoint> last_segment;
-        for (size_t i = 0; i < std::get<0>(last_path).size(); i++) {
-          p = std::get<0>(last_path)[i];
-          last_segment.push_back(p);
-          p.clear();
-        }
-        _rrt.Add(MotionPlanning::_pt_end, q_rand, std::get<2>(last_path),
-                 last_segment);
+        // get the last node
+        std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> end_node =
+            _rrt.Add(MotionPlanning::_pt_end, new_node, std::get<2>(last_path),
+                     std::get<0>(last_path));
+        std::cout << "Final cost is " << _rrt.Cost(end_node, _radius, true)
+                  << std::endl;
+      } else {
+        std::cout << "Final cost is " << _rrt.Cost(new_node, _radius, true)
+                  << std::endl;
       }
+      // compute the final cost
       return _ReconstrucPath();
     }
     nodes_counter += 1;

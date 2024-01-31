@@ -35,6 +35,8 @@
 #include "visualization_msgs/msg/marker.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
 
+#define SHELFINO_WIDTH 0.5 
+
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::linestring<point_xy> Linestring;
 typedef boost::geometry::model::polygon<point_xy> polygon;
@@ -109,6 +111,7 @@ class MapInfo : public rclcpp::Node {
   bool borders_received_;
   bool gates_received_;
   bool victims_received_;
+  double dubins_radius;
   double min_x, max_x, min_y, max_y;
   KDPoint pt_start;
   KDPoint pt_end;

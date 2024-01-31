@@ -16,6 +16,12 @@ def generate_launch_description():
             launch.actions.DeclareLaunchArgument("show_graphics", default_value="true"),
             Node(
                 package="planner",
+                executable="nav2_client",
+                name="rviz",
+                output="log",
+            ),
+            Node(
+                package="planner",
                 executable="rrt_star_dubins",
                 name="rrt_star_dubins",
                 output="both",
@@ -25,16 +31,6 @@ def generate_launch_description():
                         "show_graphics": launch.substitutions.LaunchConfiguration('show_graphics'),
                     }
                 ],
-            ),
-            Node(
-                package="rviz2",
-                executable="rviz2",
-                name="rviz",
-                output="log",
-                # condition=IfCondition(
-                #     PythonExpression(["'", launch.substitutions.LaunchConfiguration("show_graphics"), "' == 'true'"])
-                # ),
-                arguments=["-d", rviz_config_dir],
             ),
             # Node(
             #     package="rviz2",

@@ -7,8 +7,13 @@
 MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>(
       "visualization_marker", 10000);
+
   this->declare_parameter("show_graphics", true);
   this->_show_graphics = this->get_parameter("show_graphics").as_bool();
+
+  this->declare_parameter("dubins_radius", 0.5);
+  this->dubins_radius = this->get_parameter("dubins_radius").as_double();
+
   RCLCPP_INFO(this->get_logger(), "show_graphics: %s",
               this->_show_graphics ? "true" : "false");
 
@@ -84,7 +89,14 @@ void MapInfo::borders_cb(const geometry_msgs::msg::PolygonStamped &msg) {
 void MapInfo::gate_cb(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
   // unsubscribe
   subscription_gates_.reset();
-  KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y, -1.57};
+  tf2::Quaternion q(msg->poses[0].orientation.x, msg->poses[0].orientation.y,
+                    msg->poses[0].orientation.z, msg->poses[0].orientation.w);
+  // extract yaw
+  double roll, pitch, yaw;
+  tf2::Matrix3x3 m(q);
+  m.getRPY(roll, pitch, yaw);
+
+  KDPoint end = {msg->poses[0].position.x, msg->poses[0].position.y, yaw};
   set_end(end);
   this->gates_received_ = true;
   RCLCPP_INFO(this->get_logger(), "\033[1;32mGate received! \033[0m");
@@ -99,7 +111,7 @@ void MapInfo::victims_cb(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
   for (size_t i = 0; i < msg.obstacles.size(); ++i) {
     KDPoint victim = {msg.obstacles[i].polygon.points[0].x,
                       msg.obstacles[i].polygon.points[0].y};
-    double cost = (double)msg.obstacles[i].radius / 100;
+    double cost = (double)msg.obstacles[i].radius / 10;
     Victim v = std::make_tuple(victim, cost);
     _victims.push_back(v);
   }
@@ -162,6 +174,20 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
   RCLCPP_INFO(this->get_logger(), "Found %d obstacles",
               (int)msg.obstacles.size());
 
+  // Defines strategies for the circles creation
+  boost::geometry::strategy::buffer::point_circle circle_point_strategy(30);
+  boost::geometry::strategy::buffer::join_round circle_join_strategy;
+  boost::geometry::strategy::buffer::end_round end_strategy;
+  boost::geometry::strategy::buffer::side_straight side_strategy;
+  boost::geometry::model::multi_polygon<polygon> result;
+
+  // Other strategies for polygons' offsetting
+  double offset = SHELFINO_WIDTH / 2 + 0.07;
+  boost::geometry::strategy::buffer::point_square offsetting_point_strategy;
+  boost::geometry::strategy::buffer::join_miter offsetting_join_strategy;
+  boost::geometry::strategy::buffer::distance_symmetric<double>
+      offsetting_distance_strategy(offset);
+
   for (auto obs : msg.obstacles) {
     visualization_msgs::msg::Marker marker;
     marker.points.clear();
@@ -173,43 +199,37 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
     marker.color.g = 1.0;
     marker.color.a = 1.0;
 
+    // Adds circles and rectangles
     if (obs.radius != 0.0) {
-      // Adds circles
+      // Adding circles
       marker.type = visualization_msgs::msg::Marker::CYLINDER;
       marker.pose.position.x = obs.polygon.points[0].x;
       marker.pose.position.y = obs.polygon.points[0].y;
       marker.pose.position.z = obs.polygon.points[0].z;
       marker.scale.x = obs.radius * 2;
       marker.scale.y = obs.radius * 2;
-      marker.scale.z = 1;
+      marker.scale.z = 1.1;
       _obstacle_array.markers.push_back(marker);
-      // Creates circle exploiting boost circular buffers
-      boost::geometry::strategy::buffer::point_circle point_strategy(30);
-      boost::geometry::strategy::buffer::distance_symmetric<double>
-          distance_strategy(obs.radius);
-      boost::geometry::strategy::buffer::join_round join_strategy;
-      boost::geometry::strategy::buffer::end_round end_strategy;
-      boost::geometry::strategy::buffer::side_straight side_strategy;
+
       // Defines the circle center
       boost::geometry::model::multi_point<point_xy> mp = {
           point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)};
-      boost::geometry::model::multi_polygon<polygon> result;
+
+      // Creates the circle and stores it in result
+      boost::geometry::strategy::buffer::distance_symmetric<double>
+          distance_strategy(obs.radius + offset);
       boost::geometry::buffer(mp, result, distance_strategy, side_strategy,
-                              join_strategy, end_strategy, point_strategy);
-      // Print wkt of the circle
-      // std::cout << "Circle: " << boost::geometry::wkt(result) << std::endl;
+                              circle_join_strategy, end_strategy,
+                              circle_point_strategy);
 
       // Iterates over vertexes of the circle
       for (auto p : result[0].outer()) {
-        // ROS2 Point
         _map.inners()[obs_counter].push_back(point_xy(p.x(), p.y()));
       }
       // close ring
       _map.inners()[obs_counter].push_back(_map.inners()[obs_counter].front());
 
-    }
-
-    else {
+    } else {
       // Adding rectangles
       marker.type = visualization_msgs::msg::Marker::CUBE;
       marker.pose.position.x =
@@ -217,14 +237,29 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
       marker.pose.position.y =
           (obs.polygon.points[0].y + obs.polygon.points[2].y) / 2;
       marker.pose.position.z = 0;
-      marker.scale.x = abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
-      marker.scale.y = abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
-      marker.scale.z = 1;
 
+      marker.scale.x =
+          abs(obs.polygon.points[0].x - obs.polygon.points[2].x) + offset;
+      marker.scale.y =
+          abs(obs.polygon.points[0].y - obs.polygon.points[2].y) + offset;
+      marker.scale.z = 1.1;
       _obstacle_array.markers.push_back(marker);
-      for (int j = 0; j < (int)obs.polygon.points.size(); j++) {
-        _map.inners()[obs_counter].push_back(
-            point_xy(obs.polygon.points[j].x, obs.polygon.points[j].y));
+
+      // OFFSETTING
+      boost::geometry::model::multi_polygon<polygon> mp = {
+          {{{point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)},
+            {point_xy(obs.polygon.points[1].x, obs.polygon.points[1].y)},
+            {point_xy(obs.polygon.points[2].x, obs.polygon.points[2].y)},
+            {point_xy(obs.polygon.points[3].x, obs.polygon.points[3].y)},
+            {point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)}}}};
+
+      // Offset the polygon and store it in result
+      boost::geometry::buffer(mp, result, offsetting_distance_strategy,
+                              side_strategy, offsetting_join_strategy, end_strategy,
+                              offsetting_point_strategy);
+
+      for (auto p : result[0].outer()) {
+        _map.inners()[obs_counter].push_back(point_xy(p.x(), p.y()));
       }
       // close ring
       _map.inners()[obs_counter].push_back(_map.inners()[obs_counter].front());
@@ -671,8 +706,8 @@ void MapInfo::publish_path(std::vector<KDPoint> final_path) {
       yaw = compute_yaw(final_path[i], final_path[i + 1]);
     }
     // convert pose rpy to quaternion
-    std::cout << "Adding point: " << final_path[i][0] << ", "
-              << final_path[i][1] << ", " << yaw << std::endl;
+    // std::cout << "Adding point: " << final_path[i][0] << ", "
+    //           << final_path[i][1] << ", " << yaw << std::endl;
     quat.setRPY(0, 0, yaw);
     // populate point message with orientation
     point_pose_msg.pose.orientation.x = quat.getX();
