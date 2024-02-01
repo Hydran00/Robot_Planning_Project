@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 #define VELOCITY 0.2
-#define TIME_LIMIT 30.0
+#define TIME_LIMIT 500000.0
 
 void RRTDubins::set_root(KDPoint &p) {
   _root.assign(p.begin(), p.end());
@@ -18,9 +18,11 @@ RRTDubins::SearchNearestVertex(KDPoint &q_rand, double radius, int iter) {
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
   std::uniform_int_distribution<int> epsilon_greedy_prob(0, 100);
-  if (epsilon_greedy_prob(generator) < (float)0.1 * iter) {
+  if (epsilon_greedy_prob(generator) < (float)0.01 * iter) {
     std::uniform_int_distribution<int> dis_s(0, _rrt.size() - 1);
     int idx = dis_s(generator);
+    std::cout << "Selected nearest random node with prob " << (float)0.01 * iter
+              << std::endl;
     return _rrt[idx];
   }
   for (auto node : _rrt) {
@@ -91,6 +93,7 @@ double RRTDubins::Cost(
 
   while (std::get<0>(q) != _root) {
     cost += GetPathLength(std::get<2>(q), radius);
+
     if (consider_victims) {
       auto it = std::find_if(victims_list.begin(), victims_list.end(),
                              [&](std::tuple<KDPoint, double> &victim) {
@@ -101,9 +104,13 @@ double RRTDubins::Cost(
         cost -= std::get<1>(*it);
         victims_list.erase(it);
       }
+    } else {
+      std::cout << "Adding cost " << GetPathLength(std::get<2>(q), radius)
+                << std::endl;
     }
     q = GetParent(std::get<0>(q));
   }
+  std::cout << "-------------------" << std::endl;
   return cost;
 }
 
@@ -194,19 +201,30 @@ void RRTDubins::Rewire(
 //             self.direct_cost_old = direct_cost_new
 //             self.UpdateBeacons()
 
-void RRTDubins::PathOptimisation(
-    std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node_new,
+bool RRTDubins::PathOptimisation(
+    std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &current_node_,
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node_end,
     std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
     double dubins_radius) {
+  std::cout << "\033[1;35mStart optimising!\033[0m" << std::endl;
+
+  bool is_path_improved = false;
   double direct_cost_new = 0.0;
 
   // Node we start looking from
-  auto current_node = node_new;
+  auto current_node = current_node_;
 
   // Node we want to reduce the cost
   auto node_to_opt = node_end;
 
+
+  std::cout << "Root is "<<  _root[0] << ", " << _root[1] << std::endl;
+  std::cout << "Current node is "<<  std::get<0>(current_node)[0] << ", " << std::get<0>(current_node)[1] << std::endl;
+  if (std::get<0>(current_node) == _root) {
+    std::cout << "Root coincide: " << (std::get<0>(current_node) == _root)
+              << std::endl;
+    return false;
+  }
   // iterates from node_new to root
   while (std::get<0>(current_node) != _root) {
     // get parent of the current node
@@ -220,31 +238,41 @@ void RRTDubins::PathOptimisation(
               << ", " << std::get<0>(node_parent)[1] << " to "
               << std::get<0>(node_to_opt)[0] << ", "
               << std::get<0>(node_to_opt)[1] << std::endl;
-    if (!DubinsCollision(std::get<0>(dubins_opt_path1))) {
+    double new_cost =
+        Cost(node_parent, dubins_radius, false) +
+        GetPathLength(std::get<2>(dubins_opt_path1), dubins_radius);
+
+    if (new_cost < Cost(node_to_opt, dubins_radius, false) + 0.04 &&
+        !DubinsCollision(std::get<0>(dubins_opt_path1))) {
       // if the Dubins is collision free, we can optimise the path
-      std::cout << "Optimisation found!" << std::endl;
-      direct_cost_new +=
-          GetPathLength(std::get<2>(dubins_opt_path1), dubins_radius);
-      // update the parent of the node we want to optimise
-      std::get<1>(node_to_opt) = std::get<1>(current_node);
+      std::cout << "\033[1;32mOptimisation found!\033[0m" << std::endl;
+
+      auto it_node_to_opt = std::find_if(
+          _rrt.begin(), _rrt.end(),
+          [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
+                  &tuple) {
+            return (std::get<0>(tuple) == std::get<0>(node_to_opt));
+          });
+
+      std::get<1>(*it_node_to_opt) = std::get<1>(current_node);
+      std::get<2>(*it_node_to_opt) = std::get<2>(dubins_opt_path1);
+      std::get<3>(*it_node_to_opt) = std::get<0>(dubins_opt_path1);
+
+      // std::cout << "Cost was " << Cost(node_to_opt, dubins_radius, false)
+      //           << " and becomes " << new_cost << std::endl;
+      // // update the parent of the node we want to optimise
+      // std::cout << "Parent was " << std::get<1>(node_to_opt) << " and becomes
+      // "
+      //           << std::get<1>(current_node) << std::endl;
+      is_path_improved = true;
     } else {
-      std::cout << "Optimisation not found!--> Recursion" << std::endl;
-      // if the Dubins is not collision free, we change the node we want to
-      // optimise
-      auto dubins_opt_path2 = get_dubins_best_path_and_cost(
-          std::get<0>(current_node), std::get<0>(node_to_opt), dubins_radius,
-          0.1);
-      direct_cost_new +=
-          GetPathLength(std::get<2>(dubins_opt_path2), dubins_radius);
+      std::cout << "\033[1;33mOptimisation not found!--> Recursion\033[0m"
+                << std::endl;
       node_to_opt = current_node;
     }
     current_node = node_parent;
   }
-  if (direct_cost_new < _direct_cost_old) {
-    _direct_cost_old = direct_cost_new;
-    std::cout << "Update beacons" << std::endl;
-    // UpdateBeacons();
-  }
+  return is_path_improved;
 }
 
 // def UpdateBeacons(self):

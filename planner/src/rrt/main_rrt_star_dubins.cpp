@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
   m->ShowMap();
   // }
   // wait for the map to be shown
-  rclcpp::sleep_for(std::chrono::milliseconds(600));
+  rclcpp::sleep_for(std::chrono::milliseconds(2000));
 
   RRTStarDubinsPlan plan(m, m->dubins_radius);
   cout << "Planner started!" << endl;

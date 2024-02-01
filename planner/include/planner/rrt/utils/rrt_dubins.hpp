@@ -57,8 +57,8 @@ class RRTDubins {
       KDPoint &p);
 
   // RRT*-smart Dubins
-  void PathOptimisation(
-      std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node_new,
+  bool PathOptimisation(
+      std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &current_node_,
       std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node_end,
       std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
       double dubins_radius);

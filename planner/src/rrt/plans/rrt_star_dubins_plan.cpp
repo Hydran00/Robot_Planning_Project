@@ -1,5 +1,8 @@
 #include "planner/rrt/rrt_star_dubins_plan.hpp"
 
+#include <fstream>
+
+#include "ament_index_cpp/get_package_share_directory.hpp"
 #include "planner/dubins/dubins.h"
 
 RRTStarDubinsPlan::RRTStarDubinsPlan(std::shared_ptr<MapInfo> &map_info,
@@ -63,14 +66,31 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath() {
   std::vector<KDPoint> path;
   auto last_path = _rrt.GetPointPath(p);
   path.insert(path.begin(), last_path.begin(), last_path.end());
-  KDPoint p_copy = p;
-  while (MotionPlanning::_pt_start != p_copy) {
-    auto parent = _rrt.GetParent(p_copy);
+  while (MotionPlanning::_pt_start != p) {
+    std::cout << "Adding: " << p[0] << ", " << p[1] << std::endl;
+    auto parent = _rrt.GetParent(p);
     std::vector<KDPoint> parent_path = std::get<3>(parent);
     path.insert(path.begin(), parent_path.begin(), parent_path.end());
-    p_copy = std::get<0>(parent);
+    p = std::get<0>(parent);
   }
+  std::cout << "\n";
   return path;
+}
+
+void print_path_on_file1(std::vector<KDPoint> path) {
+  std::string file_path =
+      ament_index_cpp::get_package_share_directory("planner") +
+      "/data/final_path0.txt";
+  std::remove(file_path.c_str());
+  std::cout << "Printing path on file: " << file_path << std::endl;
+  std::ofstream fout;
+  fout.open(file_path, std::ios::app);
+  // fout << std::endl;
+  for (size_t i = 0; i < path.size(); i++) {
+    fout << path[i][0] << ", " << path[i][1] << std::endl;
+  }
+  // close
+  fout.close();
 }
 
 std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
@@ -133,24 +153,42 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
 
     // check if we are close to the end
     if (sqrt(pow(q_rand[0] - MotionPlanning::_pt_end[0], 2) +
-             pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.2) {
+             pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.0001) {
       nodes_counter += 1;
       // if we did not extract the end point, we add it to the tree
-      if (q_rand != MotionPlanning::_pt_end) {
-        // compute the last path from the last node to the end point
-        auto last_path = get_dubins_best_path_and_cost(
-            q_rand, MotionPlanning::_pt_end, _radius, 0.1);
-        // get the last node
-        std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> end_node =
-            _rrt.Add(MotionPlanning::_pt_end, new_node, std::get<2>(last_path),
-                     std::get<0>(last_path));
-        std::cout << "Final cost is " << _rrt.Cost(end_node, _radius, true)
-                  << std::endl;
-      } else {
-        std::cout << "Final cost is " << _rrt.Cost(new_node, _radius, true)
-                  << std::endl;
-      }
+      // if (q_rand != MotionPlanning::_pt_end) {
+      //   // compute the last path from the last node to the end point
+      //   auto last_path = get_dubins_best_path_and_cost(
+      //       q_rand, MotionPlanning::_pt_end, _radius, 0.1);
+      //   // get the last node
+      //   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> end_node
+      //   =
+      //       _rrt.Add(MotionPlanning::_pt_end, new_node,
+      //       std::get<2>(last_path),
+      //                std::get<0>(last_path));
+      //   std::cout << "Final cost is " << _rrt.Cost(end_node, _radius, true)
+      //             << std::endl;
+      // } else {
+      double cost1 = _rrt.Cost(new_node, _radius, false);
+      // }
+      std::vector<KDPoint> before_path = _ReconstrucPath();
+      print_path_on_file1(before_path);
       // compute the final cost
+      // keep optimising the path until it does not change anymore
+      while (true) {
+        auto parent = _rrt.GetParent(std::get<0>(new_node));
+        if (_rrt.PathOptimisation(
+                parent, new_node,
+                [&](std::vector<KDPoint> &path) {
+                  return MotionPlanning::_map_info->Collision(path);
+                },
+                _radius) == false) {
+          break;
+        }
+      };
+      std::cout << "\n\nFinal cost is \n" << cost1 << std::endl;
+      std::cout << "Final cost after optimisation is \n tot:"
+                << _rrt.Cost(new_node, _radius, false) << std::endl;
       return _ReconstrucPath();
     }
     nodes_counter += 1;
