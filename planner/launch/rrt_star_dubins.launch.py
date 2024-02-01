@@ -14,12 +14,12 @@ def generate_launch_description():
         [
             launch.actions.DeclareLaunchArgument("type", default_value="rrt_star"),
             launch.actions.DeclareLaunchArgument("show_graphics", default_value="true"),
-            Node(
-                package="planner",
-                executable="nav2_client",
-                name="rviz",
-                output="log",
-            ),
+            # Node(
+            #     package="planner",
+            #     executable="nav2_client",
+            #     name="rviz",
+            #     output="log",
+            # ),
             Node(
                 package="planner",
                 executable="rrt_star_dubins",

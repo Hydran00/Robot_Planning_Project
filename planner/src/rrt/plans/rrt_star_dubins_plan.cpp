@@ -58,7 +58,8 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
   }
 }
 
-std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath(KDPoint p) {
+std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath() {
+  KDPoint p = MotionPlanning::_pt_end;
   std::vector<KDPoint> path;
   auto last_path = _rrt.GetPointPath(p);
   path.insert(path.begin(), last_path.begin(), last_path.end());
@@ -81,7 +82,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
     p.clear();
     KDPoint q_rand = _GenerateRandPoint(iter);
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> near_node =
-        _rrt.SearchNearestVertex(q_rand, _radius);
+        _rrt.SearchNearestVertex(q_rand, _radius, iter);
 
     KDPoint q_near = std::get<0>(near_node);
 
@@ -135,24 +136,22 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
              pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.2) {
       nodes_counter += 1;
       // if we did not extract the end point, we add it to the tree
-      // if (q_rand != MotionPlanning::_pt_end) {
-      //   // compute the last path from the last node to the end point
-      //   auto last_path = get_dubins_best_path_and_cost(
-      //       q_rand, MotionPlanning::_pt_end, _radius, 0.1);
-      //   // get the last node
-      //   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> end_node
-      //   =
-      //       _rrt.Add(MotionPlanning::_pt_end, new_node,
-      //       std::get<2>(last_path),
-      //                std::get<0>(last_path));
-      //   std::cout << "Final cost is " << _rrt.Cost(end_node, _radius, true)
-      //             << std::endl;
-      // } else {
-      //   std::cout << "Final cost is " << _rrt.Cost(new_node, _radius, true)
-      //             << std::endl;
-      // }
+      if (q_rand != MotionPlanning::_pt_end) {
+        // compute the last path from the last node to the end point
+        auto last_path = get_dubins_best_path_and_cost(
+            q_rand, MotionPlanning::_pt_end, _radius, 0.1);
+        // get the last node
+        std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> end_node =
+            _rrt.Add(MotionPlanning::_pt_end, new_node, std::get<2>(last_path),
+                     std::get<0>(last_path));
+        std::cout << "Final cost is " << _rrt.Cost(end_node, _radius, true)
+                  << std::endl;
+      } else {
+        std::cout << "Final cost is " << _rrt.Cost(new_node, _radius, true)
+                  << std::endl;
+      }
       // compute the final cost
-      return _ReconstrucPath(std::get<0>(new_node));
+      return _ReconstrucPath();
     }
     nodes_counter += 1;
     std::cout << "Number of nodes: " << nodes_counter

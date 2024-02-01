@@ -70,7 +70,7 @@ target_link_libraries(voronoi_boost Boost::headers)
 
 # RRT*
 add_executable(rrt_star 
-  ${RRTSTAR_FOLDER}/main.cpp
+  ${RRTSTAR_FOLDER}/main_rrt_star.cpp
   ${RRTSTAR_FOLDER}/plans/rrt_plan.cpp 
   ${RRTSTAR_FOLDER}/utils/kdtree.cpp
   ${RRTSTAR_FOLDER}/plans/rrt_star_plan.cpp
@@ -113,7 +113,7 @@ target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # RRT
 add_executable(rrt_star_dubins
-${RRTSTAR_FOLDER}/main_dubins.cpp
+${RRTSTAR_FOLDER}/main_rrt_star_dubins.cpp
 ${RRTSTAR_FOLDER}/utils/map_info.cpp 
 ${RRTSTAR_FOLDER}/utils/kdtree.cpp
 ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
@@ -136,6 +136,7 @@ target_link_libraries(rrt_star_dubins Boost::headers)
 target_include_directories(rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
+
 
 # Path Planner
 

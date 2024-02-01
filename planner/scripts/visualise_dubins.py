@@ -19,10 +19,12 @@ def test2(path):
     plt.show()
 
 if __name__ == "__main__":
-    path = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path.txt', delimiter=',')
-    def distance(a,b):
-        return np.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
-    for i in range(1,len(path),1):
-        if(distance(path[i], path[i-1]) > 0.15):
-            print("Inconstency at index ",i)
-    test2(path)
+    path1 = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path.txt', delimiter=',')
+    path2 = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path0.txt', delimiter=',')
+    # def distance(a,b):
+    #     return np.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
+    # for i in range(1,len(path),1):
+    #     if(distance(path[i], path[i-1]) > 0.15):
+    #         print("Inconstency at index ",i)
+    test2(path1)
+    test2(path2)
