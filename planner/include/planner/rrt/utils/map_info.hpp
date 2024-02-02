@@ -125,6 +125,8 @@ class MapInfo : public rclcpp::Node {
   bool gates_received_;
   bool victims_received_;
   double dubins_radius;
+  double _timeout;
+  double _num_threads;
   double min_x, max_x, min_y, max_y;
   KDPoint pt_start;
   KDPoint pt_end;

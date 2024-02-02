@@ -14,6 +14,12 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   this->declare_parameter("dubins_radius", 0.5);
   this->dubins_radius = this->get_parameter("dubins_radius").as_double();
 
+  this->declare_parameter("num_threads", 4);
+  this->_num_threads = this->get_parameter("num_threads").as_int();
+
+  this->declare_parameter("timeout", 10.0);
+  this->_timeout = this->get_parameter("timeout").as_double();
+
   RCLCPP_INFO(this->get_logger(), "show_graphics: %s",
               this->_show_graphics ? "true" : "false");
 

@@ -21,8 +21,6 @@ RRTDubins::SearchNearestVertex(KDPoint &q_rand, double radius, int iter) {
   if (epsilon_greedy_prob(generator) < (float)0.01 * iter) {
     std::uniform_int_distribution<int> dis_s(0, _rrt.size() - 1);
     int idx = dis_s(generator);
-    std::cout << "Selected nearest random node with prob " << (float)0.01 * iter
-              << std::endl;
     return _rrt[idx];
   }
   for (auto node : _rrt) {
@@ -185,8 +183,8 @@ bool RRTDubins::PathOptimisation(
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node_end,
     std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
     double dubins_radius) {
-  std::cout << "\033[1;35mStart optimising!\033[0m" << std::endl;
-  std::cout << "---------------------" << std::endl;
+  // std::cout << "\033[1;35mStart optimising!\033[0m" << std::endl;
+  // std::cout << "---------------------" << std::endl;
 
   bool is_path_improved = false;
 
@@ -217,16 +215,16 @@ bool RRTDubins::PathOptimisation(
       new_cost -= std::get<1>(*it);
     }
       
-    std::cout << "Trying to skip node " << std::get<0>(current_node)[0] << " "
-              << std::get<0>(current_node)[1] << " and connect "
-              << std::get<0>(node_parent)[0] << " "
-              << std::get<0>(node_parent)[1] << " to "
-              << std::get<0>(node_to_opt)[0] << " "
-              << std::get<0>(node_to_opt)[1] << std::endl;
+    // std::cout << "Trying to skip node " << std::get<0>(current_node)[0] << " "
+    //           << std::get<0>(current_node)[1] << " and connect "
+    //           << std::get<0>(node_parent)[0] << " "
+    //           << std::get<0>(node_parent)[1] << " to "
+    //           << std::get<0>(node_to_opt)[0] << " "
+    //           << std::get<0>(node_to_opt)[1] << std::endl;
     if (new_cost < Cost(node_to_opt, dubins_radius, true) &&
         !DubinsCollision(std::get<0>(dubins_opt_path1))) {
       // if the Dubins is collision free, we can optimise the path
-      std::cout << "\033[1;32mOptimisation found!\033[0m" << std::endl;
+      // std::cout << "\033[1;32mOptimisation found!\033[0m" << std::endl;
 
       auto it_node_to_opt = std::find_if(
           _rrt.begin(), _rrt.end(),
@@ -241,20 +239,20 @@ bool RRTDubins::PathOptimisation(
 
       is_path_improved = true;
     } else {
-      std::cout << "\033[1;33mOptimisation not found!\033[0m" << std::endl;
-      std::cout << "Reason-> Cost improvement:"
-                << ((new_cost < Cost(node_to_opt, dubins_radius, true))
-                        ? "true"
-                        : "false")
-                << " | Path free: "
-                << (!DubinsCollision(std::get<0>(dubins_opt_path1)) ? "true"
-                                                                    : "false")
-                << std::endl;
-      std::cout << "Costs are : " << new_cost << " and "
-                << Cost(node_to_opt, dubins_radius, false) << std::endl;
+      // std::cout << "\033[1;33mOptimisation not found!\033[0m" << std::endl;
+      // std::cout << "Reason-> Cost improvement:"
+      //           << ((new_cost < Cost(node_to_opt, dubins_radius, true))
+      //                   ? "true"
+      //                   : "false")
+      //           << " | Path free: "
+      //           << (!DubinsCollision(std::get<0>(dubins_opt_path1)) ? "true"
+      //                                                               : "false")
+      //           << std::endl;
+      // std::cout << "Costs are : " << new_cost << " and "
+      //           << Cost(node_to_opt, dubins_radius, false) << std::endl;
       node_to_opt = current_node;
     }
-    std::cout << "---------------------" << std::endl;
+    // std::cout << "---------------------" << std::endl;
     current_node = node_parent;
   }
   return is_path_improved;

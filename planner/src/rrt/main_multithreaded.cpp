@@ -11,6 +11,7 @@
 #include "planner/rrt/utils/kdtree.hpp"
 #include "planner/rrt/utils/map_info.hpp"
 #include "planner/rrt/utils/rrt.hpp"
+#include "planner/rrt/threaded_planner.hpp"
 
 using namespace std;
 
@@ -21,11 +22,9 @@ void print_path_on_file(std::vector<KDPoint> path) {
   std::cout << "Printing path on file: " << file_path << std::endl;
   std::ofstream fout;
   fout.open(file_path, std::ios::app);
-  // fout << std::endl;
   for (size_t i = 0; i < path.size(); i++) {
     fout << path[i][0] << ", " << path[i][1] << std::endl;
   }
-  // close
   fout.close();
 }
 
@@ -48,14 +47,11 @@ int main(int argc, char **argv) {
   while (!m->start_received_ || !m->obstacles_received_ ||
          !m->borders_received_ || !m->gates_received_ ||
          !m->victims_received_) {
-    // RCLCPP_INFO(m->get_logger(), "Map received: %d, Border: %d, Gates: %d",
-    // m->obstacles_received_, m->borders_received_, m->gates_received_);
     rclcpp::spin_some(m->get_node_base_interface());
     rclcpp::sleep_for(std::chrono::milliseconds(100));
   }
   RCLCPP_INFO(m->get_logger(), "\033[1;32m Map information received!\033[0m");
 
-  // print map on file
   std::ofstream map_file;
   map_file.open(map_path);
   // print wkt
@@ -70,15 +66,9 @@ int main(int argc, char **argv) {
   // wait for the map to be shown
   rclcpp::sleep_for(std::chrono::milliseconds(2000));
 
-  RRTStarDubinsPlan plan(m, m->dubins_radius);
-  cout << "Planner started!" << endl;
-  auto time_start = rclcpp::Clock().now();
-  std::tuple<std::vector<KDPoint>,double> final_path_cost = plan.run();
-  std::vector<KDPoint> final_path = std::get<0>(final_path_cost);
-  auto time_end = rclcpp::Clock().now();
-  auto time_diff = time_end - time_start;
-  cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
-
+  ThreadedPlanner threaded_planner(m->_num_threads, m);
+  std::vector<KDPoint> final_path = threaded_planner.execute_plans();
+  std::cout << "Plan completed!" << std::endl;
   m->set_dubins_path(final_path);
   // Check path validity
   cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")

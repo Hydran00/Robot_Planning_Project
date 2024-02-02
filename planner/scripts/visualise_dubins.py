@@ -51,7 +51,7 @@ def test3(path1, path2):
 
 
 if __name__ == "__main__":
-    path1 = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path0.txt', delimiter=',')
+    # path1 = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path0.txt', delimiter=',')
     path2 = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path.txt', delimiter=',')
     # def distance(a,b):
     #     return np.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
@@ -59,5 +59,5 @@ if __name__ == "__main__":
     #     if(distance(path[i], path[i-1]) > 0.15):
     #         print("Inconstency at index ",i)
     # test2(path1)
-    # test2(path2)
-    test3(path1, path2)
+    test2(path2)
+    # test3(path1, path2)

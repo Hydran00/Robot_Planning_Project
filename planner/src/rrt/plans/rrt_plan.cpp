@@ -64,7 +64,7 @@ std::tuple<std::vector<KDPoint>, double> RRTPlan::run(void) {
       }
       std::tuple<std::vector<KDPoint>, double> final_path_cost = std::make_tuple(
           _ReconstrucPath(), _rrt.Cost((MotionPlanning::_pt_end), true));
-      return path;
+      return final_path_cost;
     }
   }
 }

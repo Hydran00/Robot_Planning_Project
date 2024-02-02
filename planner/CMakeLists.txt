@@ -94,21 +94,6 @@ target_link_libraries(rrt_star Boost::headers)
 target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
-
-# Dubins
-
-# add_executable(dubins
-#   src/dubins/dubins.cpp
-# )
-
-# ament_target_dependencies(dubins
-#   rclcpp
-#   geometry_msgs
-# )
-
-# target_include_directories(dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-#############################################################################
-
 # RRT* Dubins
 
 # RRT
@@ -137,6 +122,34 @@ target_include_directories(rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 
 #############################################################################
 
+# RRT* Dubins (Multithread)
+
+# RRT
+add_executable(multithread_rrt_star_dubins
+${RRTSTAR_FOLDER}/main_multithreaded.cpp
+${RRTSTAR_FOLDER}/threaded_planner.cpp
+${RRTSTAR_FOLDER}/utils/map_info.cpp 
+${RRTSTAR_FOLDER}/utils/kdtree.cpp
+${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
+${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
+${RRTSTAR_FOLDER}/utils/rrt.cpp
+${RRTSTAR_FOLDER}/plans/rrt_plan.cpp 
+src/dubins/dubins.cpp
+  )
+
+ament_target_dependencies(multithread_rrt_star_dubins
+  rclcpp
+  visualization_msgs
+  geometry_msgs
+  obstacles_msgs
+  tf2
+  tf2_ros
+  nav_msgs
+)
+target_link_libraries(multithread_rrt_star_dubins Boost::headers)
+target_include_directories(multithread_rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+#############################################################################
 
 # Path Planner
 
@@ -181,6 +194,7 @@ install(TARGETS
   # wkt_generator
   rrt_star
   rrt_star_dubins
+  multithread_rrt_star_dubins
   # dubins
   nav2_client
   DESTINATION lib/${PROJECT_NAME})

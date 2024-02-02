@@ -68,27 +68,20 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath() {
   return path;
 }
 
-void print_path_on_file1(std::vector<KDPoint> path) {
-  std::string file_path =
-      ament_index_cpp::get_package_share_directory("planner") +
-      "/data/final_path0.txt";
-  std::remove(file_path.c_str());
-  std::cout << "Printing path on file: " << file_path << std::endl;
-  std::ofstream fout;
-  fout.open(file_path, std::ios::app);
-  // fout << std::endl;
-  for (size_t i = 0; i < path.size(); i++) {
-    fout << path[i][0] << ", " << path[i][1] << std::endl;
-  }
-  // close
-  fout.close();
-}
-
-std::tuple<std::vector<KDPoint>, double>  RRTStarDubinsPlan::run(void) {
+std::tuple<std::vector<KDPoint>, double> RRTStarDubinsPlan::run(void) {
   int nodes_counter = 0;
   KDPoint p;
   int iter = 0;
+  auto startTime = std::chrono::high_resolution_clock::now();
   while (true) {
+    if (std::chrono::high_resolution_clock::now() - startTime >
+        std::chrono::milliseconds(1000 * (int)MotionPlanning::_map_info->_timeout)) {
+      std::cout << "Timeout" << std::endl;
+      std::vector<KDPoint> empty;
+      // return empy path and infinite cost
+      return std::make_tuple(empty, std::numeric_limits<double>::infinity());
+    }
+
     iter++;
     p.clear();
     KDPoint q_rand = _GenerateRandPoint(iter);
@@ -147,9 +140,7 @@ std::tuple<std::vector<KDPoint>, double>  RRTStarDubinsPlan::run(void) {
 
       double cost1 = _rrt.Cost(new_node, _radius, false);
       // }
-      std::vector<KDPoint> before_path = _ReconstrucPath();
-      print_path_on_file1(before_path);
-      // compute the final cost
+
       // keep optimising the path until it does not change anymore
       while (true) {
         auto parent = _rrt.GetParent(std::get<0>(new_node));
@@ -163,13 +154,13 @@ std::tuple<std::vector<KDPoint>, double>  RRTStarDubinsPlan::run(void) {
         }
       };
       std::cout << "\n\nFinal cost of node " << std::get<0>(new_node)[0] << ", "
-                << std::get<0>(new_node)[1] << " is "
-                << cost1 << std::endl;
-      std::cout << "Final cost after optimisation of node "<< std::get<0>(new_node)[0] << ", "
-                << std::get<0>(new_node)[1] << " is " 
-                << _rrt.Cost(new_node, _radius, false) << std::endl;
+                << std::get<0>(new_node)[1] << " is " << cost1 << std::endl;
+      std::cout << "Final cost after optimisation of node "
+                << std::get<0>(new_node)[0] << ", " << std::get<0>(new_node)[1]
+                << " is " << _rrt.Cost(new_node, _radius, false) << std::endl;
       std::tuple<std::vector<KDPoint>, double> final_path_cost =
-          std::make_tuple(_ReconstrucPath(), _rrt.Cost(new_node, _radius, true));
+          std::make_tuple(_ReconstrucPath(),
+                          _rrt.Cost(new_node, _radius, true));
       return final_path_cost;
     }
     nodes_counter += 1;
