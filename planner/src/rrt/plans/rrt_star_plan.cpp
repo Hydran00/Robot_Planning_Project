@@ -55,16 +55,11 @@ std::vector<KDPoint> RRTStarPlan::_ReconstrucPath(void) {
   // print the cost of every node
   for (size_t i = 0; i < _rrt._rrt.size(); i++) {
     KDPoint p = _rrt._rrt[i].first;
-    std::cout << "Cost of " << p[0] << ", " << p[1] << " is " << _rrt.Cost(p)
-              << std::endl;
   }
-  std::cout << "BEST PATH COST IS " << _rrt.Cost(MotionPlanning::_pt_end)
-            << std::endl;
-
   return path;
 }
 
-std::vector<KDPoint> RRTStarPlan::run(void) {
+std::tuple<std::vector<KDPoint>, double> RRTStarPlan::run(void) {
   int iter = 0;
   while (true) {
     iter++;
@@ -108,7 +103,9 @@ std::vector<KDPoint> RRTStarPlan::run(void) {
         _rrt.Add(MotionPlanning::_pt_end, q_new);
       }
       std::cout << "Found path" << std::endl;
-      return _ReconstrucPath();
+      std::tuple<std::vector<KDPoint>, double>  final_path_cost = std::make_tuple(
+          _ReconstrucPath(), _rrt.Cost((MotionPlanning::_pt_end),true));
+      return final_path_cost;
     }
   }
 }

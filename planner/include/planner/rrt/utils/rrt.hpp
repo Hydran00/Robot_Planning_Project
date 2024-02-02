@@ -44,7 +44,7 @@ class RRT {
   KDPoint CalcNewPoint(KDPoint &q_near, KDPoint &q_rand);
   void Add(KDPoint &q_new, KDPoint &q_near);
   KDPoint GetParent(KDPoint &p);
-  double Cost(KDPoint &p);
+  double Cost(KDPoint &p, bool consider_victims);
   void Rewire(KDPoint &p, double r,
               std::function<bool(std::vector<KDPoint> &branch)> Collision);
 

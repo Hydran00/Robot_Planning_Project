@@ -25,11 +25,6 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
     KDPoint p = std::get<0>(MotionPlanning::_map_info->_victims[idx]);
     std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI - EPSILON);
     p.push_back(dis_yaw(generator));
-    // std::cout << "Selected victim: (" << p[0] << ", " << p[1] << ",  " <<
-    // p[2]
-    //           << ") with cost " <<
-    //           std::get<1>(MotionPlanning::_map_info->_victims[idx])
-    // << std::endl;
     return p;
   } else {
     if (extracted < 99.9 - iter * 0.02) {
@@ -51,8 +46,6 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
         }
       }
     } else {
-      // std::cout << "Sampling end point at iter " << iter
-      //           << "| prob: " << iter * 0.01 << std::endl;
       std::uniform_real_distribution<double> dis_yaw(0.0, 2 * M_PI - EPSILON);
       KDPoint p = {MotionPlanning::_pt_end[0], MotionPlanning::_pt_end[1],
                    dis_yaw(generator)};
@@ -91,7 +84,7 @@ void print_path_on_file1(std::vector<KDPoint> path) {
   fout.close();
 }
 
-std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
+std::tuple<std::vector<KDPoint>, double>  RRTStarDubinsPlan::run(void) {
   int nodes_counter = 0;
   KDPoint p;
   int iter = 0;
@@ -128,8 +121,6 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
 
     // Checks collisions
     if (MotionPlanning::_map_info->Collision(new_path)) {
-      // std::cout << "Collision" << std::endl;
-      // std::cout << "---------------------" << std::endl;
       continue;
     }
     // Gets the new node
@@ -153,20 +144,6 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
     if (sqrt(pow(q_rand[0] - MotionPlanning::_pt_end[0], 2) +
              pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.0000001) {
       nodes_counter += 1;
-      // if we did not extract the end point, we add it to the tree
-      // if (q_rand != MotionPlanning::_pt_end) {
-      //   // compute the last path from the last node to the end point
-      //   auto last_path = get_dubins_best_path_and_cost(
-      //       q_rand, MotionPlanning::_pt_end, _radius, 0.1);
-      //   // get the last node
-      //   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> end_node
-      //   =
-      //       _rrt.Add(MotionPlanning::_pt_end, new_node,
-      //       std::get<2>(last_path),
-      //                std::get<0>(last_path));
-      //   std::cout << "Final cost is " << _rrt.Cost(end_node, _radius, true)
-      //             << std::endl;
-      // } else {
 
       double cost1 = _rrt.Cost(new_node, _radius, false);
       // }
@@ -191,12 +168,10 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
       std::cout << "Final cost after optimisation of node "<< std::get<0>(new_node)[0] << ", "
                 << std::get<0>(new_node)[1] << " is " 
                 << _rrt.Cost(new_node, _radius, false) << std::endl;
-      return _ReconstrucPath();
+      std::tuple<std::vector<KDPoint>, double> final_path_cost =
+          std::make_tuple(_ReconstrucPath(), _rrt.Cost(new_node, _radius, true));
+      return final_path_cost;
     }
     nodes_counter += 1;
-    // std::cout << "Number of nodes: " << nodes_counter
-    //           << "| prob of extractin end is " << (double)iter * 0.005
-    //           << std::endl;
-    // std::cout << "---------------------" << std::endl;
   }
 }

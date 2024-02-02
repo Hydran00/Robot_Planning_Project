@@ -16,7 +16,7 @@ public:
         _pt_start.assign(map_info->pt_start.begin(), map_info->pt_start.end());
         _pt_end.assign(map_info->pt_end.begin(), map_info->pt_end.end());
     }
-    virtual std::vector<KDPoint> run(void) = 0;
+    virtual std::tuple<std::vector<KDPoint>,double> run(void) = 0;
 };
 
 #endif // !__MOTIONPLANNING__

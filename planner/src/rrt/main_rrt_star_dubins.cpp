@@ -81,7 +81,8 @@ int main(int argc, char **argv) {
   RRTStarDubinsPlan plan(m, m->dubins_radius);
   cout << "Planner started!" << endl;
   auto time_start = rclcpp::Clock().now();
-  std::vector<KDPoint> final_path = plan.run();
+  std::tuple<std::vector<KDPoint>,double> final_path_cost = plan.run();
+  std::vector<KDPoint> final_path = std::get<0>(final_path_cost);
   auto time_end = rclcpp::Clock().now();
   auto time_diff = time_end - time_start;
   cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;

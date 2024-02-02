@@ -75,7 +75,8 @@ int main(int argc, char **argv) {
   std::cout << "Running RRT*" << std::endl;
   RRTStarPlan plan(m);
 
-  std::vector<KDPoint> final_path = plan.run();
+  std::tuple<std::vector<KDPoint>, double> final_path_cost = plan.run();
+  std::vector<KDPoint> final_path = std::get<0>(final_path_cost);
   auto time_end = rclcpp::Clock().now();
   auto time_diff = time_end - time_start;
   std::cout << "Plan completed" << std::endl;

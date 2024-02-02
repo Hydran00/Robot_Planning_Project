@@ -17,7 +17,7 @@ private:
     std::vector<KDPoint> _ReconstrucPath(void);
 public:
     RRTStarPlan(std::shared_ptr<MapInfo> &map_info);
-    std::vector<KDPoint> run(void);
+    std::tuple<std::vector<KDPoint>,double> run(void);
 };
 
 #endif // !__RRT_STAR_PLAN__

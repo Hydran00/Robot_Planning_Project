@@ -1,7 +1,8 @@
 #include "planner/rrt/rrt_plan.hpp"
 
 RRTPlan::RRTPlan(std::shared_ptr<MapInfo> &map_info,
-                 std::vector<std::tuple<KDPoint, double>> &victims) : MotionPlanning(map_info),_rrt(victims) {
+                 std::vector<std::tuple<KDPoint, double>> &victims)
+    : MotionPlanning(map_info), _rrt(victims) {
   _display = map_info->_show_graphics;
   // call rrt constructor
   _rrt.set_root(MotionPlanning::_pt_start);
@@ -43,7 +44,7 @@ std::vector<KDPoint> RRTPlan::_ReconstrucPath(void) {
   return path;
 }
 
-std::vector<KDPoint> RRTPlan::run(void) {
+std::tuple<std::vector<KDPoint>, double> RRTPlan::run(void) {
   while (true) {
     KDPoint q_rand = _GenerateRandPoint();
     KDPoint q_near = _rrt.SearchNearestVertex(q_rand);
@@ -61,7 +62,9 @@ std::vector<KDPoint> RRTPlan::run(void) {
       if (q_new != MotionPlanning::_pt_end) {
         _rrt.Add(MotionPlanning::_pt_end, q_new);
       }
-      return _ReconstrucPath();
+      std::tuple<std::vector<KDPoint>, double> final_path_cost = std::make_tuple(
+          _ReconstrucPath(), _rrt.Cost((MotionPlanning::_pt_end), true));
+      return path;
     }
   }
 }

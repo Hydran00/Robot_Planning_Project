@@ -1,5 +1,6 @@
-#include <unistd.h>
 #include "planner/rrt/utils/rrt.hpp"
+
+#include <unistd.h>
 
 void RRT::set_root(KDPoint &p) {
   _root.assign(p.begin(), p.end());
@@ -10,7 +11,7 @@ KDPoint RRT::SearchNearestVertex(KDPoint &q_rand) {
   std::vector<double> d;
 
   for (auto pair : _rrt) {
-    d.push_back(Distance(pair.first, q_rand) + 0.90 * Cost(pair.first));
+    d.push_back(Distance(pair.first, q_rand) + 0.90 * Cost(pair.first, true));
   }
   int i = std::min_element(d.begin(), d.end()) - d.begin();
   return _rrt[i].first;
@@ -44,20 +45,22 @@ KDPoint RRT::GetParent(KDPoint &p) {
   return _rrt[it->second].first;
 }
 
-double RRT::Cost(KDPoint &point) {
+double RRT::Cost(KDPoint &point, bool consider_victims) {
   std::vector<std::tuple<KDPoint, double>> victims_list = victims;
   KDPoint p = point;
   double cost = 0.0;
   int i = 0;
   while (p != _root) {
     // checks if p is a victim
-    auto it = std::find_if(victims_list.begin(), victims_list.end(),
-                           [&](std::tuple<KDPoint, double> &victim) {
-                             return (std::get<0>(victim) == p);
-                           });
-    if (it != victims_list.end()) {
-      cost -= std::get<1>(*it);
-      victims_list.erase(it);
+    if (consider_victims) {
+      auto it = std::find_if(victims_list.begin(), victims_list.end(),
+                             [&](std::tuple<KDPoint, double> &victim) {
+                               return (std::get<0>(victim) == p);
+                             });
+      if (it != victims_list.end()) {
+        cost -= std::get<1>(*it);
+        victims_list.erase(it);
+      }
     }
     KDPoint f = GetParent(p);
     cost += Distance(p, f);
@@ -81,7 +84,7 @@ void RRT::Rewire(KDPoint &p, double r,
     }
   });
   for (auto pt : nears) {
-    if (Cost(pt) + Distance(pt, p) < Cost(p)) {
+    if (Cost(pt, true) + Distance(pt, p) < Cost(p, true)) {
       int idx = std::find_if(_rrt.begin(), _rrt.end(),
                              [&](std::pair<KDPoint, int> &pair) {
                                return (pair.first == pt);
