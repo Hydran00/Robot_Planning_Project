@@ -184,7 +184,7 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
 }
 
 void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
-  int i = 11;
+  int i = 100;
   int obs_counter = 0;
   _map.inners().resize(msg.obstacles.size());
   RCLCPP_INFO(this->get_logger(), "Found %d obstacles",
@@ -297,12 +297,38 @@ void MapInfo::set_victims() {
   _m_victims.color.b = 1.0;
   _m_victims.color.a = 1.0;
   _m_victims.points.clear();
+
+  int i = 150;
+  geometry_msgs::msg::Point p;
+  visualization_msgs::msg::Marker cost_text;
+  cost_text.header.frame_id = "map";
+  cost_text.header.stamp = now();
+  cost_text.action = visualization_msgs::msg::Marker::ADD;
+  cost_text.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+  cost_text.ns = "map";
+  cost_text.scale.z = 0.5;
+  cost_text.scale.y = 0.5;
+  cost_text.scale.x = 0.5;
+  cost_text.pose.orientation.w = 1.0;
+  cost_text.color.r = 0.0;
+  cost_text.color.g = 0.0;
+  cost_text.color.b = 1.0;
+  cost_text.color.a = 1.0;
   for (auto v : _victims) {
-    geometry_msgs::msg::Point p;
     p.x = std::get<0>(v)[0];
     p.y = std::get<0>(v)[1];
     p.z = 0;
     _m_victims.points.push_back(p);
+    cost_text.pose.position.x = std::get<0>(v)[0];
+    cost_text.pose.position.y = std::get<0>(v)[1] + 0.4;
+    cost_text.pose.position.z = 0.6;
+    char buffer[20];
+    snprintf(buffer, sizeof(buffer), "%.2f",
+             -roundf(std::get<1>(v) * 100) / 100);
+    cost_text.text = buffer;
+    cost_text.id = _id_victims_cost_text + i;
+    _m_victim_cost_text.markers.push_back(cost_text);
+    i++;
   }
 }
 void MapInfo::set_start(KDPoint &point) {
@@ -408,123 +434,6 @@ void MapInfo::set_dubins_path(std::vector<KDPoint> &path) {
   }
 }
 
-// void MapInfo::set_openlist(std::vector<KDPoint> &points) {
-//   _m_openlist.header.frame_id = "map";
-//   _m_openlist.header.stamp = now();
-//   _m_openlist.action = visualization_msgs::msg::Marker::ADD;
-//   _m_openlist.ns = "map";
-//   _m_openlist.id = _id_openlist;
-//   _m_openlist.type = visualization_msgs::msg::Marker::POINTS;
-//   _m_openlist.pose.orientation.w = 1.0;
-//   _m_openlist.scale.x = 0.3;
-//   _m_openlist.scale.y = 0.3;
-//   _m_openlist.color.b = 0.5;
-//   _m_openlist.color.g = 0.5;
-//   _m_openlist.color.a = 1.0;
-
-//   _m_openlist.points.clear();
-//   for (auto p : points) {
-//     geometry_msgs::msg::Point p_;
-//     p_.x = p[0];
-//     p_.y = p[1];
-//     p_.z = 0;
-//     _m_openlist.points.push_back(p_);
-//   }
-//   _marker_pub->publish(_m_openlist);
-//   _pub_i = (_pub_i + 1) % 10;
-//   if (_pub_i == 0) {
-//     // rclcpp::sleep_for(std::chrono::milliseconds(10));
-//     return;
-//   }
-// }
-
-// void MapInfo::set_closelist(std::vector<KDPoint> &points) {
-//   _m_closelist.header.frame_id = "map";
-//   _m_closelist.header.stamp = now();
-//   _m_closelist.action = visualization_msgs::msg::Marker::ADD;
-//   _m_closelist.ns = "map";
-//   _m_closelist.id = _id_closelist;
-//   _m_closelist.type = visualization_msgs::msg::Marker::POINTS;
-//   _m_closelist.pose.orientation.w = 1.0;
-//   _m_closelist.scale.x = 0.3;
-//   _m_closelist.scale.y = 0.3;
-//   _m_closelist.color.b = 1.0;
-//   _m_closelist.color.a = 1.0;
-
-//   _m_closelist.points.clear();
-//   for (auto p : points) {
-//     geometry_msgs::msg::Point p_;
-//     p_.x = p[0];
-//     p_.y = p[1];
-//     p_.z = 0;
-//     _m_closelist.points.push_back(p_);
-//   }
-//   _marker_pub->publish(_m_closelist);
-//   _pub_i = (_pub_i + 1) % 10;
-//   if (_pub_i == 0) {
-//     // rclcpp::sleep_for(std::chrono::milliseconds(10));
-//     return;
-//   }
-// }
-
-// void MapInfo::set_rand_points(std::vector<KDPoint> &points) {
-//   _m_rand_points.header.frame_id = "map";
-//   _m_rand_points.header.stamp = now();
-//   _m_rand_points.action = visualization_msgs::msg::Marker::ADD;
-//   _m_rand_points.ns = "map";
-//   _m_rand_points.id = _id_rand_points;
-//   _m_rand_points.type = visualization_msgs::msg::Marker::POINTS;
-//   _m_rand_points.pose.orientation.w = 1.0;
-//   _m_rand_points.scale.x = 0.3;
-//   _m_rand_points.scale.y = 0.3;
-//   _m_rand_points.color.b = 0.8;
-//   _m_rand_points.color.r = 0.8;
-//   _m_rand_points.color.a = 1.0;
-
-//   _m_rand_points.points.clear();
-//   for (auto p : points) {
-//     geometry_msgs::msg::Point p_;
-//     p_.x = p[0];
-//     p_.y = p[1];
-//     p_.z = 0;
-//     _m_rand_points.points.push_back(p_);
-//   }
-//   _marker_pub->publish(_m_rand_points);
-// }
-
-// void MapInfo::set_roadmap(
-//     std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map) {
-//   _m_roadmap.header.frame_id = "map";
-//   _m_roadmap.header.stamp = now();
-//   _m_roadmap.action = visualization_msgs::msg::Marker::ADD;
-//   _m_roadmap.ns = "map";
-//   _m_roadmap.id = _id_roadmap;
-//   _m_roadmap.type = visualization_msgs::msg::Marker::LINE_LIST;
-//   _m_roadmap.pose.orientation.w = 1.0;
-//   _m_roadmap.scale.x = 0.1;
-//   _m_roadmap.scale.y = 0.1;
-//   _m_roadmap.color.b = 0.3;
-//   _m_roadmap.color.r = 0.1;
-//   _m_roadmap.color.a = 1.0;
-
-//   _m_roadmap.points.clear();
-//   for (auto rm : road_map) {
-//     geometry_msgs::msg::Point p1;
-//     p1.x = rm.first[0];
-//     p1.y = rm.first[1];
-//     p1.z = 0;
-//     for (auto p : rm.second) {
-//       geometry_msgs::msg::Point p2;
-//       p2.x = p[0];
-//       p2.y = p[1];
-//       p2.z = 0;
-//       _m_roadmap.points.push_back(p1);
-//       _m_roadmap.points.push_back(p2);
-//     }
-//   }
-//   _marker_pub->publish(_m_roadmap);
-// }
-
 void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
   _m_rand_point.header.frame_id = "map";
   _m_rand_point.header.stamp = now();
@@ -572,7 +481,6 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
   _marker_pub->publish(_m_rand_point);
   _pub_i = (_pub_i + 1) % 10;
   if (_pub_i == 0) {
-    // rclcpp::sleep_for(std::chrono::milliseconds(10));
     return;
   }
 }
@@ -588,8 +496,9 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {
   branch.pose.orientation.w = 1.0;
   branch.scale.x = 0.1;
   branch.scale.y = 0.1;
-  branch.color.g = 0.5;
-  branch.color.b = 0.5;
+  branch.color.r = 1.0;
+  branch.color.g = 1.0;
+  branch.color.b = 0.3;
   branch.color.a = 1.0;
   branch.points.clear();
 
@@ -598,30 +507,17 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {
   m_points.header.stamp = now();
   m_points.action = visualization_msgs::msg::Marker::ADD;
   m_points.ns = "map";
-  m_points.id = _id_rrt + 1000;
+  m_points.id = _id_rrt + 130;
   m_points.type = visualization_msgs::msg::Marker::POINTS;
-  m_points.pose.orientation.w = 1.0;
+  m_points.pose.position.z = 0.1;
   m_points.scale.x = 0.1;
   m_points.scale.y = 0.1;
-  m_points.color.b = 1;
+  m_points.color.r = 1.0;
+  m_points.color.g = 0.5;
+  m_points.color.b = 0.0;
   m_points.color.a = 1.0;
   m_points.points.clear();
 
-  visualization_msgs::msg::Marker m_parents;
-  m_parents.header.frame_id = "map";
-  m_parents.header.stamp = now();
-  m_parents.action = visualization_msgs::msg::Marker::ADD;
-  m_parents.ns = "map";
-  // change id to avoid overwriting
-  m_parents.id = _id_rrt + 1001;
-  m_parents.type = visualization_msgs::msg::Marker::LINE_LIST;
-  m_parents.pose.orientation.w = 1.0;
-  m_parents.scale.x = 0.05;
-  m_parents.scale.y = 0.05;
-  m_parents.color.r = 1.0;
-  m_parents.color.g = 0.33;
-  m_parents.color.a = 1.0;
-  m_parents.points.clear();
   geometry_msgs::msg::Point p1, p2;
   for (std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> tuple :
        rrt_dubins._rrt) {
@@ -651,7 +547,6 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {
 
   _marker_pub->publish(branch);
   _marker_pub->publish(m_points);
-  _marker_pub->publish(m_parents);
 
   // _pub_i = (_pub_i + 1) % 10;
   // if (_pub_i == 0) {
@@ -669,26 +564,6 @@ bool MapInfo::Collision(std::vector<KDPoint> &path) {
     l.push_back(point_xy(path[i][0], path[i][1]));
   }
   return !boost::geometry::within(l, _map);
-}
-
-void MapInfo::ShowMap(void) {
-  while (_marker_pub->get_subscription_count() < 1) {
-    rclcpp::sleep_for(std::chrono::milliseconds(100));
-  }
-
-  // force publishing
-  for (int i = 0; i < 10; i++) {
-    for (auto obstacle : _obstacle_array.markers) {
-      _marker_pub->publish(obstacle);
-    }
-    _marker_pub->publish(_line_boundary);
-    _marker_pub->publish(_m_start);
-    _marker_pub->publish(_m_end);
-    _m_victims.header.stamp = now();
-    _m_victims.header.frame_id = "map";
-    _marker_pub->publish(_m_victims);
-    rclcpp::sleep_for(std::chrono::milliseconds(50));
-  }
 }
 
 void MapInfo::publish_path(std::vector<KDPoint> final_path) {
@@ -718,9 +593,6 @@ void MapInfo::publish_path(std::vector<KDPoint> final_path) {
     } else {
       yaw = compute_yaw(final_path[i], final_path[i + 1]);
     }
-    // convert pose rpy to quaternion
-    // std::cout << "Adding point: " << final_path[i][0] << ", "
-    //           << final_path[i][1] << ", " << yaw << std::endl;
     quat.setRPY(0, 0, yaw);
     // populate point message with orientation
     point_pose_msg.pose.orientation.x = quat.getX();
@@ -731,4 +603,28 @@ void MapInfo::publish_path(std::vector<KDPoint> final_path) {
     nav_final_path.poses.push_back(point_pose_msg);
   }
   _final_path_pub->publish(nav_final_path);
+}
+
+void MapInfo::ShowMap(void) {
+  while (_marker_pub->get_subscription_count() < 1) {
+    rclcpp::sleep_for(std::chrono::milliseconds(100));
+  }
+
+  // force publishing
+  for (int i = 0; i < 10; i++) {
+    for (auto obstacle : _obstacle_array.markers) {
+      _marker_pub->publish(obstacle);
+    }
+    for (visualization_msgs::msg::Marker cost_text :
+         _m_victim_cost_text.markers) {
+      cost_text.header.stamp = now();
+      cost_text.header.frame_id = "map";
+      _marker_pub->publish(cost_text);
+    }
+    _marker_pub->publish(_line_boundary);
+    _marker_pub->publish(_m_start);
+    _marker_pub->publish(_m_end);
+    _marker_pub->publish(_m_victims);
+    rclcpp::sleep_for(std::chrono::milliseconds(50));
+  }
 }

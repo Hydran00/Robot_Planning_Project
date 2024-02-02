@@ -67,13 +67,11 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath() {
   auto last_path = _rrt.GetPointPath(p);
   path.insert(path.begin(), last_path.begin(), last_path.end());
   while (MotionPlanning::_pt_start != p) {
-    std::cout << "Adding: " << p[0] << ", " << p[1] << std::endl;
     auto parent = _rrt.GetParent(p);
     std::vector<KDPoint> parent_path = std::get<3>(parent);
     path.insert(path.begin(), parent_path.begin(), parent_path.end());
     p = std::get<0>(parent);
   }
-  std::cout << "\n";
   return path;
 }
 
@@ -153,7 +151,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
 
     // check if we are close to the end
     if (sqrt(pow(q_rand[0] - MotionPlanning::_pt_end[0], 2) +
-             pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.0001) {
+             pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.0000001) {
       nodes_counter += 1;
       // if we did not extract the end point, we add it to the tree
       // if (q_rand != MotionPlanning::_pt_end) {
@@ -169,6 +167,7 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
       //   std::cout << "Final cost is " << _rrt.Cost(end_node, _radius, true)
       //             << std::endl;
       // } else {
+
       double cost1 = _rrt.Cost(new_node, _radius, false);
       // }
       std::vector<KDPoint> before_path = _ReconstrucPath();
@@ -186,15 +185,18 @@ std::vector<KDPoint> RRTStarDubinsPlan::run(void) {
           break;
         }
       };
-      std::cout << "\n\nFinal cost is \n" << cost1 << std::endl;
-      std::cout << "Final cost after optimisation is \n tot:"
+      std::cout << "\n\nFinal cost of node " << std::get<0>(new_node)[0] << ", "
+                << std::get<0>(new_node)[1] << " is "
+                << cost1 << std::endl;
+      std::cout << "Final cost after optimisation of node "<< std::get<0>(new_node)[0] << ", "
+                << std::get<0>(new_node)[1] << " is " 
                 << _rrt.Cost(new_node, _radius, false) << std::endl;
       return _ReconstrucPath();
     }
     nodes_counter += 1;
-    std::cout << "Number of nodes: " << nodes_counter
-              << "| prob of extractin end is " << (double)iter * 0.005
-              << std::endl;
-    std::cout << "---------------------" << std::endl;
+    // std::cout << "Number of nodes: " << nodes_counter
+    //           << "| prob of extractin end is " << (double)iter * 0.005
+    //           << std::endl;
+    // std::cout << "---------------------" << std::endl;
   }
 }

@@ -104,13 +104,9 @@ double RRTDubins::Cost(
         cost -= std::get<1>(*it);
         victims_list.erase(it);
       }
-    } else {
-      std::cout << "Adding cost " << GetPathLength(std::get<2>(q), radius)
-                << std::endl;
     }
     q = GetParent(std::get<0>(q));
   }
-  std::cout << "-------------------" << std::endl;
   return cost;
 }
 
@@ -183,23 +179,6 @@ void RRTDubins::Rewire(
     }
   }
 }
-// //    def PathOptimization(self, node):
-//         direct_cost_new = 0.0
-//         node_end = self.x_goal
-
-//         while node.parent:
-//             node_parent = node.parent
-//             if not self.utils.is_collision(node_parent, node_end):
-//                 node_end.parent = node_parent
-//             else:
-//                 direct_cost_new += self.Line(node, node_end)
-//                 node_end = node
-
-//             node = node_parent
-
-//         if direct_cost_new < self.direct_cost_old:
-//             self.direct_cost_old = direct_cost_new
-//             self.UpdateBeacons()
 
 bool RRTDubins::PathOptimisation(
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &current_node_,
@@ -207,9 +186,9 @@ bool RRTDubins::PathOptimisation(
     std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
     double dubins_radius) {
   std::cout << "\033[1;35mStart optimising!\033[0m" << std::endl;
+  std::cout << "---------------------" << std::endl;
 
   bool is_path_improved = false;
-  double direct_cost_new = 0.0;
 
   // Node we start looking from
   auto current_node = current_node_;
@@ -217,14 +196,6 @@ bool RRTDubins::PathOptimisation(
   // Node we want to reduce the cost
   auto node_to_opt = node_end;
 
-
-  std::cout << "Root is "<<  _root[0] << ", " << _root[1] << std::endl;
-  std::cout << "Current node is "<<  std::get<0>(current_node)[0] << ", " << std::get<0>(current_node)[1] << std::endl;
-  if (std::get<0>(current_node) == _root) {
-    std::cout << "Root coincide: " << (std::get<0>(current_node) == _root)
-              << std::endl;
-    return false;
-  }
   // iterates from node_new to root
   while (std::get<0>(current_node) != _root) {
     // get parent of the current node
@@ -234,15 +205,25 @@ bool RRTDubins::PathOptimisation(
     auto dubins_opt_path1 = get_dubins_best_path_and_cost(
         std::get<0>(node_parent), std::get<0>(node_to_opt), dubins_radius, 0.1);
 
-    std::cout << "Trying to optimise path from " << std::get<0>(node_parent)[0]
-              << ", " << std::get<0>(node_parent)[1] << " to "
-              << std::get<0>(node_to_opt)[0] << ", "
-              << std::get<0>(node_to_opt)[1] << std::endl;
     double new_cost =
-        Cost(node_parent, dubins_radius, false) +
+        Cost(node_parent, dubins_radius, true) +
         GetPathLength(std::get<2>(dubins_opt_path1), dubins_radius);
-
-    if (new_cost < Cost(node_to_opt, dubins_radius, false) + 0.04 &&
+    // checks if node_to_opt is a victim
+    auto it = std::find_if(victims.begin(), victims.end(),
+                           [&](std::tuple<KDPoint, double> &victim) {
+                             return (std::get<0>(victim) == std::get<0>(node_to_opt));
+                           });
+    if (it != victims.end()) {
+      new_cost -= std::get<1>(*it);
+    }
+      
+    std::cout << "Trying to skip node " << std::get<0>(current_node)[0] << " "
+              << std::get<0>(current_node)[1] << " and connect "
+              << std::get<0>(node_parent)[0] << " "
+              << std::get<0>(node_parent)[1] << " to "
+              << std::get<0>(node_to_opt)[0] << " "
+              << std::get<0>(node_to_opt)[1] << std::endl;
+    if (new_cost < Cost(node_to_opt, dubins_radius, true) &&
         !DubinsCollision(std::get<0>(dubins_opt_path1))) {
       // if the Dubins is collision free, we can optimise the path
       std::cout << "\033[1;32mOptimisation found!\033[0m" << std::endl;
@@ -258,53 +239,23 @@ bool RRTDubins::PathOptimisation(
       std::get<2>(*it_node_to_opt) = std::get<2>(dubins_opt_path1);
       std::get<3>(*it_node_to_opt) = std::get<0>(dubins_opt_path1);
 
-      // std::cout << "Cost was " << Cost(node_to_opt, dubins_radius, false)
-      //           << " and becomes " << new_cost << std::endl;
-      // // update the parent of the node we want to optimise
-      // std::cout << "Parent was " << std::get<1>(node_to_opt) << " and becomes
-      // "
-      //           << std::get<1>(current_node) << std::endl;
       is_path_improved = true;
     } else {
-      std::cout << "\033[1;33mOptimisation not found!--> Recursion\033[0m"
+      std::cout << "\033[1;33mOptimisation not found!\033[0m" << std::endl;
+      std::cout << "Reason-> Cost improvement:"
+                << ((new_cost < Cost(node_to_opt, dubins_radius, true))
+                        ? "true"
+                        : "false")
+                << " | Path free: "
+                << (!DubinsCollision(std::get<0>(dubins_opt_path1)) ? "true"
+                                                                    : "false")
                 << std::endl;
+      std::cout << "Costs are : " << new_cost << " and "
+                << Cost(node_to_opt, dubins_radius, false) << std::endl;
       node_to_opt = current_node;
     }
+    std::cout << "---------------------" << std::endl;
     current_node = node_parent;
   }
   return is_path_improved;
 }
-
-// def UpdateBeacons(self):
-//     node = self.x_goal
-//     beacons = []
-
-//     while node.parent:
-//         near_vertex = [v for v in self.obs_vertex
-//                        if (node.x - v[0]) ** 2 + (node.y - v[1]) ** 2 < 9]
-//         if len(near_vertex) > 0:
-//             for v in near_vertex:
-//                 beacons.append(v)
-
-//         node = node.parent
-
-//     self.beacons = beacons
-void RRTDubins::UpdateBeacons(KDPoint &q_end){};
-//   KDPoint node = q_end;
-//   std::vector<KDPoint> beacons;
-//   while (node != _root) {
-//     std::vector<KDPoint> near_vertex;
-//     for (auto v : MotionPlanning::_map_info->GetObstacleVertex()) {
-//       if (Distance(node, v) < 3.0) {
-//         near_vertex.push_back(v);
-//       }
-//     }
-//     if (near_vertex.size() > 0) {
-//       for (auto v : near_vertex) {
-//         beacons.push_back(v);
-//       }
-//     }
-//     node = GetParent(node);
-//   }
-//   _beacons = beacons;
-// }

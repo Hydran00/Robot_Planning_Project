@@ -4,7 +4,6 @@
 #include <random>
 #include <tuple>
 #include <vector>
-
 // Boost geometry primitives
 #include <boost/geometry.hpp>
 #include <boost/geometry/algorithms/append.hpp>
@@ -68,7 +67,8 @@ class MapInfo : public rclcpp::Node {
     _id_roadmap = 8,
     _id_rand_point = 9,
     _id_rrt = 10,
-    _id_victims = 11
+    _id_victims = 11,
+    _id_victims_cost_text = 12
   };
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
   // rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
@@ -102,6 +102,7 @@ class MapInfo : public rclcpp::Node {
   visualization_msgs::msg::Marker _m_rand_point;
   visualization_msgs::msg::Marker _m_rrt;
   visualization_msgs::msg::Marker _m_victims;
+  visualization_msgs::msg::MarkerArray _m_victim_cost_text;
   KDTree _okdtree;
 
   int _pub_i;
