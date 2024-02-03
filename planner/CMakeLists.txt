@@ -130,10 +130,11 @@ ${RRTSTAR_FOLDER}/main_multithreaded.cpp
 ${RRTSTAR_FOLDER}/threaded_planner.cpp
 ${RRTSTAR_FOLDER}/utils/map_info.cpp 
 ${RRTSTAR_FOLDER}/utils/kdtree.cpp
-${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
-${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
 ${RRTSTAR_FOLDER}/utils/rrt.cpp
 ${RRTSTAR_FOLDER}/plans/rrt_plan.cpp 
+${RRTSTAR_FOLDER}/plans/rrt_star_plan.cpp 
+${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
+${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
 src/dubins/dubins.cpp
   )
 

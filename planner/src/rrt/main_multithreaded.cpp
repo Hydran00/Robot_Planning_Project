@@ -7,6 +7,7 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "planner/dubins/dubins.h"
 #include "planner/rrt/rrt_plan.hpp"
+#include "planner/rrt/rrt_star_plan.hpp"
 #include "planner/rrt/rrt_star_dubins_plan.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
 #include "planner/rrt/utils/map_info.hpp"
@@ -66,6 +67,7 @@ int main(int argc, char **argv) {
   // wait for the map to be shown
   rclcpp::sleep_for(std::chrono::milliseconds(2000));
 
+  // ThreadedPlanner<RRTStarPlan> threaded_planner(m->_num_threads, m);
   ThreadedPlanner<RRTStarDubinsPlan> threaded_planner(m->_num_threads, m);
   std::vector<KDPoint> final_path = threaded_planner.execute_plans();
   std::cout << "Plan completed!" << std::endl;
