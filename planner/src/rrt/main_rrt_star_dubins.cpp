@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
   // wait for the map to be shown
   rclcpp::sleep_for(std::chrono::milliseconds(2000));
 
-  RRTStarDubinsPlan plan(m, m->dubins_radius);
+  RRTStarDubinsPlan plan(m);
   cout << "Planner started!" << endl;
   auto time_start = rclcpp::Clock().now();
   std::tuple<std::vector<KDPoint>,double> final_path_cost = plan.run();

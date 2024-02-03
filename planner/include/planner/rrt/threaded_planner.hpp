@@ -13,8 +13,10 @@
 #include "planner/rrt/rrt_star_dubins_plan.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
 
-class ThreadedPlanner {
- private:
+template <class PlannerType>
+class ThreadedPlanner
+{
+private:
   std::vector<KDPoint> _choose_path();
   void _run_wrapper();
   int thread_number;
@@ -22,12 +24,11 @@ class ThreadedPlanner {
   std::vector<double> cost_list;
   // TODO: generalize to any planner (Use template)
   std::shared_ptr<MapInfo> map_info;
+  std::mutex vectorMutex;
 
- public:
-
+public:
   ThreadedPlanner(int thread_number, const std::shared_ptr<MapInfo> map_info);
   std::vector<KDPoint> execute_plans();
 };
-
 
 #endif // __THREADED_PLANNER__

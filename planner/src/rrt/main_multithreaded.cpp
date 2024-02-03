@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
   // wait for the map to be shown
   rclcpp::sleep_for(std::chrono::milliseconds(2000));
 
-  ThreadedPlanner threaded_planner(m->_num_threads, m);
+  ThreadedPlanner<RRTStarDubinsPlan> threaded_planner(m->_num_threads, m);
   std::vector<KDPoint> final_path = threaded_planner.execute_plans();
   std::cout << "Plan completed!" << std::endl;
   m->set_dubins_path(final_path);

@@ -5,12 +5,11 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "planner/dubins/dubins.h"
 
-RRTStarDubinsPlan::RRTStarDubinsPlan(std::shared_ptr<MapInfo> &map_info,
-                                     double radius)
+RRTStarDubinsPlan::RRTStarDubinsPlan(std::shared_ptr<MapInfo> &map_info)
     : MotionPlanning(map_info), _rrt(map_info->_victims) {
   _display = map_info->_show_graphics;
   _rrt.set_root(MotionPlanning::_pt_start);
-  _radius = radius;
+  _radius = map_info->dubins_radius;
 }
 
 KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
