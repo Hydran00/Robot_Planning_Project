@@ -4,9 +4,9 @@
 #include <vector>
 #include <random>
 #include <chrono>
-#include "utils/motionplanning.hpp"
-#include "utils/kdtree.hpp"
-#include "utils/rrt_dubins.hpp"
+#include "planner/rrt/utils/motionplanning.hpp"
+#include "planner/rrt/utils/kdtree.hpp"
+#include "planner/rrt/utils/rrt_dubins.hpp"
 
 class RRTStarDubinsPlan : public MotionPlanning
 {

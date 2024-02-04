@@ -23,40 +23,40 @@
 
 using FollowPath = nav2_msgs::action::FollowPath;
 
-typedef struct RobotPosition {
-  float x = 0;
-  float y = 0;
-  float theta = 0;
-  bool is_updated = false;
-};
+// typedef struct RobotPosition {
+//   float x = 0;
+//   float y = 0;
+//   float theta = 0;
+//   bool is_updated = false;
+// };
 
-typedef struct RPY {
-  float roll;
-  float pitch;
-  float yaw;
-  RPY(float R, float P, float Y) {
-    roll = R;
-    pitch = P;
-    yaw = Y;
-  }
-  RPY() {
-    roll = 0;
-    pitch = 0;
-    yaw = 0;
-  }
-  tf2::Quaternion getQuaternion() {
-    tf2::Quaternion q;
-    q.setRPY(roll, pitch, yaw);
-    return q;
-  }
-};
+// typedef struct RPY {
+//   float roll;
+//   float pitch;
+//   float yaw;
+//   RPY(float R, float P, float Y) {
+//     roll = R;
+//     pitch = P;
+//     yaw = Y;
+//   }
+//   RPY() {
+//     roll = 0;
+//     pitch = 0;
+//     yaw = 0;
+//   }
+//   tf2::Quaternion getQuaternion() {
+//     tf2::Quaternion q;
+//     q.setRPY(roll, pitch, yaw);
+//     return q;
+//   }
+// };
 
-RPY fromQuaternion(tf2::Quaternion q) {
-  tf2::Matrix3x3 m(q);
-  double roll, pitch, yaw;
-  m.getRPY(roll, pitch, yaw);
-  return RPY((float)roll, (float)pitch, (float)yaw);
-}
+// RPY fromQuaternion(tf2::Quaternion q) {
+//   tf2::Matrix3x3 m(q);
+//   double roll, pitch, yaw;
+//   m.getRPY(roll, pitch, yaw);
+//   return RPY((float)roll, (float)pitch, (float)yaw);
+// }
 
 class PathPublisher : public rclcpp::Node {
  public:
@@ -82,7 +82,7 @@ class PathPublisher : public rclcpp::Node {
   rclcpp_action::Client<FollowPath>::SharedPtr client_ptr_;
   // geometry_msgs::msg::PoseArray waypoints;
   nav_msgs::msg::Path full_path;
-  RobotPosition robot_pose;
+  // RobotPosition robot_pose;
   bool waypoints_received = false;
   bool already_received = false;
 

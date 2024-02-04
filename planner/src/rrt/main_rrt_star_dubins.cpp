@@ -6,8 +6,8 @@
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "planner/dubins/dubins.h"
-#include "planner/rrt/rrt_plan.hpp"
-#include "planner/rrt/rrt_star_dubins_plan.hpp"
+#include "planner/rrt/planners/rrt_plan.hpp"
+#include "planner/rrt/planners/rrt_star_dubins_plan.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
 #include "planner/rrt/utils/map_info.hpp"
 #include "planner/rrt/utils/rrt.hpp"
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
   auto time_diff = time_end - time_start;
   cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
 
-  m->set_dubins_path(final_path);
+  m->set_final_path(final_path);
   // Check path validity
   cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
        << endl;

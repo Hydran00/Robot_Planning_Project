@@ -3,12 +3,12 @@
 #include <fstream>
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
-#include "planner/rrt/rrt_plan.hpp"
-#include "planner/rrt/rrt_star_plan.hpp"
+#include "planner/rrt/planners/rrt_plan.hpp"
+#include "planner/rrt/planners/rrt_star_plan.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
 #include "planner/rrt/utils/map_info.hpp"
 #include "planner/rrt/utils/rrt.hpp"
-
+// #include "planner/dubins/dubins.h"
 using namespace std;
 
 void print_path_on_file(std::vector<KDPoint> path) {
@@ -77,19 +77,28 @@ int main(int argc, char **argv) {
 
   std::tuple<std::vector<KDPoint>, double> final_path_cost = plan.run();
   std::vector<KDPoint> final_path = std::get<0>(final_path_cost);
+  cout << "DEBUG A" << endl;
+  std::vector<KDPoint> dubinised_final_path =
+      dubinise_path(final_path, m->dubins_radius, 0.1);
   auto time_end = rclcpp::Clock().now();
   auto time_diff = time_end - time_start;
+  cout << "DEBUG B" << endl;
+
   std::cout << "Plan completed" << std::endl;
 
-  m->set_path(final_path);
+  m->set_final_path(final_path);
+  rclcpp::sleep_for(std::chrono::milliseconds(1000));
+  m->set_final_path(dubinised_final_path);
+  cout << "DEBUG C" << endl;
+
   //   // Check path validity
-  cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
+  cout << "IS PATH VALID?: " << (m->Collision(dubinised_final_path) ? "NO" : "YES")
        << endl;
 
-  print_path_on_file(final_path);
+  print_path_on_file(dubinised_final_path);
   //   // Output path for python visualisation
 
-  m->publish_path(final_path);
+  m->publish_path(dubinised_final_path);
   cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
   rclcpp::shutdown();
   cout << "Done!" << endl;

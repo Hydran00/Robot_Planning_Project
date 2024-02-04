@@ -118,16 +118,22 @@ class MapInfo : public rclcpp::Node {
   boost::geometry::strategy::buffer::end_round end_strategy_;
   boost::geometry::strategy::buffer::side_straight side_strategy_;
 
+  // ros params
+  double _timeout;
+  double _num_threads;
+  std::string _planner_type;
+
+  
   polygon _map;
   bool start_received_;
   bool obstacles_received_;
   bool borders_received_;
   bool gates_received_;
   bool victims_received_;
+  
+  double offset;
   double dubins_radius;
 
-  double _timeout;
-  double _num_threads;
   double min_x, max_x, min_y, max_y;
   KDPoint pt_start;
   KDPoint pt_end;
@@ -147,8 +153,8 @@ class MapInfo : public rclcpp::Node {
   void set_victims();
   void set_start(KDPoint &point);
   void set_end(KDPoint &point);
-  void set_path(std::vector<KDPoint> &path);
-  void set_dubins_path(std::vector<KDPoint> &path);
+  void set_final_path(std::vector<KDPoint> &path);
+//   void set_dubins_path(std::vector<KDPoint> &path);
   //   void set_openlist(std::vector<KDPoint> &points);
   //   void set_closelist(std::vector<KDPoint> &points);
   //   void set_rand_points(std::vector<KDPoint> &points);

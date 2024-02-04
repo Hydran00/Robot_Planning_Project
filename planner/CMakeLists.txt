@@ -71,13 +71,14 @@ target_link_libraries(voronoi_boost Boost::headers)
 # RRT*
 add_executable(rrt_star 
   ${RRTSTAR_FOLDER}/main_rrt_star.cpp
-  ${RRTSTAR_FOLDER}/plans/rrt_plan.cpp 
+  ${RRTSTAR_FOLDER}/planners/rrt_plan.cpp 
   ${RRTSTAR_FOLDER}/utils/kdtree.cpp
-  ${RRTSTAR_FOLDER}/plans/rrt_star_plan.cpp
+  ${RRTSTAR_FOLDER}/planners/rrt_star_plan.cpp
   ${RRTSTAR_FOLDER}/utils/rrt.cpp 
   ${RRTSTAR_FOLDER}/utils/map_info.cpp 
+  src/dubins/dubins.cpp
   # ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
-  # ${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
+  # ${RRTSTAR_FOLDER}/planners/rrt_star_dubins_plan.cpp
   # src/dubins/dubins.cpp 
 )
 
@@ -98,14 +99,14 @@ target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # RRT
 add_executable(rrt_star_dubins
-${RRTSTAR_FOLDER}/main_rrt_star_dubins.cpp
-${RRTSTAR_FOLDER}/utils/map_info.cpp 
-${RRTSTAR_FOLDER}/utils/kdtree.cpp
-${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
-${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
-${RRTSTAR_FOLDER}/utils/rrt.cpp
-${RRTSTAR_FOLDER}/plans/rrt_plan.cpp 
-src/dubins/dubins.cpp
+  ${RRTSTAR_FOLDER}/main_rrt_star_dubins.cpp
+  ${RRTSTAR_FOLDER}/utils/map_info.cpp 
+  ${RRTSTAR_FOLDER}/utils/kdtree.cpp
+  ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
+  ${RRTSTAR_FOLDER}/planners/rrt_star_dubins_plan.cpp
+  ${RRTSTAR_FOLDER}/utils/rrt.cpp
+  ${RRTSTAR_FOLDER}/planners/rrt_plan.cpp 
+  src/dubins/dubins.cpp
   )
 
 ament_target_dependencies(rrt_star_dubins
@@ -126,16 +127,16 @@ target_include_directories(rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 
 # RRT
 add_executable(multithread_rrt_star_dubins
-${RRTSTAR_FOLDER}/main_multithreaded.cpp
-${RRTSTAR_FOLDER}/threaded_planner.cpp
-${RRTSTAR_FOLDER}/utils/map_info.cpp 
-${RRTSTAR_FOLDER}/utils/kdtree.cpp
-${RRTSTAR_FOLDER}/utils/rrt.cpp
-${RRTSTAR_FOLDER}/plans/rrt_plan.cpp 
-${RRTSTAR_FOLDER}/plans/rrt_star_plan.cpp 
-${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
-${RRTSTAR_FOLDER}/plans/rrt_star_dubins_plan.cpp
-src/dubins/dubins.cpp
+  ${RRTSTAR_FOLDER}/main_multithreaded.cpp
+  # ${RRTSTAR_FOLDER}/threaded_planner.cpp
+  ${RRTSTAR_FOLDER}/utils/map_info.cpp 
+  ${RRTSTAR_FOLDER}/utils/kdtree.cpp
+  ${RRTSTAR_FOLDER}/utils/rrt.cpp
+  ${RRTSTAR_FOLDER}/planners/rrt_plan.cpp 
+  ${RRTSTAR_FOLDER}/planners/rrt_star_plan.cpp 
+  ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
+  ${RRTSTAR_FOLDER}/planners/rrt_star_dubins_plan.cpp
+  src/dubins/dubins.cpp
   )
 
 ament_target_dependencies(multithread_rrt_star_dubins

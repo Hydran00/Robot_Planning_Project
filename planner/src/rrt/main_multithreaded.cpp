@@ -6,13 +6,13 @@
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "planner/dubins/dubins.h"
-#include "planner/rrt/rrt_plan.hpp"
-#include "planner/rrt/rrt_star_plan.hpp"
-#include "planner/rrt/rrt_star_dubins_plan.hpp"
+#include "planner/rrt/planners/rrt_plan.hpp"
+#include "planner/rrt/planners/rrt_star_plan.hpp"
+#include "planner/rrt/planners/rrt_star_dubins_plan.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
 #include "planner/rrt/utils/map_info.hpp"
 #include "planner/rrt/utils/rrt.hpp"
-#include "planner/rrt/threaded_planner.hpp"
+#include "planner/rrt/planners/threaded_planner.hpp"
 
 using namespace std;
 
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
   ThreadedPlanner<RRTStarDubinsPlan> threaded_planner(m->_num_threads, m);
   std::vector<KDPoint> final_path = threaded_planner.execute_plans();
   std::cout << "Plan completed!" << std::endl;
-  m->set_dubins_path(final_path);
+  m->set_final_path(final_path);
   // Check path validity
   cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
        << endl;

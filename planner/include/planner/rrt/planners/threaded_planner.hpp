@@ -10,7 +10,7 @@
 #include <mutex>
 #include <thread>
 
-#include "planner/rrt/rrt_star_dubins_plan.hpp"
+#include "planner/rrt/planners/rrt_star_dubins_plan.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
 
 template <class PlannerType>

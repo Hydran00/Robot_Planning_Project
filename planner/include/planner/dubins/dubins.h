@@ -2,44 +2,49 @@
 #define DUBINS_PATH_H
 
 #include <cmath>
-#include <vector>
 #include <tuple>
+#include <vector>
+
 #include "planner/rrt/utils/kdtree.hpp"
 typedef std::tuple<std::vector<double>, std::vector<double>> Path;
 
-
-Path gen_path(
-        const std::vector<double> &s, const std::vector<std::vector<double>> &path, double r, double step);
-std::tuple<std::vector<KDPoint>, double, std::vector<std::vector<double>>> get_dubins_best_path_and_cost(
-    std::vector<double> q_near, std::vector<double> q_rand, double _radius, double step);
+Path gen_path(const std::vector<double> &s,
+              const std::vector<std::vector<double>> &path, double r,
+              double step);
+std::tuple<std::vector<KDPoint>, double, std::vector<std::vector<double>>>
+get_dubins_best_path_and_cost(std::vector<double> q_near,
+                              std::vector<double> q_rand, double _radius,
+                              double step);
+std::vector<KDPoint> dubinise_path(std::vector<KDPoint> &waypoints, double r,
+                                   double step);
 Path test_dubins(std::vector<KDPoint> path);
-class DubinsPath
-{
-private:
-    // start
-    std::vector<std::vector<double>> _s;
-    // end
-    std::vector<std::vector<double>> _e;
-    // radius
-    double _r;
-    // paths
-    std::vector<std::vector<std::vector<double>>> _paths;
+class DubinsPath {
+ private:
+  // start
+  std::vector<std::vector<double>> _s;
+  // end
+  std::vector<std::vector<double>> _e;
+  // radius
+  double _r;
+  // paths
+  std::vector<std::vector<std::vector<double>>> _paths;
 
-public:
-    DubinsPath(std::vector<double> start, std::vector<double> end, double r = 1.0);
+ public:
+  DubinsPath(std::vector<double> start, std::vector<double> end,
+             double r = 1.0);
 
-    std::vector<std::vector<std::vector<double>>> calc_paths();
-    std::tuple<std::vector<std::vector<double>>,double> get_shortest_path_cost();
+  std::vector<std::vector<std::vector<double>>> calc_paths();
+  std::tuple<std::vector<std::vector<double>>, double> get_shortest_path_cost();
 
-private:
-    std::vector<double> calc_end();
-    double mod2pi(double theta);
-    std::vector<std::vector<double>> calc_lsl_from_origin(std::vector<double> e);
-    std::vector<std::vector<double>> calc_rsr_from_origin(std::vector<double> e);
-    std::vector<std::vector<double>> calc_lsr_from_origin(std::vector<double> e);
-    std::vector<std::vector<double>> calc_rsl_from_origin(std::vector<double> e);
-    std::vector<std::vector<double>> calc_lrl_from_origin(std::vector<double> e);
-    std::vector<std::vector<double>> calc_rlr_from_origin(std::vector<double> e);
+ private:
+  std::vector<double> calc_end();
+  double mod2pi(double theta);
+  std::vector<std::vector<double>> calc_lsl_from_origin(std::vector<double> e);
+  std::vector<std::vector<double>> calc_rsr_from_origin(std::vector<double> e);
+  std::vector<std::vector<double>> calc_lsr_from_origin(std::vector<double> e);
+  std::vector<std::vector<double>> calc_rsl_from_origin(std::vector<double> e);
+  std::vector<std::vector<double>> calc_lrl_from_origin(std::vector<double> e);
+  std::vector<std::vector<double>> calc_rlr_from_origin(std::vector<double> e);
 };
 
-#endif // DUBINS_PATH_H
+#endif  // DUBINS_PATH_H

@@ -1,4 +1,4 @@
-#include "planner/rrt/rrt_star_plan.hpp"
+#include "planner/rrt/planners/rrt_star_plan.hpp"
 
 RRTStarPlan::RRTStarPlan(std::shared_ptr<MapInfo> &map_info)
     : MotionPlanning(map_info), _rrt(map_info->_victims) {

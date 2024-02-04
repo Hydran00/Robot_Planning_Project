@@ -8,6 +8,9 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>(
       "visualization_marker", 10000);
 
+  this->declare_parameter("planner_type", "rrt_star_dubins");
+  this->_planner_type = this->get_parameter("planner_type").as_string();
+
   this->declare_parameter("show_graphics", true);
   this->_show_graphics = this->get_parameter("show_graphics").as_bool();
 
@@ -28,6 +31,12 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   borders_received_ = false;
   gates_received_ = false;
   victims_received_ = false;
+
+  if(_planner_type != "rrt_star_dubins"){
+    offset = OFFSET + 2 * dubins_radius;
+  }else{
+    offset = OFFSET;
+  }
 
   const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_custom);
   subscription_start_ = this->create_subscription<nav_msgs::msg::Odometry>(
@@ -144,7 +153,7 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
 
   // Offsetting strategies and parameters
   boost::geometry::strategy::buffer::distance_symmetric<double>
-      offsetting_distance_strategy(-OFFSET);
+      offsetting_distance_strategy(-offset);
   boost::geometry::model::multi_polygon<polygon> result;
   boost::geometry::model::multi_polygon<polygon> mp;
   mp.resize(1);
@@ -202,7 +211,7 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
 
   // Polygon offsetting
   boost::geometry::strategy::buffer::distance_symmetric<double>
-      offsetting_distance_strategy(OFFSET);
+      offsetting_distance_strategy(offset);
   boost::geometry::model::multi_polygon<polygon> result;
 
   for (auto obs : msg.obstacles) {
@@ -223,8 +232,8 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
       marker.pose.position.x = obs.polygon.points[0].x;
       marker.pose.position.y = obs.polygon.points[0].y;
       marker.pose.position.z = obs.polygon.points[0].z;
-      marker.scale.x = obs.radius * 2 + OFFSET;
-      marker.scale.y = obs.radius * 2 + OFFSET;
+      marker.scale.x = obs.radius * 2 + offset;
+      marker.scale.y = obs.radius * 2 + offset;
       marker.scale.z = 1.1;
       _obstacle_array.markers.push_back(marker);
 
@@ -232,7 +241,7 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
       boost::geometry::model::multi_point<point_xy> mp = {
           point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)};
       boost::geometry::strategy::buffer::distance_symmetric<double>
-          distance_strategy(obs.radius + OFFSET);
+          distance_strategy(obs.radius + offset);
       // Creates the circle and stores it in result
 
       boost::geometry::buffer(mp, result, distance_strategy, side_strategy_,
@@ -257,10 +266,10 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
 
       marker.scale.x =
           abs(obs.polygon.points[0].x - obs.polygon.points[2].x) +
-          OFFSET / abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
+          offset / abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
       marker.scale.y =
           abs(obs.polygon.points[0].y - obs.polygon.points[2].y) +
-          OFFSET / abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
+          offset / abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
       marker.scale.z = 1.1;
       _obstacle_array.markers.push_back(marker);
 
@@ -384,7 +393,7 @@ void MapInfo::set_end(KDPoint &point) {
   _m_end.points.push_back(p);
 }
 
-void MapInfo::set_path(std::vector<KDPoint> &path) {
+void MapInfo::set_final_path(std::vector<KDPoint> &path) {
   _m_path.header.frame_id = "map";
   _m_path.header.stamp = now();
   _m_path.action = visualization_msgs::msg::Marker::ADD;
@@ -400,6 +409,7 @@ void MapInfo::set_path(std::vector<KDPoint> &path) {
   _m_path.color.a = 1.0;
 
   _m_path.points.clear();
+
   for (auto p : path) {
     geometry_msgs::msg::Point p_;
     p_.x = p[0];
@@ -408,36 +418,6 @@ void MapInfo::set_path(std::vector<KDPoint> &path) {
     _m_path.points.push_back(p_);
   }
   _marker_pub->publish(_m_path);
-}
-
-void MapInfo::set_dubins_path(std::vector<KDPoint> &path) {
-  _m_path.header.frame_id = "map";
-  _m_path.header.stamp = now();
-  _m_path.action = visualization_msgs::msg::Marker::ADD;
-  _m_path.ns = "map";
-  _m_path.id = _id_path;
-  _m_path.type = visualization_msgs::msg::Marker::LINE_STRIP;
-  _m_path.pose.orientation.w = 1.0;
-  // show path map on top (avoid graphical glitches)
-  _m_path.pose.position.z = 0.05;
-  _m_path.scale.x = 0.1;
-  _m_path.scale.y = 0.1;
-  _m_path.color.r = 1.0;
-  _m_path.color.a = 1.0;
-
-  _m_path.points.clear();
-  geometry_msgs::msg::Point p_;
-
-  for (size_t i = 0; i < path.size(); ++i) {
-    p_.x = path[i][0];
-    p_.y = path[i][1];
-    p_.z = 0;
-    _m_path.points.push_back(p_);
-  }
-  for (int i = 0; i < 100; i++) {
-    _marker_pub->publish(_m_path);
-    rclcpp::sleep_for(std::chrono::milliseconds(10));
-  }
 }
 
 void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
@@ -553,11 +533,6 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {
 
   _marker_pub->publish(branch);
   _marker_pub->publish(m_points);
-
-  // _pub_i = (_pub_i + 1) % 10;
-  // if (_pub_i == 0) {
-  //   return;
-  // }
 }
 
 bool MapInfo::Collision(KDPoint &point) {

@@ -1,8 +1,4 @@
-#include "planner/rrt/rrt_star_dubins_plan.hpp"
-
-#include <fstream>
-
-#include "ament_index_cpp/get_package_share_directory.hpp"
+#include "planner/rrt/planners/rrt_star_dubins_plan.hpp"
 #include "planner/dubins/dubins.h"
 
 RRTStarDubinsPlan::RRTStarDubinsPlan(std::shared_ptr<MapInfo> &map_info)

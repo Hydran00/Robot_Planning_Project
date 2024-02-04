@@ -12,8 +12,8 @@ rviz_config_dir = get_package_share_directory("planner") + "/rviz/map.rviz"
 def generate_launch_description():
     return LaunchDescription(
         [
-            launch.actions.DeclareLaunchArgument("type", default_value="rrt_star"),
             launch.actions.DeclareLaunchArgument("show_graphics", default_value="true"),
+            launch.actions.DeclareLaunchArgument("dubins_radius", default_value="0.5"),
             Node(
                 package="planner",
                 executable="rrt_star",
@@ -21,8 +21,9 @@ def generate_launch_description():
                 output="screen",
                 parameters=[
                     {
-                        "type": launch.substitutions.LaunchConfiguration("type"),
+                        "planner_type": "rrt_star",
                         "show_graphics": launch.substitutions.LaunchConfiguration('show_graphics'),
+                        "dubins_radius": launch.substitutions.LaunchConfiguration('dubins_radius'),
                     }
                 ],
             ),

@@ -12,7 +12,6 @@ DubinsPath::DubinsPath(std::vector<double> start, std::vector<double> end,
 std::tuple<std::vector<double>, std::vector<double>> gen_path(
     const std::vector<double> &s, const std::vector<std::vector<double>> &path,
     double r = 1.0, double step = 0.1) {
-
   auto calc_TurnCenter = [](const std::vector<double> &point, char dir,
                             double r) -> std::tuple<double, double> {
     double ang;
@@ -36,7 +35,7 @@ std::tuple<std::vector<double>, std::vector<double>> gen_path(
   std::vector<double> start = s;
   double yaw = s[2];
 
-  double step_angle = step/r;
+  double step_angle = step / r;
 
   for (const auto &p : path) {
     if (p[0] == 's') {
@@ -231,17 +230,13 @@ get_dubins_best_path_and_cost(std::vector<double> q_near,
   // discretize the best path
   Path full_path =
       gen_path(q_near, std::get<0>(shortest_path_cost), _radius, step);
-  std::tuple < std::vector<KDPoint>, double,
-      std::vector<std::vector<double>>> best_path_and_cost;
-  // set X
+  std::tuple<std::vector<KDPoint>, double, std::vector<std::vector<double>>>
+      best_path_and_cost;
+  // set KDPoints
   for (size_t i = 0; i < std::get<0>(full_path).size(); i++) {
-    // p.push_back(std::get<0>(full_path)[i]);
-    // p.push_back(std::get<1>(full_path)[i]);
-    // KDPoint p = ;    
-    std::get<0>(best_path_and_cost).push_back({std::get<0>(full_path)[i], std::get<1>(full_path)[i]});
-
+    std::get<0>(best_path_and_cost)
+        .push_back({std::get<0>(full_path)[i], std::get<1>(full_path)[i]});
   }
-
   // set cost
   std::get<1>(best_path_and_cost) = std::get<1>(shortest_path_cost);
   // set symbolic path
@@ -249,10 +244,38 @@ get_dubins_best_path_and_cost(std::vector<double> q_near,
   return best_path_and_cost;
 }
 
-std::vector<KDPoint> test_dubins(std::vector<double> start, std::vector<double> end) {
-  std::tuple<std::vector<KDPoint>, double,
-             std::vector<std::vector<double>>>
-      p = get_dubins_best_path_and_cost(start, end, 1, 0.001);
+std::vector<KDPoint> dubinise_path(std::vector<KDPoint> &waypoints, double r,
+                                   double step) {
+  std::vector<KDPoint> path;
+  std::cout << "Radius is "<< r << std::endl;
+  std::cout << "Step is "<< step << std::endl;
+  auto compute_yaw = [](KDPoint &p1, KDPoint &p2) {
+    return atan2(p2[1] - p1[1], p2[0] - p1[0]);
+  };
+  for (size_t i = 0; i < waypoints.size() - 1; i++) {
+    KDPoint p1 = waypoints[i];
+    KDPoint p2 = waypoints[i + 1];
+    if (i == waypoints.size() - 2) {
+      p1.push_back(compute_yaw(waypoints[i], waypoints[i + 1]));
+      p2.push_back(waypoints[i + 1][2]);
+    } else {
+      p1.push_back(compute_yaw(waypoints[i], waypoints[i + 1]));
+      p2.push_back(compute_yaw(waypoints[i + 1], waypoints[i + 2]));
+    }
+    std::cout << "Creating dubins from (" << p1[0] << ", " << p1[1] << ", "
+              << p1[2] << ") to (" << p2[0] << ", " << p2[1] << ", " << p2[2]
+              << ")" << std::endl;
+    auto best_path_and_cost = get_dubins_best_path_and_cost(p1, p2, r, step);
+    path.insert(path.end(), std::get<0>(best_path_and_cost).begin(),
+                std::get<0>(best_path_and_cost).end());
+  }
+  return path;
+}
+
+std::vector<KDPoint> test_dubins(std::vector<double> start,
+                                 std::vector<double> end) {
+  std::tuple<std::vector<KDPoint>, double, std::vector<std::vector<double>>> p =
+      get_dubins_best_path_and_cost(start, end, 1, 0.001);
   std::cout << "Start: " << start[0] << ", " << start[1] << ", " << start[2]
             << std::endl;
   std::cout << "End: " << end[0] << ", " << end[1] << ", " << end[2]
