@@ -114,7 +114,7 @@ void RRT::Rewire(KDPoint &p, double r,
 
   for (auto pt : nears) {
     // avoid rewiring if the new total path is too long to be travelled
-    if (Distance(pt, p) > VELOCITY * TIME_LIMIT) {
+    if (Cost(pt, false) + Distance(pt, p) > VELOCITY * TIME_LIMIT) {
       continue;
     }
     // avoid rewiring a node that is already in the path to the root
@@ -143,7 +143,7 @@ void RRT::Rewire(KDPoint &p, double r,
   }
 
   for (auto pt : nears) {
-    if (Distance(pt, p) > VELOCITY * TIME_LIMIT) {
+    if (Cost(p, false) + Distance(p, pt)  > VELOCITY * TIME_LIMIT) {
       continue;
     }
     // avoid rewiring a node that is already in the path to the root
@@ -170,7 +170,7 @@ void RRT::Rewire(KDPoint &p, double r,
       victim_discount_pt = -std::get<1>(*it_vict_pt);
     }
     // rewires x_near (pt)
-    if (Cost(p, true) + Distance(pt, p) + victim_discount_pt < Cost(pt, true)) {
+    if (Cost(p, true) + Distance(p, pt) + victim_discount_pt < Cost(pt, true)) {
       auto it_pt = std::find_if(
           _rrt.begin(), _rrt.end(),
           [&](std::pair<KDPoint, int> &pair) { return (pair.first == pt); });
