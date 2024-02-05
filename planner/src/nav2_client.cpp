@@ -22,42 +22,6 @@
 #include "tf2_ros/buffer.h"
 
 using FollowPath = nav2_msgs::action::FollowPath;
-
-// typedef struct RobotPosition {
-//   float x = 0;
-//   float y = 0;
-//   float theta = 0;
-//   bool is_updated = false;
-// };
-
-// typedef struct RPY {
-//   float roll;
-//   float pitch;
-//   float yaw;
-//   RPY(float R, float P, float Y) {
-//     roll = R;
-//     pitch = P;
-//     yaw = Y;
-//   }
-//   RPY() {
-//     roll = 0;
-//     pitch = 0;
-//     yaw = 0;
-//   }
-//   tf2::Quaternion getQuaternion() {
-//     tf2::Quaternion q;
-//     q.setRPY(roll, pitch, yaw);
-//     return q;
-//   }
-// };
-
-// RPY fromQuaternion(tf2::Quaternion q) {
-//   tf2::Matrix3x3 m(q);
-//   double roll, pitch, yaw;
-//   m.getRPY(roll, pitch, yaw);
-//   return RPY((float)roll, (float)pitch, (float)yaw);
-// }
-
 class PathPublisher : public rclcpp::Node {
  public:
   PathPublisher() : Node("Nav2Client") {
@@ -84,27 +48,16 @@ class PathPublisher : public rclcpp::Node {
   nav_msgs::msg::Path full_path;
   // RobotPosition robot_pose;
   bool waypoints_received = false;
-  bool already_received = false;
 
   void store_path(const nav_msgs::msg::Path& msg) {
-    if (already_received) {
+    if (waypoints_received) {
       return;
     }
     std::cout << "Storing path" << std::endl;
     full_path = msg;
     waypoints_received = true;
-    already_received = true;
     return;
   }
-
-  // void follow_path(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
-  //   if (!robot_pose.is_updated) {
-  //     RCLCPP_INFO(this->get_logger(), "Cannot plan: Robot position unknown");
-  //     return;
-  //   }
-  //   store_path(msg);
-  //   return;
-  // }
 };
 
 int main(int argc, char* argv[]) {
@@ -116,7 +69,6 @@ int main(int argc, char* argv[]) {
       // nav_msgs::msg::Path full_path;
       node->full_path.header.stamp = node->get_clock()->now();
       node->full_path.header.frame_id = "map";
-      std::cout << "1" << std::endl;
 
       auto goal_msg = FollowPath::Goal();
       goal_msg.path = node->full_path;
@@ -132,13 +84,8 @@ int main(int argc, char* argv[]) {
         std::cout << "---------------------" << std::endl;
       }
       goal_msg.controller_id = "FollowPath";
-
-      std::cout << "2" << std::endl;
-
       node->client_ptr_->async_send_goal(goal_msg);
-
       node->waypoints_received = false;
-      std::cout << "3" << std::endl;
     }
     rclcpp::spin_some(node);
   }

@@ -9,7 +9,7 @@
 #include "planner/rrt/planners/rrt_plan.hpp"
 #include "planner/rrt/planners/rrt_star_dubins_plan.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
-#include "planner/rrt/utils/map_info.hpp"
+#include "planner/map_info_node.hpp"
 #include "planner/rrt/utils/rrt.hpp"
 
 using namespace std;

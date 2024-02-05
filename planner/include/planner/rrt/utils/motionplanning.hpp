@@ -1,7 +1,7 @@
 #ifndef __MOTIONPLANNING__
 #define __MOTIONPLANNING__
 
-#include "map_info.hpp"
+#include "planner/map_info_node.hpp"
 #include <vector>
 
 class MotionPlanning

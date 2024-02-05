@@ -35,7 +35,7 @@ find_package(Boost 1.74)
 # Variables
 
 set(VORONOI_FOLDER src/voronoi)
-set(RRTSTAR_FOLDER src/rrt)
+set(RRT_FOLDER src/rrt)
 
 #############################################################################
 
@@ -70,15 +70,15 @@ target_link_libraries(voronoi_boost Boost::headers)
 
 # RRT*
 add_executable(rrt_star 
-  ${RRTSTAR_FOLDER}/main_rrt_star.cpp
-  ${RRTSTAR_FOLDER}/planners/rrt_plan.cpp 
-  ${RRTSTAR_FOLDER}/utils/kdtree.cpp
-  ${RRTSTAR_FOLDER}/planners/rrt_star_plan.cpp
-  ${RRTSTAR_FOLDER}/utils/rrt.cpp 
-  ${RRTSTAR_FOLDER}/utils/map_info.cpp 
+  ${RRT_FOLDER}/main_rrt_star.cpp
+  ${RRT_FOLDER}/planners/rrt_plan.cpp 
+  ${RRT_FOLDER}/utils/kdtree.cpp
+  ${RRT_FOLDER}/planners/rrt_star_plan.cpp
+  ${RRT_FOLDER}/utils/rrt.cpp 
+  src/map_info_node.cpp 
   src/dubins/dubins.cpp
-  # ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
-  # ${RRTSTAR_FOLDER}/planners/rrt_star_dubins_plan.cpp
+  # ${RRT_FOLDER}/utils/rrt_dubins.cpp 
+  # ${RRT_FOLDER}/planners/rrt_star_dubins_plan.cpp
   # src/dubins/dubins.cpp 
 )
 
@@ -99,13 +99,13 @@ target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # RRT
 add_executable(rrt_star_dubins
-  ${RRTSTAR_FOLDER}/main_rrt_star_dubins.cpp
-  ${RRTSTAR_FOLDER}/utils/map_info.cpp 
-  ${RRTSTAR_FOLDER}/utils/kdtree.cpp
-  ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
-  ${RRTSTAR_FOLDER}/planners/rrt_star_dubins_plan.cpp
-  ${RRTSTAR_FOLDER}/utils/rrt.cpp
-  ${RRTSTAR_FOLDER}/planners/rrt_plan.cpp 
+  ${RRT_FOLDER}/main_rrt_star_dubins.cpp
+  src/map_info_node.cpp 
+  ${RRT_FOLDER}/utils/kdtree.cpp
+  ${RRT_FOLDER}/utils/rrt_dubins.cpp 
+  ${RRT_FOLDER}/planners/rrt_star_dubins_plan.cpp
+  ${RRT_FOLDER}/utils/rrt.cpp
+  ${RRT_FOLDER}/planners/rrt_plan.cpp 
   src/dubins/dubins.cpp
   )
 
@@ -127,15 +127,15 @@ target_include_directories(rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 
 # RRT
 add_executable(multithread_rrt_star_dubins
-  ${RRTSTAR_FOLDER}/main_multithreaded.cpp
-  # ${RRTSTAR_FOLDER}/threaded_planner.cpp
-  ${RRTSTAR_FOLDER}/utils/map_info.cpp 
-  ${RRTSTAR_FOLDER}/utils/kdtree.cpp
-  ${RRTSTAR_FOLDER}/utils/rrt.cpp
-  ${RRTSTAR_FOLDER}/planners/rrt_plan.cpp 
-  ${RRTSTAR_FOLDER}/planners/rrt_star_plan.cpp 
-  ${RRTSTAR_FOLDER}/utils/rrt_dubins.cpp 
-  ${RRTSTAR_FOLDER}/planners/rrt_star_dubins_plan.cpp
+  ${RRT_FOLDER}/main_multithreaded.cpp
+  # ${RRT_FOLDER}/threaded_planner.cpp
+  src/map_info_node.cpp 
+  ${RRT_FOLDER}/utils/kdtree.cpp
+  ${RRT_FOLDER}/utils/rrt.cpp
+  ${RRT_FOLDER}/planners/rrt_plan.cpp 
+  ${RRT_FOLDER}/planners/rrt_star_plan.cpp 
+  ${RRT_FOLDER}/utils/rrt_dubins.cpp 
+  ${RRT_FOLDER}/planners/rrt_star_dubins_plan.cpp
   src/dubins/dubins.cpp
   )
 
