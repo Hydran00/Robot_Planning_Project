@@ -1,4 +1,5 @@
 #include "planner/rrt/planners/rrt_star_plan.hpp"
+
 #include <unistd.h>
 RRTStarPlan::RRTStarPlan(std::shared_ptr<MapInfo> &map_info)
     : MotionPlanning(map_info), _rrt(map_info->_victims, this->seed) {
@@ -68,7 +69,8 @@ std::tuple<std::vector<KDPoint>, double> RRTStarPlan::run(void) {
     // handle timeout returning empty path and infinite cost
     // if (std::chrono::high_resolution_clock::now() - startTime >
     //     std::chrono::milliseconds(1000 *
-    //                               (int)MotionPlanning::_map_info->_timeout)) {
+    //                               (int)MotionPlanning::_map_info->_timeout))
+    //                               {
     //   std::cout << "\033[0;31mTimeout\033[0m" << std::endl;
     //   std::vector<KDPoint> empty;
     //   return std::make_tuple(empty, std::numeric_limits<double>::infinity());
@@ -101,7 +103,7 @@ std::tuple<std::vector<KDPoint>, double> RRTStarPlan::run(void) {
       continue;
     }
     _rrt.Add(q_new, q_near);
-    _rrt.Rewire(q_new, 100, [&](std::vector<KDPoint> &branch) {
+    _rrt.Rewire(q_new, 2, [&](std::vector<KDPoint> &branch) {
       return MotionPlanning::_map_info->Collision(branch);
     });
 
@@ -114,21 +116,17 @@ std::tuple<std::vector<KDPoint>, double> RRTStarPlan::run(void) {
       // the last point is not the end point -> we need to add it
       if (q_new != MotionPlanning::_pt_end) {
         _rrt.Add(MotionPlanning::_pt_end, q_new);
-        // std::cout << "Added end point" << std::endl;
-      } else {
-        // std::cout << "NOT Added end point" << std::endl;
-        KDPoint parent = _rrt.GetParent(MotionPlanning::_pt_end);
       }
-      // while (true) {
-      //   if (_rrt.PathOptimisation(parent, MotionPlanning::_pt_end,
-      //                             [&](std::vector<KDPoint> &path) {
-      //                               return
-      //                               MotionPlanning::_map_info->Collision(
-      //                                   path);
-      //                             }) == false) {
-      //     break;
-      //   }
-      // }
+      while (true) {
+        auto parent = _rrt.GetParent(MotionPlanning::_pt_end);
+        if (_rrt.PathOptimisation(parent, MotionPlanning::_pt_end,
+                                  [&](std::vector<KDPoint> &path) {
+                                    return MotionPlanning::_map_info->Collision(
+                                        path);
+                                  }) == false) {
+          break;
+        }
+      }
       std::cout << "Found path with cost "
                 << _rrt.Cost(MotionPlanning::_pt_end, true) << std::endl;
       std::tuple<std::vector<KDPoint>, double> final_path_cost =
