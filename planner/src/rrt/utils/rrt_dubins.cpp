@@ -59,8 +59,8 @@ std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
 RRTDubins::GetParent(KDPoint &p) {
   auto it = std::find_if(
       _rrt.begin(), _rrt.end(),
-      [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &tuple) {
-        return (std::get<0>(tuple) == p);
+      [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node) {
+        return (std::get<0>(node) == p);
       });
 
   // return _rrt[it->second].first;
@@ -70,8 +70,8 @@ RRTDubins::GetParent(KDPoint &p) {
 std::vector<KDPoint> RRTDubins::GetPointPath(KDPoint &p) {
   auto it = std::find_if(
       _rrt.begin(), _rrt.end(),
-      [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &tuple) {
-        return (std::get<0>(tuple) == p);
+      [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node) {
+        return (std::get<0>(node) == p);
       });
   return std::get<3>(*it);
 }
@@ -111,7 +111,7 @@ double RRTDubins::Cost(
 
 void RRTDubins::Rewire(
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_new,
-    double r, std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
+    double r, std::function<bool(std::vector<KDPoint> &path)> Collision,
     double dubins_radius) {
   std::vector<std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>>
       nears;
@@ -142,8 +142,20 @@ void RRTDubins::Rewire(
   }
 
   for (auto pt : nears) {
-    // std::vector<KDPoint> Path, double cost, std::vector<std::vector<double>
-    // Symbolic Path
+    // avoid rewiring a node that is already in the path to the root
+    auto qnew_copy = std::get<0>(q_new);
+    bool is_anchestor = false;
+    while (qnew_copy != _root) {
+      if (qnew_copy == std::get<0>(pt)) {
+        is_anchestor = true;
+        break;
+      }
+      qnew_copy = std::get<0>(GetParent(qnew_copy));
+    }
+    if (is_anchestor) {
+      continue;
+    }
+    //returns path, cost, symbolic path
     auto dubins_best_path = get_dubins_best_path_and_cost(
         std::get<0>(pt), std::get<0>(q_new), dubins_radius, 0.1);
 
@@ -162,34 +174,46 @@ void RRTDubins::Rewire(
             qnew_victim_discount <
         Cost(q_new, dubins_radius, true)) {
       // Check collision of the new path
-      if (DubinsCollision(std::get<0>(dubins_best_path))) {
+      if (Collision(std::get<0>(dubins_best_path))) {
         continue;
       }
       // Rewire q_new with its new parent
       int idx = std::find_if(_rrt.begin(), _rrt.end(),
                              [&](std::tuple<KDPoint, int, SymbolicPath,
-                                            std::vector<KDPoint>> &tuple) {
-                               return (std::get<0>(tuple) == std::get<0>(pt));
+                                            std::vector<KDPoint>> &node) {
+                               return (std::get<0>(node) == std::get<0>(pt));
                              }) -
                 _rrt.begin();
       // Update parent
       std::get<1>(*it_p) = idx;
-      // std::get<1>(q_new) = idx;
       // Update symbolic path
       std::get<2>(*it_p) = std::get<2>(dubins_best_path);
-      // std::get<2>(q_new) = std::get<2>(dubins_best_path);
       // Update path
       std::get<3>(*it_p) = std::get<0>(dubins_best_path);
-      // std::get<3>(q_new) = std::get<0>(dubins_best_path);
     }
   }
 
   // for (auto pt : nears) {
+  //   // avoid rewiring a node that is already in the path to the root
+  //   auto qnew_copy = std::get<0>(q_new);
+  //   bool is_anchestor = false;
+  //   while (qnew_copy != _root) {
+  //     if (qnew_copy == std::get<0>(pt)) {
+  //       is_anchestor = true;
+  //       break;
+  //     }
+  //     qnew_copy = std::get<0>(GetParent(qnew_copy));
+  //   }
+  //   if (is_anchestor) {
+  //     continue;
+  //   }
+
   //   // checks if pt is a victim
-  //   auto it_vict_pt = std::find_if(victims.begin(), victims.end(),
-  //                                  [&](std::tuple<KDPoint, double> &victim) {
-  //                                    return (std::get<0>(victim) == pt);
-  //                                  });
+  //   auto it_vict_pt =
+  //       std::find_if(victims.begin(), victims.end(),
+  //                    [&](std::tuple<KDPoint, double> &victim) {
+  //                      return (std::get<0>(victim) == std::get<0>(pt));
+  //                    });
   //   double victim_discount_pt = 0.0;
   //   if (it_vict_pt != victims.end()) {
   //     victim_discount_pt = -std::get<1>(*it_vict_pt);
@@ -209,29 +233,26 @@ void RRTDubins::Rewire(
   //   }
 
   //   // Check cost improvement
-  //   if (Cost(pt, dubins_radius, true) + last_segment_length +
-  //           qnew_victim_discount <
-  //       Cost(q_new, dubins_radius, true)) {
+  //   if (Cost(q_new, dubins_radius, true) +
+  //           Distance(std::get<0>(q_new), std::get<0>(pt)) + victim_discount_pt <
+  //       Cost(pt, dubins_radius, true)) {
   //     // Check collision of the new path
-  //     if (DubinsCollision(std::get<0>(dubins_best_path))) {
+  //     if (Collision(std::get<0>(dubins_best_path))) {
   //       continue;
   //     }
-  //     // Rewire q_new with its new parent
-  //     int idx = std::find_if(_rrt.begin(), _rrt.end(),
-  //                            [&](std::tuple<KDPoint, int, SymbolicPath,
-  //                                           std::vector<KDPoint>> &tuple) {
-  //                              return (std::get<0>(tuple) == std::get<0>(pt));
-  //                            }) -
-  //               _rrt.begin();
+
+  //     // rewires x_near (pt)
+  //     auto it_pt = std::find_if(
+  //         _rrt.begin(), _rrt.end(),
+  //         [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
+  //                 &node) { return (std::get<0>(node) == std::get<0>(pt)); });
+
   //     // Update parent
-  //     std::get<1>(*it_p) = idx;
-  //     // std::get<1>(q_new) = idx;
+  //     std::get<1>(*it_pt) = int(it_p - _rrt.begin());
   //     // Update symbolic path
-  //     std::get<2>(*it_p) = std::get<2>(dubins_best_path);
-  //     // std::get<2>(q_new) = std::get<2>(dubins_best_path);
+  //     std::get<2>(*it_pt) = std::get<2>(dubins_best_path);
   //     // Update path
-  //     std::get<3>(*it_p) = std::get<0>(dubins_best_path);
-  //     // std::get<3>(q_new) = std::get<0>(dubins_best_path);
+  //     std::get<3>(*it_pt) = std::get<0>(dubins_best_path);
   //   }
   // }
 }
@@ -239,7 +260,7 @@ void RRTDubins::Rewire(
 bool RRTDubins::PathOptimisation(
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &current_node_,
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node_end,
-    std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
+    std::function<bool(std::vector<KDPoint> &path)> Collision,
     double dubins_radius) {
   // std::cout << "\033[1;35mStart optimising!\033[0m" << std::endl;
   // std::cout << "---------------------" << std::endl;
@@ -282,15 +303,15 @@ bool RRTDubins::PathOptimisation(
     //           << std::get<0>(node_to_opt)[0] << " "
     //           << std::get<0>(node_to_opt)[1] << std::endl;
     if (new_cost < Cost(node_to_opt, dubins_radius, true) &&
-        !DubinsCollision(std::get<0>(dubins_opt_path1))) {
+        !Collision(std::get<0>(dubins_opt_path1))) {
       // if the Dubins is collision free, we can optimise the path
       // std::cout << "\033[1;32mOptimisation found!\033[0m" << std::endl;
 
       auto it_node_to_opt = std::find_if(
           _rrt.begin(), _rrt.end(),
           [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
-                  &tuple) {
-            return (std::get<0>(tuple) == std::get<0>(node_to_opt));
+                  &node) {
+            return (std::get<0>(node) == std::get<0>(node_to_opt));
           });
 
       std::get<1>(*it_node_to_opt) = std::get<1>(current_node);
@@ -305,7 +326,7 @@ bool RRTDubins::PathOptimisation(
       //                   ? "true"
       //                   : "false")
       //           << " | Path free: "
-      //           << (!DubinsCollision(std::get<0>(dubins_opt_path1)) ? "true"
+      //           << (!Collision(std::get<0>(dubins_opt_path1)) ? "true"
       //                                                               :
       //                                                               "false")
       //           << std::endl;

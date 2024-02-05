@@ -53,7 +53,7 @@ class RRTDubins {
   // RRT* Dubins
   void Rewire(
       std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_new,
-      double r, std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
+      double r, std::function<bool(std::vector<KDPoint> &path)> Collision,
       double dubins_radius);
   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> GetParent(
       KDPoint &p);
@@ -62,7 +62,7 @@ class RRTDubins {
   bool PathOptimisation(
       std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &current_node_,
       std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node_end,
-      std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
+      std::function<bool(std::vector<KDPoint> &path)> Collision,
       double dubins_radius);
 
   // Tree iterator
