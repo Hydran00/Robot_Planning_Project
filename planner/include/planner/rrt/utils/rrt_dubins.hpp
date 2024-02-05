@@ -25,9 +25,11 @@ class RRTDubins {
   KDPoint _root;
   DubinsTree _rrt;
   double _direct_cost_old = 0.0;
+  std::default_random_engine generator;
 
-  RRTDubins(std::vector<std::tuple<KDPoint, double>> &victims) {
+  RRTDubins(std::vector<std::tuple<KDPoint, double>> &victims, uint seed) {
     this->victims = victims;
+    this->generator = std::default_random_engine(seed);
   }
   std::vector<std::tuple<KDPoint, double>> victims;
 
@@ -62,8 +64,6 @@ class RRTDubins {
       std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node_end,
       std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
       double dubins_radius);
-
-  void UpdateBeacons(KDPoint &q_end);
 
   // Tree iterator
   class iterator {

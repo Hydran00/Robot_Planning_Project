@@ -33,7 +33,7 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   victims_received_ = false;
 
   if(_planner_type != "rrt_star_dubins"){
-    offset = OFFSET + 2 * dubins_radius;
+    offset = OFFSET; //+ 2 * dubins_radius;
   }else{
     offset = OFFSET;
   }
@@ -402,9 +402,10 @@ void MapInfo::set_final_path(std::vector<KDPoint> &path) {
   _m_path.type = visualization_msgs::msg::Marker::LINE_STRIP;
   _m_path.pose.orientation.w = 1.0;
   // show path map on top (avoid graphical glitches)
-  _m_path.pose.position.z += 0.05;
+  _m_path.pose.position.z = 0.05;
   _m_path.scale.x = 0.1;
   _m_path.scale.y = 0.1;
+  _m_path.scale.z = 0.01;
   _m_path.color.r = 1.0;
   _m_path.color.a = 1.0;
 
@@ -414,7 +415,7 @@ void MapInfo::set_final_path(std::vector<KDPoint> &path) {
     geometry_msgs::msg::Point p_;
     p_.x = p[0];
     p_.y = p[1];
-    p_.z = 0;
+    p_.z = 0.05;
     _m_path.points.push_back(p_);
   }
   _marker_pub->publish(_m_path);
@@ -482,9 +483,9 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {
   branch.pose.orientation.w = 1.0;
   branch.scale.x = 0.1;
   branch.scale.y = 0.1;
-  branch.color.r = 1.0;
-  branch.color.g = 1.0;
-  branch.color.b = 0.3;
+  // branch.color.r = 1.0;
+  branch.color.b = 0.5;
+  branch.color.g = 0.5;
   branch.color.a = 1.0;
   branch.points.clear();
 
@@ -498,9 +499,9 @@ void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {
   m_points.pose.position.z = 0.1;
   m_points.scale.x = 0.1;
   m_points.scale.y = 0.1;
-  m_points.color.r = 1.0;
-  m_points.color.g = 0.5;
-  m_points.color.b = 0.0;
+  // m_points.color.r = 1.0;
+  // m_points.color.g = 0.5;
+  m_points.color.b = 1.0;
   m_points.color.a = 1.0;
   m_points.points.clear();
 

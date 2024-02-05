@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 #define VELOCITY 0.2
-#define TIME_LIMIT 500000.0
+#define TIME_LIMIT 25.0
 
 void RRTDubins::set_root(KDPoint &p) {
   _root.assign(p.begin(), p.end());
@@ -15,20 +15,20 @@ std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
 RRTDubins::SearchNearestVertex(KDPoint &q_rand, double radius, int iter) {
   std::vector<double> d;
   // extract random point with prob 0.05
-  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  std::default_random_engine generator(seed);
+  // unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  // std::default_random_engine generator(seed);
   std::uniform_int_distribution<int> epsilon_greedy_prob(0, 100);
   if (epsilon_greedy_prob(generator) < (float)0.01 * iter) {
     std::uniform_int_distribution<int> dis_s(0, _rrt.size() - 1);
     int idx = dis_s(generator);
     return _rrt[idx];
   }
+  double distance;
   for (auto node : _rrt) {
-    double distance = sqrt(pow(q_rand[0] - std::get<0>(node)[0], 2) +
+    distance = sqrt(pow(q_rand[0] - std::get<0>(node)[0], 2) +
                            pow(q_rand[1] - std::get<0>(node)[1], 2));
-    distance = 0.0;
 
-    if (Cost(node, radius, false) > VELOCITY * TIME_LIMIT) {
+    if (Cost(node, radius, false)  + distance > VELOCITY * TIME_LIMIT) {
       // std::cout << "Node too far" << std::endl;
       // exclude nodes that are too far to be reached
       d.push_back(std::numeric_limits<double>::infinity());
@@ -136,11 +136,11 @@ void RRTDubins::Rewire(
         std::get<0>(q), std::get<0>(q_new), dubins_radius, 0.1);
 
     // compute the length of the last segment of the new path
-    double last_segment_distance =
+    double last_segment_cost =
         GetPathLength(std::get<2>(dubins_best_path), dubins_radius);
 
     // avoid rewiring if the new total path is too long to be travelled
-    double distance = Cost(q, dubins_radius, false) + last_segment_distance;
+    double distance = Cost(q, dubins_radius, false) + last_segment_cost;
     if (distance > VELOCITY * TIME_LIMIT) {
       continue;
     }
@@ -151,11 +151,11 @@ void RRTDubins::Rewire(
                              return (std::get<0>(victim) == std::get<0>(q_new));
                            });
     if (it != victims.end()) {
-      last_segment_distance -= std::get<1>(*it);
+      last_segment_cost -= std::get<1>(*it);
     }
 
     // Check cost improvement
-    if (Cost(q, dubins_radius, true) + last_segment_distance <
+    if (Cost(q, dubins_radius, true) + last_segment_cost <
         Cost(q_new, dubins_radius, true)) {
       // Check collision of the new path
       if (DubinsCollision(std::get<0>(dubins_best_path))) {
@@ -170,10 +170,13 @@ void RRTDubins::Rewire(
                 _rrt.begin();
       // Update parent
       std::get<1>(*it_p) = idx;
+      // std::get<1>(q_new) = idx;
       // Update symbolic path
       std::get<2>(*it_p) = std::get<2>(dubins_best_path);
+      // std::get<2>(q_new) = std::get<2>(dubins_best_path);
       // Update path
       std::get<3>(*it_p) = std::get<0>(dubins_best_path);
+      // std::get<3>(q_new) = std::get<0>(dubins_best_path);
     }
   }
 }

@@ -1,17 +1,32 @@
 #include "planner/rrt/utils/rrt.hpp"
 
 #include <unistd.h>
+#define VELOCITY 0.2
+#define TIME_LIMIT 5000.0
 
 void RRT::set_root(KDPoint &p) {
   _root.assign(p.begin(), p.end());
   _rrt.push_back(std::make_pair(_root, 0));
 }
 
-KDPoint RRT::SearchNearestVertex(KDPoint &q_rand) {
+KDPoint RRT::SearchNearestVertex(KDPoint &q_rand, int iter) {
   std::vector<double> d;
-
+  // extract random point with increasing probability
+  // unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  std::uniform_int_distribution<int> epsilon_greedy_prob(0, 100);
+  if (epsilon_greedy_prob(generator) < (float)0.005 * iter) {
+    std::uniform_int_distribution<int> dis_s(0, _rrt.size() - 1);
+    int idx = dis_s(generator);
+    return _rrt[idx].first;
+  }
+  double distance;
   for (auto pair : _rrt) {
-    d.push_back(Distance(pair.first, q_rand) + 0.90 * Cost(pair.first, true));
+    distance = Distance(pair.first, q_rand);
+    if (Cost(pair.first, false) + distance > VELOCITY * TIME_LIMIT) {
+      d.push_back(std::numeric_limits<double>::infinity());
+    } else {
+      d.push_back(distance);  // + 0.90 * Cost(pair.first, true));
+    }
   }
   int i = std::min_element(d.begin(), d.end()) - d.begin();
   return _rrt[i].first;
@@ -49,7 +64,6 @@ double RRT::Cost(KDPoint &point, bool consider_victims) {
   std::vector<std::tuple<KDPoint, double>> victims_list = victims;
   KDPoint p = point;
   double cost = 0.0;
-  int i = 0;
   while (p != _root) {
     // checks if p is a victim
     if (consider_victims) {
@@ -65,7 +79,6 @@ double RRT::Cost(KDPoint &point, bool consider_victims) {
     KDPoint f = GetParent(p);
     cost += Distance(p, f);
     p = f;
-    i++;
   }
   return cost;
 }
@@ -84,22 +97,105 @@ void RRT::Rewire(KDPoint &p, double r,
     }
   });
   for (auto pt : nears) {
-    if (Cost(pt, true) + Distance(pt, p) < Cost(p, true)) {
+    std::cout << "Checking node " << pt[0] << " , " << pt[1] << std::endl;
+    double last_segment_cost = Distance(p, pt);
+    
+    // avoid rewiring if the new total path is too long to be travelled
+    double distance = Cost(pt, false) + last_segment_cost;
+    if (distance > VELOCITY * TIME_LIMIT) {
+      continue;
+    }
+
+    // checks if p is a victim
+    auto it = std::find_if(victims.begin(), victims.end(),
+                           [&](std::tuple<KDPoint, double> &victim) {
+                             return (std::get<0>(victim) == p);
+                           });
+    if (it != victims.end()) {
+      last_segment_cost -= std::get<1>(*it);
+    }
+    if (Cost(pt, true) + last_segment_cost < Cost(p, true)) {
+      std::cout << "Rewiring node "<< pt[0] << " , " << pt[1] << " to " << p[0] << " , " << p[1] << std::endl;
       int idx = std::find_if(_rrt.begin(), _rrt.end(),
                              [&](std::pair<KDPoint, int> &pair) {
                                return (pair.first == pt);
                              }) -
                 _rrt.begin();
       it_p->second = idx;
+      std::cout << "iter "<< std::endl;
     }
   }
-  // for (auto pt : nears) {
-  //   if (Cost(p) + Distance(pt, p) < Cost(pt)) {
-  //     auto it_pt = std::find_if(
-  //         _rrt.begin(), _rrt.end(),
-  //         [&](std::pair<KDPoint, int> &pair) { return (pair.first == pt);
-  //         });
-  //     it_pt->second = int(it_p - _rrt.begin());
-  //   }
-  // }
+}
+bool RRT::PathOptimisation(
+    KDPoint &current_node_, KDPoint &node_end,
+    std::function<bool(std::vector<KDPoint> &path)> Collision) {
+  // std::cout << "\033[1;35mStart optimising!\033[0m" << std::endl;
+  // std::cout << "---------------------" << std::endl;
+
+  bool is_path_improved = false;
+
+  // Node we start looking from
+  KDPoint current_node = current_node_;
+
+  // Node we want to reduce the cost
+  auto node_to_opt = node_end;
+
+  // iterates from node_new to root
+  while (current_node != _root) {
+    // get parent of the current node
+    KDPoint node_parent = GetParent(current_node);
+
+    double new_cost =
+        Cost(node_parent, true) + Distance(node_parent, node_to_opt);
+    // checks if node_to_opt is a victim
+    auto it = std::find_if(victims.begin(), victims.end(),
+                           [&](std::tuple<KDPoint, double> &victim) {
+                             return (std::get<0>(victim) == node_to_opt);
+                           });
+    if (it != victims.end()) {
+      new_cost -= std::get<1>(*it);
+    }
+
+    std::cout << "Trying to skip node " << current_node[0] << " , "
+              << current_node[1] << " and connect " << node_parent[0] << " "
+              << node_parent[1] << " to " << node_to_opt[0] << " "
+              << node_to_opt[1] << std::endl;
+    std::vector<KDPoint> new_path = {node_parent, node_to_opt};
+    if (new_cost < Cost(node_to_opt, true) && !Collision(new_path) - 0.1) {
+      // if the Dubins is collision free, we can optimise the path
+      std::cout << "\033[1;32mOptimisation found!\033[0m" << std::endl;
+
+      int idx = std::find_if(_rrt.begin(), _rrt.end(),
+                             [&](std::pair<KDPoint, int> &pair) {
+                               return (std::get<0>(pair) == node_parent);
+                             }) -
+                _rrt.begin();
+      auto it_node_to_opt = std::find_if(
+          _rrt.begin(), _rrt.end(), [&](std::pair<KDPoint, int> &pair) {
+            return (std::get<0>(pair) == node_to_opt);
+          });
+
+      std::get<1>(*it_node_to_opt) = idx;//std::get<1>(*it_current_node);
+      // std::cout << "Parent of " << node_to_optce)[1] << std::endl;
+      is_path_improved = true;
+    } else {
+      std::cout << "\033[1;33mOptimisation not found!\033[0m" << std::endl;
+      // std::cout << "Reason-> Cost improvement:"
+      //           << ((new_cost < Cost(node_to_opt, dubins_radius, true))
+      //                   ? "true"
+      //                   : "false")
+      //           << " | Path free: "
+      //           << (!DubinsCollision(std::get<0>(dubins_opt_path1)) ? "true"
+      //                                                               :
+      //                                                               "false")
+      //           << std::endl;
+      // std::cout << "Costs are : " << new_cost << " and "
+      //           << Cost(node_to_opt, dubins_radius, false) << std::endl;
+      node_to_opt = current_node;
+    }
+    // std::cout << "---------------------" << std::endl;
+    current_node = node_parent;
+  }
+  std::cout << "Path optimisation done!" << std::endl;
+  return is_path_improved;
 }
