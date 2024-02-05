@@ -12,7 +12,8 @@ void RRT::set_root(KDPoint &p) {
 KDPoint RRT::SearchNearestVertex(KDPoint &q_rand, int iter) {
   std::vector<double> d;
   // extract random point with increasing probability
-  // unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  // unsigned seed =
+  // std::chrono::system_clock::now().time_since_epoch().count();
   std::uniform_int_distribution<int> epsilon_greedy_prob(0, 100);
   if (epsilon_greedy_prob(generator) < (float)0.005 * iter) {
     std::uniform_int_distribution<int> dis_s(0, _rrt.size() - 1);
@@ -25,7 +26,7 @@ KDPoint RRT::SearchNearestVertex(KDPoint &q_rand, int iter) {
     if (Cost(pair.first, false) + distance > VELOCITY * TIME_LIMIT) {
       d.push_back(std::numeric_limits<double>::infinity());
     } else {
-      d.push_back(distance);  // + 0.90 * Cost(pair.first, true));
+      d.push_back((distance) + 0.95 * Cost(pair.first, true));
     }
   }
   int i = std::min_element(d.begin(), d.end()) - d.begin();
@@ -66,6 +67,8 @@ double RRT::Cost(KDPoint &point, bool consider_victims) {
   double cost = 0.0;
   while (p != _root) {
     // checks if p is a victim
+    // std::cout<<"| loop "<<p[0]<<" , "<<p[1]<<"|"<<std::endl;
+
     if (consider_victims) {
       auto it = std::find_if(victims_list.begin(), victims_list.end(),
                              [&](std::tuple<KDPoint, double> &victim) {
@@ -96,36 +99,92 @@ void RRT::Rewire(KDPoint &p, double r,
       nears.push_back(pair.first);
     }
   });
+
+  // checks if p is a victim
+  auto it_vict = std::find_if(victims.begin(), victims.end(),
+                              [&](std::tuple<KDPoint, double> &victim) {
+                                return (std::get<0>(victim) == p);
+                              });
+
+  double last_segment_cost = 0.0;
+
   for (auto pt : nears) {
-    std::cout << "Checking node " << pt[0] << " , " << pt[1] << std::endl;
-    double last_segment_cost = Distance(p, pt);
-    
-    // avoid rewiring if the new total path is too long to be travelled
-    double distance = Cost(pt, false) + last_segment_cost;
-    if (distance > VELOCITY * TIME_LIMIT) {
+    // if (pt == GetParent(p)) {
+    //   continue;
+    // }
+    // if (pt == _root || GetParent(pt) == _root) {
+    //   continue;
+    // }
+    KDPoint p_copy = p;
+    bool is_anchestor = false;
+    while(p_copy != _root){
+      if(p_copy == pt){
+        is_anchestor = true;
+        break;
+      }
+      p_copy = GetParent(p_copy);
+    }
+    if(is_anchestor){
+      // std::cout << "Anchestor found! Skipping..."<<std::endl; 
       continue;
     }
 
-    // checks if p is a victim
-    auto it = std::find_if(victims.begin(), victims.end(),
-                           [&](std::tuple<KDPoint, double> &victim) {
-                             return (std::get<0>(victim) == p);
-                           });
-    if (it != victims.end()) {
-      last_segment_cost -= std::get<1>(*it);
+    // std::cout << "Checking node " << pt[0] << " , " << pt[1] << std::endl;
+    last_segment_cost = Distance(p, pt);
+    // std::cout << "DEBUG 0"<< std::endl;
+
+    // avoid rewiring if the new total path is too long to be travelled
+    double distance = last_segment_cost;
+    if (distance > VELOCITY * TIME_LIMIT) {
+      continue;
     }
-    if (Cost(pt, true) + last_segment_cost < Cost(p, true)) {
-      std::cout << "Rewiring node "<< pt[0] << " , " << pt[1] << " to " << p[0] << " , " << p[1] << std::endl;
-      int idx = std::find_if(_rrt.begin(), _rrt.end(),
-                             [&](std::pair<KDPoint, int> &pair) {
-                               return (pair.first == pt);
-                             }) -
-                _rrt.begin();
-      it_p->second = idx;
-      std::cout << "iter "<< std::endl;
+    // // considers the fact that p could be a victim
+    // if (it_vict != victims.end()) {
+    //   last_segment_cost -= std::get<1>(*it_vict);
+    // }
+    
+    // if (Cost(pt, true) + last_segment_cost < Cost(p, true)) {
+
+    // checks for the cost improvement
+    // std::cout << "Checking node " << pt[0] << " , " << pt[1] << " with cost "
+    //           << Cost(pt, false) << " and " << p[0] << " , " << p[1] << " with "
+    //           << Cost(p, false) << std::endl;
+    std::vector<KDPoint> branch = {pt, p};
+    if (Cost(pt, true) > Cost(p, true) + last_segment_cost &&
+        !Collision(branch)) {
+      // std::cout << "Rewiring node "<< pt[0] << " , " << pt[1] << " to " <<
+      // p[0]
+      // << " , " << p[1] << std::endl;
+      // int idx = std::find_if(_rrt.begin(), _rrt.end(),
+      //                        [&](std::pair<KDPoint, int> &pair) {
+      //                          return (pair.first == pt);
+      //                        }) -
+      //           _rrt.begin();
+      // it_p->second = idx;
+
+      // pt becomes son of p
+      // std::cout << "Parent of " << pt[0] << " , " << pt[1] << " was "
+      //           << GetParent(pt)[0] << " , " << GetParent(pt)[1] << std::endl;
+      // std::get<1>(*std::find_if(_rrt.begin(), _rrt.end(),
+      //                           [&](std::pair<KDPoint, int> &pair) {
+      //                             return (pair.first == pt);
+      //                           })) = it_p - _rrt.begin();
+
+      auto it = std::find_if(_rrt.begin(), _rrt.end(),
+                            [&](std::pair<KDPoint, int> &pair) {
+                              return (pair.first == pt);
+                            });
+      std::get<1>(*it) = it_p - _rrt.begin();
+
+
+
+      // std::cout << "Parent of " << pt[0] << " , " << pt[1] << " becomes "
+      //           << GetParent(pt)[0] << " , " << GetParent(pt)[1]
+      //           << "\n-------------------------" << std::endl;
     }
   }
 }
+
 bool RRT::PathOptimisation(
     KDPoint &current_node_, KDPoint &node_end,
     std::function<bool(std::vector<KDPoint> &path)> Collision) {
@@ -175,7 +234,7 @@ bool RRT::PathOptimisation(
             return (std::get<0>(pair) == node_to_opt);
           });
 
-      std::get<1>(*it_node_to_opt) = idx;//std::get<1>(*it_current_node);
+      std::get<1>(*it_node_to_opt) = idx;  // std::get<1>(*it_current_node);
       // std::cout << "Parent of " << node_to_optce)[1] << std::endl;
       is_path_improved = true;
     } else {

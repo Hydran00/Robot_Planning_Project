@@ -75,21 +75,21 @@ int main(int argc, char **argv) {
   std::cout << "Running RRT*" << std::endl;
   RRTStarPlan plan(m);
 
+  std::cout << "\033[1;32mSeed is " << plan.seed << "\033[0m" << std::endl;
+
   std::tuple<std::vector<KDPoint>, double> final_path_cost = plan.run();
+  
   std::vector<KDPoint> final_path = std::get<0>(final_path_cost);
-  cout << "DEBUG A" << endl;
   std::vector<KDPoint> dubinised_final_path =
       dubinise_path(final_path, m->dubins_radius, 0.1);
   auto time_end = rclcpp::Clock().now();
   auto time_diff = time_end - time_start;
-  cout << "DEBUG B" << endl;
 
   std::cout << "Plan completed" << std::endl;
 
   m->set_final_path(final_path);
   rclcpp::sleep_for(std::chrono::milliseconds(1000));
   m->set_final_path(dubinised_final_path);
-  cout << "DEBUG C" << endl;
 
   //   // Check path validity
   cout << "IS PATH VALID?: " << (m->Collision(dubinised_final_path) ? "NO" : "YES")

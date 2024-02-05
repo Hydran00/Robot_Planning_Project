@@ -15,7 +15,7 @@
 class RRT {
  private:
   // branch step length
-  const double branch_lenght = 0.6;
+  const double branch_lenght = 1.5;
 
  public:
   std::vector<std::pair<KDPoint, int>> _rrt;
@@ -23,7 +23,6 @@ class RRT {
   std::default_random_engine generator;
   RRT(std::vector<std::tuple<KDPoint, double>> &victims, uint seed) {
     this->victims = victims;
-    std::cout << "Constructor seed is " << seed << std::endl;
     
     this->generator = std::default_random_engine(seed);
   }
