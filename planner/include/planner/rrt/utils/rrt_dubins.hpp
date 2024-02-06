@@ -52,7 +52,7 @@ class RRTDubins {
 
   // RRT* Dubins
   void Rewire(
-      std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_new,
+      std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &p,
       double r, std::function<bool(std::vector<KDPoint> &path)> Collision,
       double dubins_radius);
   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> GetParent(
