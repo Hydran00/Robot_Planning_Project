@@ -17,7 +17,7 @@ public:
     {
         _pt_start.assign(map_info->pt_start.begin(), map_info->pt_start.end());
         _pt_end.assign(map_info->pt_end.begin(), map_info->pt_end.end());
-        seed = 276852979;//std::chrono::system_clock::now().time_since_epoch().count();
+        seed = std::chrono::system_clock::now().time_since_epoch().count();
     }
     virtual std::tuple<std::vector<KDPoint>,double> run(void) = 0;
 };

@@ -15,7 +15,7 @@
 class RRT {
  private:
   // branch step length
-  const double branch_lenght = 1.5;
+  const double branch_lenght = 3;
 
  public:
   std::vector<std::pair<KDPoint, int>> _rrt;

@@ -15,7 +15,8 @@ std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
 RRTDubins::SearchNearestVertex(KDPoint &q_rand, double radius, int iter) {
   std::vector<double> d;
   // extract random point with prob 0.05
-  // unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  // unsigned seed =
+  // std::chrono::system_clock::now().time_since_epoch().count();
   // std::default_random_engine generator(seed);
   std::uniform_int_distribution<int> epsilon_greedy_prob(0, 100);
   if (epsilon_greedy_prob(generator) < (float)0.01 * iter) {
@@ -26,9 +27,9 @@ RRTDubins::SearchNearestVertex(KDPoint &q_rand, double radius, int iter) {
   double distance;
   for (auto node : _rrt) {
     distance = sqrt(pow(q_rand[0] - std::get<0>(node)[0], 2) +
-                           pow(q_rand[1] - std::get<0>(node)[1], 2));
+                    pow(q_rand[1] - std::get<0>(node)[1], 2));
 
-    if (Cost(node, radius, false)  + distance > VELOCITY * TIME_LIMIT) {
+    if (Cost(node, radius, false) + distance > VELOCITY * TIME_LIMIT) {
       // std::cout << "Node too far" << std::endl;
       // exclude nodes that are too far to be reached
       d.push_back(std::numeric_limits<double>::infinity());
@@ -58,8 +59,8 @@ std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
 RRTDubins::GetParent(KDPoint &p) {
   auto it = std::find_if(
       _rrt.begin(), _rrt.end(),
-      [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &tuple) {
-        return (std::get<0>(tuple) == p);
+      [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node) {
+        return (std::get<0>(node) == p);
       });
 
   // return _rrt[it->second].first;
@@ -69,8 +70,8 @@ RRTDubins::GetParent(KDPoint &p) {
 std::vector<KDPoint> RRTDubins::GetPointPath(KDPoint &p) {
   auto it = std::find_if(
       _rrt.begin(), _rrt.end(),
-      [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &tuple) {
-        return (std::get<0>(tuple) == p);
+      [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node) {
+        return (std::get<0>(node) == p);
       });
   return std::get<3>(*it);
 }
@@ -110,7 +111,7 @@ double RRTDubins::Cost(
 
 void RRTDubins::Rewire(
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_new,
-    double r, std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
+    double r, std::function<bool(std::vector<KDPoint> &path)> Collision,
     double dubins_radius) {
   std::vector<std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>>
       nears;
@@ -129,62 +130,137 @@ void RRTDubins::Rewire(
           nears.push_back(node);
         }
       });
-  for (auto q : nears) {
-    // std::vector<KDPoint> Path, double cost, std::vector<std::vector<double>
-    // Symbolic Path
+
+  // check if q_new is victim
+  double qnew_victim_discount = 0.0;
+  auto it = std::find_if(victims.begin(), victims.end(),
+                         [&](std::tuple<KDPoint, double> &victim) {
+                           return (std::get<0>(victim) == std::get<0>(q_new));
+                         });
+  if (it != victims.end()) {
+    qnew_victim_discount = -std::get<1>(*it);
+  }
+
+  for (auto pt : nears) {
+    // avoid rewiring a node that is already in the path to the root
+    auto qnew_copy = std::get<0>(q_new);
+    bool is_anchestor = false;
+    while (qnew_copy != _root) {
+      if (qnew_copy == std::get<0>(pt)) {
+        is_anchestor = true;
+        break;
+      }
+      qnew_copy = std::get<0>(GetParent(qnew_copy));
+    }
+    if (is_anchestor) {
+      continue;
+    }
+    //returns path, cost, symbolic path
     auto dubins_best_path = get_dubins_best_path_and_cost(
-        std::get<0>(q), std::get<0>(q_new), dubins_radius, 0.1);
+        std::get<0>(pt), std::get<0>(q_new), dubins_radius, 0.1);
 
     // compute the length of the last segment of the new path
-    double last_segment_cost =
+    double last_segment_length =
         GetPathLength(std::get<2>(dubins_best_path), dubins_radius);
 
     // avoid rewiring if the new total path is too long to be travelled
-    double distance = Cost(q, dubins_radius, false) + last_segment_cost;
+    double distance = Cost(pt, dubins_radius, false) + last_segment_length;
     if (distance > VELOCITY * TIME_LIMIT) {
       continue;
     }
 
-    // check if q_new is victim
-    auto it = std::find_if(victims.begin(), victims.end(),
-                           [&](std::tuple<KDPoint, double> &victim) {
-                             return (std::get<0>(victim) == std::get<0>(q_new));
-                           });
-    if (it != victims.end()) {
-      last_segment_cost -= std::get<1>(*it);
-    }
-
     // Check cost improvement
-    if (Cost(q, dubins_radius, true) + last_segment_cost <
+    if (Cost(pt, dubins_radius, true) + last_segment_length +
+            qnew_victim_discount <
         Cost(q_new, dubins_radius, true)) {
       // Check collision of the new path
-      if (DubinsCollision(std::get<0>(dubins_best_path))) {
+      if (Collision(std::get<0>(dubins_best_path))) {
         continue;
       }
-      // Rewire nodes with their new parent
+      // Rewire q_new with its new parent
       int idx = std::find_if(_rrt.begin(), _rrt.end(),
                              [&](std::tuple<KDPoint, int, SymbolicPath,
-                                            std::vector<KDPoint>> &tuple) {
-                               return (std::get<0>(tuple) == std::get<0>(q));
+                                            std::vector<KDPoint>> &node) {
+                               return (std::get<0>(node) == std::get<0>(pt));
                              }) -
                 _rrt.begin();
       // Update parent
       std::get<1>(*it_p) = idx;
-      // std::get<1>(q_new) = idx;
       // Update symbolic path
       std::get<2>(*it_p) = std::get<2>(dubins_best_path);
-      // std::get<2>(q_new) = std::get<2>(dubins_best_path);
       // Update path
       std::get<3>(*it_p) = std::get<0>(dubins_best_path);
-      // std::get<3>(q_new) = std::get<0>(dubins_best_path);
     }
   }
+
+  // for (auto pt : nears) {
+  //   // avoid rewiring a node that is already in the path to the root
+  //   auto qnew_copy = std::get<0>(q_new);
+  //   bool is_anchestor = false;
+  //   while (qnew_copy != _root) {
+  //     if (qnew_copy == std::get<0>(pt)) {
+  //       is_anchestor = true;
+  //       break;
+  //     }
+  //     qnew_copy = std::get<0>(GetParent(qnew_copy));
+  //   }
+  //   if (is_anchestor) {
+  //     continue;
+  //   }
+
+  //   // checks if pt is a victim
+  //   auto it_vict_pt =
+  //       std::find_if(victims.begin(), victims.end(),
+  //                    [&](std::tuple<KDPoint, double> &victim) {
+  //                      return (std::get<0>(victim) == std::get<0>(pt));
+  //                    });
+  //   double victim_discount_pt = 0.0;
+  //   if (it_vict_pt != victims.end()) {
+  //     victim_discount_pt = -std::get<1>(*it_vict_pt);
+  //   }
+
+  //   auto dubins_best_path = get_dubins_best_path_and_cost(
+  //       std::get<0>(q_new), std::get<0>(pt), dubins_radius, 0.1);
+
+  //   // compute the length of the last segment of the new path
+  //   double last_segment_length =
+  //       GetPathLength(std::get<2>(dubins_best_path), dubins_radius);
+
+  //   // avoid rewiring if the new total path is too long to be travelled
+  //   double distance = Cost(pt, dubins_radius, false) + last_segment_length;
+  //   if (distance > VELOCITY * TIME_LIMIT) {
+  //     continue;
+  //   }
+
+  //   // Check cost improvement
+  //   if (Cost(q_new, dubins_radius, true) +
+  //           Distance(std::get<0>(q_new), std::get<0>(pt)) + victim_discount_pt <
+  //       Cost(pt, dubins_radius, true)) {
+  //     // Check collision of the new path
+  //     if (Collision(std::get<0>(dubins_best_path))) {
+  //       continue;
+  //     }
+
+  //     // rewires x_near (pt)
+  //     auto it_pt = std::find_if(
+  //         _rrt.begin(), _rrt.end(),
+  //         [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
+  //                 &node) { return (std::get<0>(node) == std::get<0>(pt)); });
+
+  //     // Update parent
+  //     std::get<1>(*it_pt) = int(it_p - _rrt.begin());
+  //     // Update symbolic path
+  //     std::get<2>(*it_pt) = std::get<2>(dubins_best_path);
+  //     // Update path
+  //     std::get<3>(*it_pt) = std::get<0>(dubins_best_path);
+  //   }
+  // }
 }
 
 bool RRTDubins::PathOptimisation(
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &current_node_,
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node_end,
-    std::function<bool(std::vector<KDPoint> &path)> DubinsCollision,
+    std::function<bool(std::vector<KDPoint> &path)> Collision,
     double dubins_radius) {
   // std::cout << "\033[1;35mStart optimising!\033[0m" << std::endl;
   // std::cout << "---------------------" << std::endl;
@@ -210,30 +286,32 @@ bool RRTDubins::PathOptimisation(
         Cost(node_parent, dubins_radius, true) +
         GetPathLength(std::get<2>(dubins_opt_path1), dubins_radius);
     // checks if node_to_opt is a victim
-    auto it = std::find_if(victims.begin(), victims.end(),
-                           [&](std::tuple<KDPoint, double> &victim) {
-                             return (std::get<0>(victim) == std::get<0>(node_to_opt));
-                           });
+    auto it =
+        std::find_if(victims.begin(), victims.end(),
+                     [&](std::tuple<KDPoint, double> &victim) {
+                       return (std::get<0>(victim) == std::get<0>(node_to_opt));
+                     });
     if (it != victims.end()) {
       new_cost -= std::get<1>(*it);
     }
-      
-    // std::cout << "Trying to skip node " << std::get<0>(current_node)[0] << " "
+
+    // std::cout << "Trying to skip node " << std::get<0>(current_node)[0] << "
+    // "
     //           << std::get<0>(current_node)[1] << " and connect "
     //           << std::get<0>(node_parent)[0] << " "
     //           << std::get<0>(node_parent)[1] << " to "
     //           << std::get<0>(node_to_opt)[0] << " "
     //           << std::get<0>(node_to_opt)[1] << std::endl;
     if (new_cost < Cost(node_to_opt, dubins_radius, true) &&
-        !DubinsCollision(std::get<0>(dubins_opt_path1))) {
+        !Collision(std::get<0>(dubins_opt_path1))) {
       // if the Dubins is collision free, we can optimise the path
       // std::cout << "\033[1;32mOptimisation found!\033[0m" << std::endl;
 
       auto it_node_to_opt = std::find_if(
           _rrt.begin(), _rrt.end(),
           [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>
-                  &tuple) {
-            return (std::get<0>(tuple) == std::get<0>(node_to_opt));
+                  &node) {
+            return (std::get<0>(node) == std::get<0>(node_to_opt));
           });
 
       std::get<1>(*it_node_to_opt) = std::get<1>(current_node);
@@ -248,8 +326,9 @@ bool RRTDubins::PathOptimisation(
       //                   ? "true"
       //                   : "false")
       //           << " | Path free: "
-      //           << (!DubinsCollision(std::get<0>(dubins_opt_path1)) ? "true"
-      //                                                               : "false")
+      //           << (!Collision(std::get<0>(dubins_opt_path1)) ? "true"
+      //                                                               :
+      //                                                               "false")
       //           << std::endl;
       // std::cout << "Costs are : " << new_cost << " and "
       //           << Cost(node_to_opt, dubins_radius, false) << std::endl;

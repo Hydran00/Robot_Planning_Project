@@ -128,7 +128,6 @@ class MapInfo : public rclcpp::Node {
   bool borders_received_;
   bool gates_received_;
   bool victims_received_;
-
   double offset;
   double dubins_radius;
 
