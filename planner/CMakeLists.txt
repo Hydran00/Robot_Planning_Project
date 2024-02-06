@@ -210,6 +210,7 @@ install(PROGRAMS
   scripts/plot.py
   scripts/map_publisher.py
   scripts/visualise_dubins.py
+  scripts/visualise_voronoi.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
