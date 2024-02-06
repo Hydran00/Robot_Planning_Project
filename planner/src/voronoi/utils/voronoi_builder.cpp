@@ -5,8 +5,21 @@ void VoronoiBuilder::create_voronoi() {
   std::vector<Point> points;
   std::vector<Segment> segments;
 
+  // scales the polygon (1000) to avoid numerical issues
+  polygon map_copy;
+  // Apply scale transformation
+  boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(
+      scale_factor);
+  boost::geometry::transform(_map, map_copy, scale);
+
+  // print scaled poly in file
+  std::ofstream file;
+  file.open(
+      "/home/hydran00/shelfino_ws/install/planner/share/planner/data/"
+      "scaled_poly.txt");
+
   // Iterates over exterior ring segments
-  auto &exterior_ring = boost::geometry::exterior_ring(_map);
+  auto &exterior_ring = boost::geometry::exterior_ring(map_copy);
   for (std::size_t i = 0; i < exterior_ring.size() - 1; ++i) {
     const auto &vertex1 = exterior_ring[i];
     const auto &vertex2 = exterior_ring[i + 1];
@@ -17,10 +30,14 @@ void VoronoiBuilder::create_voronoi() {
     segments.push_back(Segment(
         boost::geometry::get<0>(vertex1), boost::geometry::get<1>(vertex1),
         boost::geometry::get<0>(vertex2), boost::geometry::get<1>(vertex2)));
+    file << boost::geometry::get<0>(vertex1) << " "
+         << boost::geometry::get<1>(vertex1) << " "
+         << boost::geometry::get<0>(vertex2) << " "
+         << boost::geometry::get<1>(vertex2) << std::endl;
   }
 
   // Iterate over interior rings segments
-  auto &interior_rings = boost::geometry::interior_rings(_map);
+  auto &interior_rings = boost::geometry::interior_rings(map_copy);
   for (const auto &interior_ring : interior_rings) {
     for (std::size_t i = 0; i < interior_ring.size() - 1; ++i) {
       const auto &vertex1 = interior_ring[i];
@@ -32,6 +49,10 @@ void VoronoiBuilder::create_voronoi() {
       segments.push_back(Segment(
           boost::geometry::get<0>(vertex1), boost::geometry::get<1>(vertex1),
           boost::geometry::get<0>(vertex2), boost::geometry::get<1>(vertex2)));
+      file << boost::geometry::get<0>(vertex1) << " "
+           << boost::geometry::get<1>(vertex1) << " "
+           << boost::geometry::get<0>(vertex2) << " "
+           << boost::geometry::get<1>(vertex2) << std::endl;
     }
   }
 
@@ -43,6 +64,7 @@ void VoronoiBuilder::create_voronoi() {
   construct_voronoi(points.begin(), points.end(), segments.begin(),
                     segments.end(), &voronoi_diagram_);
   std::cout << "Voronoi diagram created!" << std::endl;
+  _map = map_copy;
 }
 
 std::vector<std::pair<point_xy, point_xy>> VoronoiBuilder::get_voronoi_edges() {
@@ -52,10 +74,10 @@ std::vector<std::pair<point_xy, point_xy>> VoronoiBuilder::get_voronoi_edges() {
     if (!edge->is_finite() || is_edge_valid(edge)) {
       continue;
     }
-    point_xy source =
-        point_xy((double)edge->vertex0()->x(), (double)edge->vertex0()->y());
-    point_xy target =
-        point_xy((double)edge->vertex1()->x(), (double)edge->vertex1()->y());
+    point_xy source = point_xy((double)edge->vertex0()->x() / scale_factor,
+                               (double)edge->vertex0()->y() / scale_factor);
+    point_xy target = point_xy((double)edge->vertex1()->x() / scale_factor,
+                               (double)edge->vertex1()->y() / scale_factor);
     voronoi_edges.push_back(make_pair(source, target));
   }
   return voronoi_edges;
@@ -76,7 +98,7 @@ void VoronoiBuilder::compute_shortest_path() {
   // Get the source and target points of the current edge
   for (auto edge = voronoi_diagram_.edges().begin();
        edge != voronoi_diagram_.edges().end(); ++edge) {
-    if (!edge->is_finite() || is_edge_valid(edge)) {
+    if (!edge->is_finite()) {
       continue;
     }
     point_xy source =
@@ -130,10 +152,10 @@ void VoronoiBuilder::correct_geometry(
 
 bool VoronoiBuilder::is_edge_valid(
     voronoi_diagram<double>::const_edge_iterator edge) {
-  // check the edge ends in a outer poly's vertex
+  // check if the edge ends in a outer poly's vertex
   for (const auto &point : _map.outer()) {
-    if (edge->vertex0()->x() == point.x() &&
-        edge->vertex0()->y() == point.y()) {
+    if (abs(edge->vertex0()->x() - point.x() < 0.001) &&
+        abs(edge->vertex0()->y() - point.y() < 0.001)) {
       return true;
     }
     if (edge->vertex1()->x() == point.x() &&
@@ -141,7 +163,7 @@ bool VoronoiBuilder::is_edge_valid(
       return true;
     }
   }
-  // check the edge ends in a inner polygon's vertex
+  // check if the edge ends in a inner polygon's vertex
   point_xy vertex0 = point_xy(edge->vertex0()->x(), edge->vertex0()->y());
   point_xy vertex1 = point_xy(edge->vertex1()->x(), edge->vertex1()->y());
   for (const auto &inner_ring : _map.inners()) {
@@ -151,10 +173,12 @@ bool VoronoiBuilder::is_edge_valid(
       return true;
     }
     for (const auto &point : inner_ring) {
-      if (vertex0.x() == point.x() && vertex0.y() == point.y()) {
+      if (abs(vertex0.x() - point.x() < 0.001) &&
+          abs(vertex0.y() - point.y() < 0.001)) {
         return true;
       }
-      if (vertex1.x() == point.x() && vertex1.y() == point.y()) {
+      if (abs(vertex1.x() - point.x() < 0.001) &&
+          abs(vertex1.y() - point.y() < 0.001)) {
         return true;
       }
     }

@@ -28,9 +28,20 @@ def plot_map(data):
     plt.show()
     plt.show(block=False)
 
-
+def plot2(data):
+    plt.axis('equal')
+    # plot voronoi
+    x1 = data[:,0]
+    y1 = data[:,1]
+    x2 = data[:,2]
+    y2 = data[:,3]
+    plt.plot([x1, x2], [y1, y2], 'k-')
+    plt.show()
+    plt.show(block=False)
+    
 if __name__ == "__main__":
     # path1 = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path0.txt', delimiter=',')
     data = np.loadtxt(str(get_package_share_directory('planner')) + '/data/voronoi.txt')
     plot_map(data)    
-
+    data2 = np.loadtxt("/home/hydran00/shelfino_ws/install/planner/share/planner/data/scaled_poly.txt")
+    plot2(data2)
