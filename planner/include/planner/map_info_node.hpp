@@ -1,5 +1,5 @@
-#ifndef MAP_INFO_HPP_
-#define MAP_INFO_HPP_
+#ifndef MAP_INFO_NODE_HPP_
+#define MAP_INFO_NODE_HPP_
 
 #include <random>
 #include <tuple>
@@ -34,9 +34,8 @@
 #include "visualization_msgs/msg/marker.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
 
-
 // Offsetting parameters and utils
-#define OFFSET 0.25 + 0.10 // half-shelfino width + epsilon
+#define OFFSET 0.25 + 0.10  // half-shelfino width + epsilon
 
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::linestring<point_xy> Linestring;
@@ -123,14 +122,12 @@ class MapInfo : public rclcpp::Node {
   double _num_threads;
   std::string _planner_type;
 
-  
   polygon _map;
   bool start_received_;
   bool obstacles_received_;
   bool borders_received_;
   bool gates_received_;
   bool victims_received_;
-  
   double offset;
   double dubins_radius;
 
@@ -154,7 +151,7 @@ class MapInfo : public rclcpp::Node {
   void set_start(KDPoint &point);
   void set_end(KDPoint &point);
   void set_final_path(std::vector<KDPoint> &path);
-//   void set_dubins_path(std::vector<KDPoint> &path);
+  //   void set_dubins_path(std::vector<KDPoint> &path);
   //   void set_openlist(std::vector<KDPoint> &points);
   //   void set_closelist(std::vector<KDPoint> &points);
   //   void set_rand_points(std::vector<KDPoint> &points);

@@ -120,24 +120,24 @@ void RRTDubins::Rewire(
   auto it_p = std::find_if(
       _rrt.begin(), _rrt.end(),
       [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node) {
-        return (std::get<0>(node) == std::get<0>(q_new));
+        return (std::get<0>(node) == std::get<0>(p));
       });
 
   // populate nears
   std::for_each(
       _rrt.begin(), _rrt.end(),
       [&](std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &node) {
-        if ((std::get<0>(node) != std::get<0>(q_new)) &&
-            (Distance(std::get<0>(node), std::get<0>(q_new)) < r)) {
+        if ((std::get<0>(node) != std::get<0>(p)) &&
+            (Distance(std::get<0>(node), std::get<0>(p)) < r)) {
           nears.push_back(node);
         }
       });
 
-  // check if q_new is victim
+  // check if p is victim
   double qnew_victim_discount = 0.0;
   auto it = std::find_if(victims.begin(), victims.end(),
                          [&](std::tuple<KDPoint, double> &victim) {
-                           return (std::get<0>(victim) == std::get<0>(q_new));
+                           return (std::get<0>(victim) == std::get<0>(p));
                          });
   if (it != victims.end()) {
     qnew_victim_discount = -std::get<1>(*it);
@@ -147,14 +147,14 @@ void RRTDubins::Rewire(
   for (auto pt : nears) {
 
     // avoid rewiring a node that is already in the path to the root
-    auto qnew_copy = std::get<0>(q_new);
+    auto p_copy = std::get<0>(p);
     bool is_anchestor = false;
-    while (qnew_copy != _root) {
-      if (qnew_copy == std::get<0>(pt)) {
+    while (p_copy != _root) {
+      if (p_copy == std::get<0>(pt)) {
         is_anchestor = true;
         break;
       }
-      qnew_copy = std::get<0>(GetParent(qnew_copy));
+      p_copy = std::get<0>(GetParent(p_copy));
     }
     if (is_anchestor) {
       continue;
@@ -162,7 +162,7 @@ void RRTDubins::Rewire(
 
     //returns path, cost, symbolic path
     auto dubins_best_path = get_dubins_best_path_and_cost(
-        std::get<0>(pt), std::get<0>(q_new), dubins_radius, 0.1);
+        std::get<0>(pt), std::get<0>(p), dubins_radius, 0.1);
 
     // compute the length of the last segment of the new path
     double last_segment_length =
@@ -265,14 +265,14 @@ void RRTDubins::Rewire(
   // <>
   // for (auto pt : nears) {
   //   // avoid rewiring a node that is already in the path to the root
-  //   auto qnew_copy = std::get<0>(q_new);
+  //   auto p_copy = std::get<0>(p);
   //   bool is_anchestor = false;
-  //   while (qnew_copy != _root) {
-  //     if (qnew_copy == std::get<0>(pt)) {
+  //   while (p_copy != _root) {
+  //     if (p_copy == std::get<0>(pt)) {
   //       is_anchestor = true;
   //       break;
   //     }
-  //     qnew_copy = std::get<0>(GetParent(qnew_copy));
+  //     p_copy = std::get<0>(GetParent(p_copy));
   //   }
   //   if (is_anchestor) {
   //     continue;
@@ -290,7 +290,7 @@ void RRTDubins::Rewire(
   //   }
 
   //   auto dubins_best_path = get_dubins_best_path_and_cost(
-  //       std::get<0>(q_new), std::get<0>(pt), dubins_radius, 0.1);
+  //       std::get<0>(p), std::get<0>(pt), dubins_radius, 0.1);
 
   //   // compute the length of the last segment of the new path
   //   double last_segment_length =

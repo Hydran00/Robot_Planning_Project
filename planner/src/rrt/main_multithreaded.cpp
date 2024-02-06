@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
   m->ShowMap();
   // }
   // wait for the map to be shown
-  rclcpp::sleep_for(std::chrono::milliseconds(2000));
+  rclcpp::sleep_for(std::chrono::milliseconds(1000));
 
   // ThreadedPlanner<RRTStarPlan> threaded_planner(m->_num_threads, m);
   ThreadedPlanner<RRTStarDubinsPlan> threaded_planner(m->_num_threads, m);

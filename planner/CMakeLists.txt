@@ -41,30 +41,30 @@ set(RRT_FOLDER src/rrt)
 
 # Voronoi Boost
 
-add_executable(voronoi_boost
-  ${VORONOI_FOLDER}/voronoi_boost.cpp
+add_executable(voronoi_planner
+  ${VORONOI_FOLDER}/main_voronoi.cpp
+  ${VORONOI_FOLDER}/utils/dijkstra.cpp
+  ${VORONOI_FOLDER}/utils/voronoi_builder.cpp
+  ${VORONOI_FOLDER}/planners/voronoi_plan.cpp
+  src/map_info_node.cpp 
+  # these are needed to compile map_info_node
+  ${RRT_FOLDER}/utils/kdtree.cpp
+  ${RRT_FOLDER}/utils/rrt.cpp
+  
+
 )
 
-target_include_directories(voronoi_boost PUBLIC
-$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-$<INSTALL_INTERFACE:include>)
-
-ament_target_dependencies(voronoi_boost
+ament_target_dependencies(voronoi_planner
   rclcpp
-  ament_index_cpp
+  visualization_msgs
+  geometry_msgs
+  obstacles_msgs
+  tf2
+  tf2_ros
+  nav_msgs
 )
-target_link_libraries(voronoi_boost Boost::headers)
-
-# add_executable(wkt_generator
-#   ${VORONOI_FOLDER}/wkt_generator.cpp
-# )
-# ament_target_dependencies(wkt_generator
-#   rclcpp
-#   obstacles_msgs
-#   geometry_msgs
-#   ament_index_cpp
-# )
-# target_include_directories(wkt_generator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(voronoi_planner Boost::headers)
+target_include_directories(voronoi_planner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
 
@@ -192,7 +192,7 @@ install(DIRECTORY
 # Install C++ executables
 
 install(TARGETS
-  voronoi_boost
+  voronoi_planner
   # wkt_generator
   rrt_star
   rrt_star_dubins
@@ -210,6 +210,7 @@ install(PROGRAMS
   scripts/plot.py
   scripts/map_publisher.py
   scripts/visualise_dubins.py
+  scripts/visualise_voronoi.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
