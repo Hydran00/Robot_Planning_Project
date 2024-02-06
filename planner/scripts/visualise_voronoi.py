@@ -40,8 +40,8 @@ def plot2(data):
     plt.show(block=False)
     
 if __name__ == "__main__":
-    # path1 = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path0.txt', delimiter=',')
+    path1 = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path0.txt', delimiter=',')
     data = np.loadtxt(str(get_package_share_directory('planner')) + '/data/voronoi.txt')
     plot_map(data)    
-    data2 = np.loadtxt("/home/hydran00/shelfino_ws/install/planner/share/planner/data/scaled_poly.txt")
-    plot2(data2)
+    # data2 = np.loadtxt("/home/hydran00/shelfino_ws/install/planner/share/planner/data/scaled_poly.txt")
+    # plot2(data2)

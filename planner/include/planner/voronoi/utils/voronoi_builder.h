@@ -81,8 +81,8 @@ class VoronoiBuilder {
  public:
   /// @brief data structure for the constructed voronoi diagram
   voronoi_diagram<double> voronoi_diagram_;
-  const double scale_factor = 10.0;
-  polygon _map;
+  const double scale_factor = 100.0;
+  polygon _map, _scaled_map;
   void create_voronoi();
   std::vector<std::pair<point_xy, point_xy>> get_voronoi_edges();
   void compute_shortest_path();
