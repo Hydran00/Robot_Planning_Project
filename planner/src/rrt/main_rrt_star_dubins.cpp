@@ -75,14 +75,17 @@ int main(int argc, char **argv) {
   auto time_start = rclcpp::Clock().now();
   std::tuple<std::vector<KDPoint>,double> final_path_cost = plan.run();
   std::vector<KDPoint> final_path = std::get<0>(final_path_cost);
+  double cost = std::get<1>(final_path_cost);
   auto time_end = rclcpp::Clock().now();
   auto time_diff = time_end - time_start;
   cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
 
   m->set_final_path(final_path);
   // Check path validity
-  cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
-       << endl;
+  cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES") << endl;
+  if (!m->Collision(final_path)) {
+    cout << "FINAL COST: " << cost << endl;
+  }
 
   // Output path for python visualisation
   print_path_on_file(final_path);

@@ -86,32 +86,43 @@ double RRT::Cost(KDPoint &point, bool consider_victims) {
   return cost;
 }
 
-void RRT::Rewire(KDPoint &p, double r,
-                 std::function<bool(std::vector<KDPoint> &branch)> Collision) {
+// ======================================================================================
+void RRT::Rewire(
+    KDPoint &p, 
+    double r,
+    std::function<bool(std::vector<KDPoint> &branch)> Collision) 
+{
+  // create near vector
   // x_nearest <- Nearest(Tree,x_new)
   std::vector<KDPoint> nears;
+
+  // find p inside the tree
   auto it_p = std::find_if(
       _rrt.begin(), _rrt.end(),
       [&](std::pair<KDPoint, int> &pair) { return (pair.first == p); });
 
-  std::for_each(_rrt.begin(), _rrt.end(), [&](std::pair<KDPoint, int> &pair) {
-    std::vector<KDPoint> branch = {pair.first, p};
-    if ((pair.first != p) && (Distance(pair.first, p) < r) &&
+  // populate nears
+  std::for_each(
+    _rrt.begin(), _rrt.end(), 
+    [&](std::pair<KDPoint, int> &pair) {
+      std::vector<KDPoint> branch = {pair.first, p};
+      if ((pair.first != p) && (Distance(pair.first, p) < r) &&
         (!Collision(branch))) {
-      nears.push_back(pair.first);
-    }
+          nears.push_back(pair.first);
+      }
   });
 
   // checks if p is a victim
+  double victim_discount_p = 0.0;
   auto it_vict_p = std::find_if(victims.begin(), victims.end(),
                                 [&](std::tuple<KDPoint, double> &victim) {
                                   return (std::get<0>(victim) == p);
                                 });
-  double victim_discount_p = 0.0;
   if (it_vict_p != victims.end()) {
     victim_discount_p = -std::get<1>(*it_vict_p);
   }
 
+  // ========== first iteration ==========
   for (auto pt : nears) {
     // avoid rewiring if the new total path is too long to be travelled
     if (Cost(pt, false) + Distance(pt, p) > VELOCITY * TIME_LIMIT) {
@@ -142,7 +153,9 @@ void RRT::Rewire(KDPoint &p, double r,
     }
   }
 
+  // ========== second iteration ==========
   for (auto pt : nears) {
+    // avoid rewiring if the new total path is too long to be travelled
     if (Cost(p, false) + Distance(p, pt)  > VELOCITY * TIME_LIMIT) {
       continue;
     }
@@ -169,6 +182,7 @@ void RRT::Rewire(KDPoint &p, double r,
     if (it_vict_pt != victims.end()) {
       victim_discount_pt = -std::get<1>(*it_vict_pt);
     }
+
     // rewires x_near (pt)
     if (Cost(p, true) + Distance(p, pt) + victim_discount_pt < Cost(pt, true)) {
       auto it_pt = std::find_if(
@@ -178,6 +192,7 @@ void RRT::Rewire(KDPoint &p, double r,
     }
   }
 }
+// ======================================================================================
 
 bool RRT::PathOptimisation(
     KDPoint &current_node_, KDPoint &node_end,

@@ -19,6 +19,7 @@ typedef std::vector<std::vector<double>> SymbolicPath;
 typedef std::vector<
     std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>>>
     DubinsTree;
+
 class RRTDubins {
  private:
  public:
@@ -53,8 +54,11 @@ class RRTDubins {
   // RRT* Dubins
   void Rewire(
       std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> &q_new,
-      double r, std::function<bool(std::vector<KDPoint> &path)> Collision,
-      double dubins_radius);
+      double r, 
+      std::function<bool(std::vector<KDPoint> &path)> Collision,
+      double dubins_radius
+  );
+
   std::tuple<KDPoint, int, SymbolicPath, std::vector<KDPoint>> GetParent(
       KDPoint &p);
 
