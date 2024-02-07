@@ -156,6 +156,9 @@ void RRTDubins::Rewire(
       }
       qnew_copy = std::get<0>(GetParent(qnew_copy));
     }
+    if (qnew_copy == _root) {
+      is_anchestor = true;
+    }
     if (is_anchestor) {
       continue;
     }
@@ -209,6 +212,9 @@ void RRTDubins::Rewire(
         break;
       }
       qnew_copy = std::get<0>(GetParent(qnew_copy));
+    }
+    if (qnew_copy == _root) {
+      is_anchestor = true;
     }
     if (is_anchestor) {
       continue;

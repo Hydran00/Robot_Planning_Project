@@ -55,18 +55,11 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath() {
   KDPoint p = MotionPlanning::_pt_end;
   std::vector<KDPoint> path;
   auto last_path = _rrt.GetPointPath(p);
-  std::cout << "\t                          p:" << p[0] << ", " << p[1] << std::endl;
-  std::cout << "\tPutting node. Starting from: (" << last_path[0][0] << ", " << last_path[0][1] << ")" << std::endl;
-  int end_idx = last_path.size() - 1;
-  std::cout << "\t                  Ending in: (" << last_path[end_idx][0] << ", " << last_path[end_idx][1] << ")" << std::endl;
   path.insert(path.begin(), last_path.begin(), last_path.end());
   while (MotionPlanning::_pt_start != p) {
     auto parent = _rrt.GetParent(p);
     std::vector<KDPoint> parent_path = std::get<3>(parent);
-    std::cout << "\t                          p:" << p[0] << ", " << p[1] << std::endl;
-    std::cout << "\tPutting node. Starting from: (" << parent_path[0][0] << ", " << parent_path[0][1] << ")" << std::endl;
-    int end_idx = parent_path.size() - 1;
-    std::cout << "\t                  Ending in: (" << parent_path[end_idx][0] << ", " << parent_path[end_idx][1] << ")\n" << std::endl;
+    // std::vector<KDPoint> parent_path = _rrt.GetPointPath(p);
     path.insert(path.begin(), parent_path.begin(), parent_path.end());
     p = std::get<0>(parent);
   }
