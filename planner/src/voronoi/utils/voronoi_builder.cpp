@@ -103,7 +103,8 @@ void VoronoiBuilder::compute_shortest_path() {
     voronoi_graph[v].push_back(make_pair(u, weight));
   }
   // Dijkstra's algorithm
-  shortestPath(voronoi_graph, voronoi_graph.size(), 1);
+  
+  // shortestPath(voronoi_graph, voronoi_graph.size(), 1);
 }
 
 void VoronoiBuilder::correct_geometry(

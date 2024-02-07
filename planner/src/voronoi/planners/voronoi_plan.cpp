@@ -14,40 +14,149 @@ void VoronoiPlan::GenerateVoronoi(void) {
                 "/data/voronoi.txt";
   std::remove(path.c_str());
   file.open(path);
-  // iteraint vertexes
+  // iteraint vertices
   auto edges = _voronoi_builder.get_voronoi_edges();
-  // connect each vertex to the start point -> create a set
 
-  // creates set
-  std::set<KDPoint> vertexes;
+  // creates set for extracting unique vertices
+  std::set<KDPoint> vertices;
+
+  // add all vertices to the set
   for (auto &edge : edges) {
-    std::cout << "Adding " << edge.first[0] << " " << edge.first[1]
-              << std::endl;
-    vertexes.insert(KDPoint{edge.first[0], edge.first[1]});
-    vertexes.insert(KDPoint{edge.second[0], edge.second[1]});
+    vertices.insert(KDPoint{edge.first[0], edge.first[1]});
+    vertices.insert(KDPoint{edge.second[0], edge.second[1]});
   }
 
-  // add connection from start point to each vertex
-  for (auto &vertex : vertexes) {
-    std::vector<KDPoint> segment = {vertex, _map_info->pt_start};
-    if (_map_info->Collision(segment)) {
-      continue;
+  auto distance = [](KDPoint a, KDPoint b) {
+    return std::sqrt(std::pow(a[0] - b[0], 2) + std::pow(a[1] - b[1], 2));
+  };
+
+  // increment voronoi connections
+  std::vector<KDPoint> segment = {{0.0, 0.0}, {0.0, 0.0}};
+  for (auto vertex : vertices) {
+    segment[0] = vertex;
+    // add connection from start point to each vertex
+    segment[1] = _map_info->pt_start;
+    if (!_map_info->Collision(segment) &&
+        distance(vertex, _map_info->pt_start) < conn_radius) {
+      edges.push_back(std::make_pair(_map_info->pt_start, vertex));
     }
-    edges.push_back(std::make_pair(_map_info->pt_start, vertex));
-    edges.push_back(std::make_pair(_map_info->pt_end, vertex));
+    // add connection from end point to each vertex
+    segment[1] = _map_info->pt_end;
+    if (!_map_info->Collision(segment) &&
+        distance(vertex, _map_info->pt_end) < conn_radius) {
+      edges.push_back(std::make_pair(_map_info->pt_end, vertex));
+    }
+    // add connection from victims to each vertex
     for (auto v : _map_info->_victims) {
-      std::vector<KDPoint> segment = {vertex, std::get<0>(v)};
-      edges.push_back(std::make_pair(std::get<0>(v), vertex));
+      segment[1] = std::get<0>(v);
+      if (!_map_info->Collision(segment) &&
+          distance(vertex, std::get<0>(v)) < conn_radius) {
+        edges.push_back(std::make_pair(std::get<0>(v), vertex));
+      }
     }
   }
-
+  // add connection from start point to end point
+  segment[0] = _map_info->pt_start;
+  segment[1] = _map_info->pt_end;
+  if (!_map_info->Collision(segment)) {
+    edges.push_back(std::make_pair(_map_info->pt_start, _map_info->pt_end));
+  }
+  // add connection from start point to each victim
+  for (auto v : _map_info->_victims) {
+    segment[1] = std::get<0>(v);
+    if (!_map_info->Collision(segment)) {
+      edges.push_back(std::make_pair(_map_info->pt_start, std::get<0>(v)));
+    }
+  }
+  // add connection from end point to each victim
+  segment[0] = _map_info->pt_end;
+  for (auto v : _map_info->_victims) {
+    segment[1] = std::get<0>(v);
+    if (!_map_info->Collision(segment)) {
+      edges.push_back(std::make_pair(_map_info->pt_end, std::get<0>(v)));
+    }
+  }
+  // add connection from each victim to each victim
+  for (size_t i = 0; i < _map_info->_victims.size() - 1; i++) {
+    for (size_t j = i + 1; j < _map_info->_victims.size(); j++) {
+      segment[0] = std::get<0>(_map_info->_victims[i]);
+      segment[1] = std::get<0>(_map_info->_victims[j]);
+      if (!_map_info->Collision(segment)) {
+        edges.push_back(std::make_pair(std::get<0>(_map_info->_victims[i]),
+                                       std::get<0>(_map_info->_victims[j])));
+      }
+    }
+  }
   for (auto &edge : edges) {
     file << edge.first[0] << " " << edge.first[1] << " " << edge.second[0]
          << " " << edge.second[1] << std::endl;
   }
   file.close();
 
-  //   using namespace dijkstra;
-  // shortestPath(voronoi_graph, voronoi_graph.size(), 1);
+  // adding start, end and victims to the vertices
+  vertices.insert(_map_info->pt_start);
+  vertices.insert(_map_info->pt_end);
+  for (auto v : _map_info->_victims) {
+    vertices.insert(std::get<0>(v));
+  }
+
+  // labelling vertices
+  std::vector<std::pair<KDPoint, int>> point_index;
+  int index = 0;
+  // labelling vertices
+  for (auto vertex : vertices) {
+    point_index.push_back(make_pair(vertex, index));
+    index++;
+  }
+
+  std::vector<std::vector<pair<int, double>>> final_voronoi;
+  final_voronoi.reserve(vertices.size() + 1);
+  final_voronoi.resize(vertices.size() + 1);
+
+  using namespace boost;
+  typedef adjacency_list<listS, vecS, directedS, no_property,
+                         property<edge_weight_t, int>>
+      graph_t;
+  typedef graph_traits<graph_t>::vertex_descriptor vertex_descriptor;
+  typedef std::pair<int, int> Edge;
+  // create edge array
+  std::vector<Edge> edge_array;
+  edge_array.resize(final_voronoi.size());
+  // creaate weights array
+  std::vector<double> weights;
+  weights.resize(final_voronoi.size());
+  // create weighted graph
+  for (auto edge : edges) {
+    int u = std::find_if(point_index.begin(), point_index.end(),
+                         [&](const std::pair<KDPoint, int> &p) {
+                           return distance(p.first, edge.first) < 1.0e-6;
+                         })
+                ->second;
+    int v = std::find_if(point_index.begin(), point_index.end(),
+                         [&](const std::pair<KDPoint, int> &p) {
+                           return distance(p.first, edge.second) < 1.0e-6;
+                         })
+                ->second;
+    edge_array.push_back(Edge(u, v));
+    weights.push_back(distance(edge.first, edge.second));
+  }
+  int num_arcs = sizeof(edge_array) / sizeof(Edge);
+  // graph_t g(edge_array, edge_array.size(), weights, vertices.size());
+  // property_map<graph_t, edge_weight_t>::type weightmap = get(edge_weight, g);
+  // std::vector<vertex_descriptor> p(num_vertices(g));
+  // std::vector<int> d(num_vertices(g));
+  // vertex_descriptor s = vertex(A, g);
+
+  // dijkstra_shortest_paths(
+  //     g, s,
+  //     predecessor_map(boost::make_iterator_property_map(
+  //                         p.begin(), get(boost::vertex_index, g)))
+  //         .distance_map(boost::make_iterator_property_map(
+  //             d.begin(), get(boost::vertex_index, g))));
+
+  // }
+  // Dijkstra's algorithm
+  // shortestPath(final_voronoi, final_voronoi.size(), 1);
+
   // std::cout << "Dijkstra's algorithm done!" << std::endl;
 }

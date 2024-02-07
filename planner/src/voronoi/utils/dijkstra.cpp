@@ -1,57 +1,61 @@
 #include "planner/voronoi/utils/dijkstra.h"
-// Prints shortest paths from src to all other vertices
-void shortestPath(const std::vector<vector<pair<int, double>>> &adj, int V, int src) {
 
-  std::cout << "Graph size: " << V << std::endl; 
-  if(V == 0){
-    return;
-  }
-  // Create a priority queue to store vertices that
-  // are being preprocessed.
-  priority_queue<Node, vector<Node>, greater<Node>> pq;
+// using namespace boost;
+// void test() {
+//   typedef adjacency_list<listS, vecS, directedS, no_property,
+//                          property<edge_weight_t, int> >
+//       graph_t;
+//   typedef graph_traits<graph_t>::vertex_descriptor vertex_descriptor;
+//   typedef std::pair<int, int> Edge;
 
-  // Create a vector for distances and initialize all
-  vector<double> dist(V, numeric_limits<double>::max());
+//   const int num_nodes = 5;
+//   enum nodes { A, B, C, D, E };
+//   char name[] = "1234";
+//   Edge edge_array[] = {Edge(A, C), Edge(B, B), Edge(B, D),
+//                        Edge(B, E), Edge(C, B), Edge(C, D),
+//                        Edge(D, E), Edge(E, A), Edge(E, B)};
+//   int weights[] = {1, 2, 1, 2, 7, 3, 1, 1, 1};
+//   int num_arcs = sizeof(edge_array) / sizeof(Edge);
+//   graph_t g(edge_array, edge_array + num_arcs, weights, num_nodes);
+//   property_map<graph_t, edge_weight_t>::type weightmap = get(edge_weight, g);
+//   std::vector<vertex_descriptor> p(num_vertices(g));
+//   std::vector<int> d(num_vertices(g));
+//   vertex_descriptor s = vertex(A, g);
 
-  // Insert source itself in priority queue and initialize
-  // its distance as 0.
-  pq.push(make_pair(0, src));
-  dist[src] = 0.0;
+//   dijkstra_shortest_paths(
+//       g, s,
+//       predecessor_map(boost::make_iterator_property_map(
+//                           p.begin(), get(boost::vertex_index, g)))
+//           .distance_map(boost::make_iterator_property_map(
+//               d.begin(), get(boost::vertex_index, g))));
 
-  /* Looping till priority queue becomes empty (or all
-  distances are not finalized) */
-  while (!pq.empty()) {
-    // The first vertex in pair is the minimum distance
-    // vertex, extract it from priority queue.
-    // vertex label is stored in second of pair (it
-    // has to be done this way to keep the vertices
-    // sorted distance (distance must be first item
-    // in pair)
-    int u = pq.top().second;
-    pq.pop();
+//   std::cout << "distances and parents:" << std::endl;
+//   graph_traits<graph_t>::vertex_iterator vi, vend;
+//   for (boost::tie(vi, vend) = vertices(g); vi != vend; ++vi) {
+//     std::cout << "distance(" << name[*vi] << ") = " << d[*vi] << ", ";
+//     std::cout << "parent(" << name[*vi] << ") = " << name[p[*vi]] << std::endl;
+//   }
+//   std::cout << std::endl;
 
-    // Get all adjacent of u.
-    for (auto x : adj[u]) {
-      // Get vertex label and weight of current
-      // adjacent of u.
-      int v = x.first;
-      double weight = x.second;
+//   // std::ofstream dot_file("dijkstra-eg.dot");
 
-      // If there is shorted path to v through u.
-      if (dist[v] > dist[u] + weight) {
-        // Updating distance of v
-        dist[v] = dist[u] + weight;
-        pq.push(make_pair(dist[v], v));
-      }
-    }
-  }
-
-  // Print shorteturn;est distances stored in dist[]
-  cout << "Vertex Distance from Source\n";
-  for (int i = 0; i < V; ++i) {
-    cout<<i<<" \t\t "<< dist[i]<<endl;
-  }
-  return;
-}
-
-// }  // namespace dijkstra
+//   // dot_file << "digraph D {\n"
+//   //          << "  rankdir=LR\n"
+//   //          << "  size=\"4,3\"\n"
+//   //          << "  ratio=\"fill\"\n"
+//   //          << "  edge[style=\"bold\"]\n"
+//   //          << "  node[shape=\"circle\"]\n";
+//   graph_traits<graph_t>::edge_iterator ei, ei_end;
+//   for (boost::tie(ei, ei_end) = edges(g); ei != ei_end; ++ei) {
+//     graph_traits<graph_t>::edge_descriptor e = *ei;
+//     graph_traits<graph_t>::vertex_descriptor u = source(e, g), v = target(e, g);
+//     // dot_file << name[u] << " -> " << name[v] << "[label=\"" << get(weightmap, e)
+//     //          << "\"";
+//     // if (p[v] == u)
+//     //   dot_file << ", color=\"black\"";
+//     // else
+//     //   dot_file << ", color=\"grey\"";
+//     // dot_file << "]";
+//   }
+//   // dot_file << "}";
+// }
