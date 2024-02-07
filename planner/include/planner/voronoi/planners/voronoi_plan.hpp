@@ -5,7 +5,7 @@ class VoronoiPlan {
  private:
   VoronoiBuilder _voronoi_builder;
  public:
-  // std::shared_ptr<MapInfo> &map_info;
+  std::shared_ptr<MapInfo> _map_info;
   void GenerateVoronoi(void);
   std::tuple<std::vector<KDPoint>, double> run(void);
   VoronoiPlan(std::shared_ptr<MapInfo> &map_info);

@@ -15,6 +15,7 @@
 #include <boost/polygon/voronoi.hpp>
 #include <boost/geometry/algorithms/transform.hpp>
 #include "planner/voronoi/utils/dijkstra.h"
+#include "planner/rrt/utils/kdtree.hpp"
 using boost::polygon::high;
 using boost::polygon::low;
 using boost::polygon::voronoi_builder;
@@ -84,7 +85,7 @@ class VoronoiBuilder {
   const double scale_factor = 100.0;
   polygon _map, _scaled_map;
   void create_voronoi();
-  std::vector<std::pair<point_xy, point_xy>> get_voronoi_edges();
+  std::vector<std::pair<KDPoint,KDPoint>> get_voronoi_edges();
   void compute_shortest_path();
   VoronoiBuilder(polygon &map) : _map(map) {}
  private:

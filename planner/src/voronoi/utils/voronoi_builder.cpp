@@ -40,19 +40,20 @@ void VoronoiBuilder::create_voronoi() {
   // _map = map_copy;
 }
 
-std::vector<std::pair<point_xy, point_xy>> VoronoiBuilder::get_voronoi_edges() {
-  std::vector<std::pair<point_xy, point_xy>> voronoi_edges;
+std::vector<std::pair<KDPoint, KDPoint>> VoronoiBuilder::get_voronoi_edges() {
+  std::vector<std::pair<KDPoint, KDPoint>> voronoi_edges;
   for (auto edge = voronoi_diagram_.edges().begin();
        edge != voronoi_diagram_.edges().end(); ++edge) {
     if (edge->is_finite() && is_edge_valid(edge)) {
-      point_xy source = point_xy((double)edge->vertex0()->x() / scale_factor,
-                                 (double)edge->vertex0()->y() / scale_factor);
-      point_xy target = point_xy((double)edge->vertex1()->x() / scale_factor,
-                                 (double)edge->vertex1()->y() / scale_factor);
+      KDPoint source = {edge->vertex0()->x() / scale_factor,
+                        edge->vertex0()->y() / scale_factor};
+      KDPoint target = {edge->vertex1()->x() / scale_factor,
+                        edge->vertex1()->y() / scale_factor};
       voronoi_edges.push_back(make_pair(source, target));
     }
   }
   return voronoi_edges;
+  // return
 }
 
 void VoronoiBuilder::compute_shortest_path() {
@@ -127,7 +128,6 @@ void VoronoiBuilder::correct_geometry(
 
 bool VoronoiBuilder::is_edge_valid(
     voronoi_diagram<double>::const_edge_iterator edge) {
-  
   // check if the edge ends in the map
   point_xy vertex0 = point_xy(edge->vertex0()->x() / scale_factor,
                               edge->vertex0()->y() / scale_factor);
