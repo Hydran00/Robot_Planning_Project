@@ -118,10 +118,8 @@ void VoronoiPlan::GenerateVoronoi(void) {
                          property<edge_weight_t, int>>
       graph_t;
   typedef graph_traits<graph_t>::vertex_descriptor vertex_descriptor;
-  typedef std::pair<int, int> Edge;
   // create edge array
-  std::vector<Edge> edge_array;
-  edge_array.resize(final_voronoi.size());
+  std::vector<VEdge> edge_array;
   // creaate weights array
   std::vector<double> weights;
   weights.resize(final_voronoi.size());
@@ -137,26 +135,25 @@ void VoronoiPlan::GenerateVoronoi(void) {
                            return distance(p.first, edge.second) < 1.0e-6;
                          })
                 ->second;
-    edge_array.push_back(Edge(u, v));
-    weights.push_back(distance(edge.first, edge.second));
+    VEdge e{u, v, distance(edge.first, edge.second)};
+    edge_array.push_back(e);
   }
-  int num_arcs = sizeof(edge_array) / sizeof(Edge);
-  // graph_t g(edge_array, edge_array.size(), weights, vertices.size());
-  // property_map<graph_t, edge_weight_t>::type weightmap = get(edge_weight, g);
-  // std::vector<vertex_descriptor> p(num_vertices(g));
-  // std::vector<int> d(num_vertices(g));
-  // vertex_descriptor s = vertex(A, g);
-
-  // dijkstra_shortest_paths(
-  //     g, s,
-  //     predecessor_map(boost::make_iterator_property_map(
-  //                         p.begin(), get(boost::vertex_index, g)))
-  //         .distance_map(boost::make_iterator_property_map(
-  //             d.begin(), get(boost::vertex_index, g))));
-
-  // }
-  // Dijkstra's algorithm
-  // shortestPath(final_voronoi, final_voronoi.size(), 1);
-
-  // std::cout << "Dijkstra's algorithm done!" << std::endl;
+  Dijkstra dijkstra(edge_array);
+  // get start vertex index 
+  int start = std::find_if(point_index.begin(), point_index.end(),
+                           [&](const std::pair<KDPoint, int> &p) {
+                             return distance(p.first, _map_info->pt_start) < 1.0e-6;
+                           })
+                  ->second;
+  int end = std::find_if(point_index.begin(), point_index.end(),
+                         [&](const std::pair<KDPoint, int> &p) {
+                           return distance(p.first, _map_info->pt_end) < 1.0e-6;
+                         })
+              ->second;
+  std::cout << "Start is "<< start << " and end is " << end << std::endl;
+  std::vector<int> shortest_path = dijkstra.get_shortest_path(start,end);
+  // print path
+  for (auto p : shortest_path) {
+    std::cout << p << " "<< std::endl;
+  }
 }
