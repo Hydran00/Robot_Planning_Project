@@ -30,10 +30,10 @@ class Dijkstra {
 
   void print_path();
   void generate_dot_file();
+  std::vector<double> kD;
 
  private:
   graph_t kGraph;
-  std::vector<double> kD;
   std::vector<vertex_descriptor> kP;
 };
 
