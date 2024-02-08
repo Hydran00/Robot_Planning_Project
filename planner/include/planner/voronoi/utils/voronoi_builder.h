@@ -16,6 +16,7 @@
 #include <boost/geometry/algorithms/transform.hpp>
 #include "planner/voronoi/utils/dijkstra.h"
 #include "planner/rrt/utils/kdtree.hpp"
+#include <boost/geometry/geometries/linestring.hpp>
 using boost::polygon::high;
 using boost::polygon::low;
 using boost::polygon::voronoi_builder;
@@ -29,6 +30,7 @@ using namespace std;
 
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::polygon<point_xy> polygon;
+typedef boost::geometry::model::linestring<point_xy> Linestring;
 // segment
 
 // polygon polygon;
@@ -82,11 +84,10 @@ class VoronoiBuilder {
  public:
   /// @brief data structure for the constructed voronoi diagram
   voronoi_diagram<double> voronoi_diagram_;
-  const double scale_factor = 100.0;
+  const double scale_factor = 1000.0;
   polygon _map, _scaled_map;
   void create_voronoi();
   std::vector<std::pair<KDPoint,KDPoint>> get_voronoi_edges();
-  void compute_shortest_path();
   VoronoiBuilder(polygon &map) : _map(map) {}
  private:
   void correct_geometry(boost::geometry::validity_failure_type &failure);

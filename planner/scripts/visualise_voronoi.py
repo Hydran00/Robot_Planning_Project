@@ -62,13 +62,12 @@ def plot3(data1,data2):
     plt.plot([x1, x2], [y1, y2], 'k-')
     plt.axis('equal')
     
-    # plot voronoi
+    # # plot voronoi
     x = data2[:,0]
     y = data2[:,1]
 
-    plt.plot(x, y, 'r-')
+    plt.plot(x, y, 'r--')
     plt.show()
-    plt.show(block=False)
     
 if __name__ == "__main__":
     # path1 = np.loadtxt(str(get_package_share_directory('planner')) + '/data/final_path.txt', delimiter=',')

@@ -56,57 +56,6 @@ std::vector<std::pair<KDPoint, KDPoint>> VoronoiBuilder::get_voronoi_edges() {
   // return
 }
 
-void VoronoiBuilder::compute_shortest_path() {
-  std::vector<std::pair<point_xy, int>> point_index;
-  int index = 0;
-  // labelling vertexes
-  for (auto vertex = voronoi_diagram_.vertices().begin();
-       vertex != voronoi_diagram_.vertices().end(); ++vertex) {
-    point_xy node(vertex->x(), vertex->y());
-    point_index.push_back(make_pair(node, index));
-  }
-  std::vector<std::vector<pair<int, double>>> voronoi_graph;
-  voronoi_graph.reserve(voronoi_diagram_.vertices().size() + 1);
-  voronoi_graph.resize(voronoi_diagram_.vertices().size() + 1);
-  // Get the source and target points of the current edge
-  for (auto edge = voronoi_diagram_.edges().begin();
-       edge != voronoi_diagram_.edges().end(); ++edge) {
-    if (!edge->is_finite() || !is_edge_valid(edge)) {
-      continue;
-    }
-    std::cout << "Valid edge is " << edge->vertex0()->x() << " "
-              << edge->vertex0()->y() << " " << edge->vertex1()->x() << " "
-              << edge->vertex1()->y() << std::endl;
-    point_xy source =
-        point_xy((double)edge->vertex0()->x(), (double)edge->vertex0()->y());
-    point_xy target =
-        point_xy((double)edge->vertex1()->x(), (double)edge->vertex1()->y());
-    // Calculate the Euclidean distance between the source and target points
-    double weight =
-        sqrt(pow(source.x() - target.x(), 2) + pow(source.y() - target.y(), 2));
-
-    // Get the index of the source and target points in the Voronoi diagram
-    int u = std::find_if(point_index.begin(), point_index.end(),
-                         [&](const std::pair<point_xy, int> &p) {
-                           return abs(p.first.x() - source.x()) < 0.001 &&
-                                  abs(p.first.y() - source.y()) < 0.001;
-                         })
-                ->second;
-    int v = std::find_if(point_index.begin(), point_index.end(),
-                         [&](const std::pair<point_xy, int> &p) {
-                           return abs(p.first.x() - target.x()) < 0.001 &&
-                                  abs(p.first.y() - target.y()) < 0.001;
-                         })
-                ->second;
-
-    voronoi_graph[u].push_back(make_pair(v, weight));
-    voronoi_graph[v].push_back(make_pair(u, weight));
-  }
-  // Dijkstra's algorithm
-  
-  // shortestPath(voronoi_graph, voronoi_graph.size(), 1);
-}
-
 void VoronoiBuilder::correct_geometry(
     boost::geometry::validity_failure_type &failure) {
   bool could_be_fixed = (failure == boost::geometry::failure_not_closed ||
@@ -134,8 +83,10 @@ bool VoronoiBuilder::is_edge_valid(
                               edge->vertex0()->y() / scale_factor);
   point_xy vertex1 = point_xy(edge->vertex1()->x() / scale_factor,
                               edge->vertex1()->y() / scale_factor);
-  if (!boost::geometry::within(vertex0, _map) ||
-      !boost::geometry::within(vertex1, _map)) {
+  Linestring l;
+  boost::geometry::append(l, vertex0);
+  boost::geometry::append(l, vertex1);
+  if (!boost::geometry::within(l,_map)) {
     return false;
   }
   // check if the edge ends in a outer poly's vertex
@@ -171,19 +122,3 @@ bool VoronoiBuilder::is_edge_valid(
   return true;
 }
 
-// int main()
-// {
-//     // monitor execution time
-//     auto start = high_resolution_clock::now();
-//     VoronoiBuilder vb;
-//     vb.create_voronoi_from_WTK(ament_index_cpp::get_package_share_directory("planner")
-//     + "/data/polygon.txt"); auto stop = high_resolution_clock::now();
-
-//     auto duration = duration_cast<microseconds>(stop - start);
-//     std::cout << "Execution time: " << duration.count() << " microseconds.
-//     Saving..." << std::endl;
-//     vb.save_voronoi(ament_index_cpp::get_package_share_directory("planner")
-//     +
-//     "/data/boost_voronoi_edges.csv"); std::cout << "Done!" << std::endl;
-//     return 0;
-// }
