@@ -181,7 +181,7 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void)
   std::vector<victim_combination> all_combinations;
   std::vector<int> indices(_map_info->_victims.size());
   std::iota(indices.begin(), indices.end(), 0);
-  std::vector<std::vector<int>> combinations = generateAllCombinations(indices);
+  std::vector<std::vector<int>> combinations = generate_subsets(indices);
   for (auto &combination : combinations)
   {
     victim_combination vc;

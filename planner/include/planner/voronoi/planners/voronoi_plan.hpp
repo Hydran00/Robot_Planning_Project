@@ -10,7 +10,7 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "planner/map_info_node.hpp"
 #include "planner/voronoi/utils/voronoi_builder.h"
-#include "planner/voronoi/utils/random_combinations.h"
+#include "planner/voronoi/utils/combinations.h"
 #include "planner/dubins/dubins.h"
 
 class VoronoiPlan {
