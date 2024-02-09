@@ -246,9 +246,8 @@ get_dubins_best_path_and_cost(std::vector<double> q_near,
 
 std::vector<KDPoint> dubinise_path(std::vector<KDPoint> &waypoints, double r,
                                    double step) {
+  std::cout << "\033[1;33mDubinising path...\033[0m" << std::endl;
   std::vector<KDPoint> path;
-  std::cout << "Radius is "<< r << std::endl;
-  std::cout << "Step is "<< step << std::endl;
   auto compute_yaw = [](KDPoint &p1, KDPoint &p2) {
     return atan2(p2[1] - p1[1], p2[0] - p1[0]);
   };
@@ -262,9 +261,9 @@ std::vector<KDPoint> dubinise_path(std::vector<KDPoint> &waypoints, double r,
       p1.push_back(compute_yaw(waypoints[i], waypoints[i + 1]));
       p2.push_back(compute_yaw(waypoints[i + 1], waypoints[i + 2]));
     }
-    std::cout << "Creating dubins from (" << p1[0] << ", " << p1[1] << ", "
-              << p1[2] << ") to (" << p2[0] << ", " << p2[1] << ", " << p2[2]
-              << ")" << std::endl;
+    // std::cout << "Creating dubins from (" << p1[0] << ", " << p1[1] << ", "
+    //           << p1[2] << ") to (" << p2[0] << ", " << p2[1] << ", " << p2[2]
+    //           << ")" << std::endl;
     auto best_path_and_cost = get_dubins_best_path_and_cost(p1, p2, r, step);
     path.insert(path.end(), std::get<0>(best_path_and_cost).begin(),
                 std::get<0>(best_path_and_cost).end());

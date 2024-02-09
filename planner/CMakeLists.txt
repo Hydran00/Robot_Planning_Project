@@ -48,6 +48,7 @@ add_executable(voronoi_planner
   ${VORONOI_FOLDER}/utils/random_combinations.cpp
   ${VORONOI_FOLDER}/planners/voronoi_plan.cpp
   src/map_info_node.cpp 
+  src/dubins/dubins.cpp
   # these are needed to compile map_info_node
   ${RRT_FOLDER}/utils/kdtree.cpp
   ${RRT_FOLDER}/utils/rrt.cpp

@@ -8,7 +8,7 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   this->_marker_pub = create_publisher<visualization_msgs::msg::Marker>(
       "visualization_marker", 10000);
 
-  this->declare_parameter("planner_type", "rrt_star_dubins");
+  this->declare_parameter("planner_type", "not_specified");
   this->_planner_type = this->get_parameter("planner_type").as_string();
 
   this->declare_parameter("show_graphics", true);
@@ -33,9 +33,12 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   victims_received_ = false;
 
   if(_planner_type != "rrt_star_dubins"){
-    offset = OFFSET; //+ 2 * dubins_radius;
+    obstacle_offset = OFFSET + dubins_radius;
+    map_offset = 0;//OFFSET; 
+
   }else{
-    offset = OFFSET;
+    obstacle_offset = OFFSET;
+    map_offset = 0;//OFFSET;
   }
 
   const auto qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_custom);
@@ -152,8 +155,9 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
   // fill the msg with the map
 
   // Offsetting strategies and parameters
+  //TODO check if the map_offset is correct
   boost::geometry::strategy::buffer::distance_symmetric<double>
-      offsetting_distance_strategy(-offset);
+      offsetting_distance_strategy(-map_offset);
   boost::geometry::model::multi_polygon<polygon> result;
   boost::geometry::model::multi_polygon<polygon> mp;
   mp.resize(1);
@@ -211,7 +215,7 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
 
   // Polygon offsetting
   boost::geometry::strategy::buffer::distance_symmetric<double>
-      offsetting_distance_strategy(offset);
+      offsetting_distance_strategy(obstacle_offset);
   boost::geometry::model::multi_polygon<polygon> result;
 
   for (auto obs : msg.obstacles) {
@@ -232,8 +236,8 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
       marker.pose.position.x = obs.polygon.points[0].x;
       marker.pose.position.y = obs.polygon.points[0].y;
       marker.pose.position.z = obs.polygon.points[0].z;
-      marker.scale.x = obs.radius * 2 + offset;
-      marker.scale.y = obs.radius * 2 + offset;
+      marker.scale.x = obs.radius * 2 + obstacle_offset;
+      marker.scale.y = obs.radius * 2 + obstacle_offset;
       marker.scale.z = 1.1;
       _obstacle_array.markers.push_back(marker);
 
@@ -241,7 +245,7 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
       boost::geometry::model::multi_point<point_xy> mp = {
           point_xy(obs.polygon.points[0].x, obs.polygon.points[0].y)};
       boost::geometry::strategy::buffer::distance_symmetric<double>
-          distance_strategy(obs.radius + offset);
+          distance_strategy(obs.radius + obstacle_offset);
       // Creates the circle and stores it in result
 
       boost::geometry::buffer(mp, result, distance_strategy, side_strategy_,
@@ -266,10 +270,10 @@ void MapInfo::set_obstacle(const obstacles_msgs::msg::ObstacleArrayMsg &msg) {
 
       marker.scale.x =
           abs(obs.polygon.points[0].x - obs.polygon.points[2].x) +
-          offset / abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
+          obstacle_offset / abs(obs.polygon.points[0].x - obs.polygon.points[2].x);
       marker.scale.y =
           abs(obs.polygon.points[0].y - obs.polygon.points[2].y) +
-          offset / abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
+          obstacle_offset / abs(obs.polygon.points[0].y - obs.polygon.points[2].y);
       marker.scale.z = 1.1;
       _obstacle_array.markers.push_back(marker);
 
@@ -410,12 +414,15 @@ void MapInfo::set_final_path(std::vector<KDPoint> &path) {
   _m_path.color.a = 1.0;
 
   _m_path.points.clear();
-
+  float inc = 0.001;
   for (auto p : path) {
     geometry_msgs::msg::Point p_;
     p_.x = p[0];
     p_.y = p[1];
-    p_.z = 0.05;
+    p_.z = 0.2 + inc;
+    // avoid glitches
+    inc += 0.001;
+    std::cout << "Plotting path: " << p[0] << " " << p[1] << std::endl;
     _m_path.points.push_back(p_);
   }
   _marker_pub->publish(_m_path);
@@ -450,7 +457,6 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
   _m_rrt.color.b = 0.5;
   _m_rrt.color.g = 0.5;
   _m_rrt.color.a = 1.0;
-
   _m_rrt.points.clear();
   for (auto p : rrt) {
     geometry_msgs::msg::Point p1, p2;

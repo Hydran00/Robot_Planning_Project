@@ -89,36 +89,6 @@ bool VoronoiBuilder::is_edge_valid(
   if (!boost::geometry::within(l,_map)) {
     return false;
   }
-  // check if the edge ends in a outer poly's vertex
-  // for (const auto &point : _map.outer()) {
-  //   if (abs(edge->vertex0()->x() / scale_factor - point.x() < 0.1) &&
-  //       abs(edge->vertex0()->y() / scale_factor - point.y() < 0.1)) {
-  //     std::cout << "A" << std::endl;
-  //     return false;
-  //   }
-  //   if (abs(edge->vertex1()->x() / scale_factor - point.x() < 0.1) &&
-  //       abs(edge->vertex1()->y() / scale_factor - point.y() < 0.1)) {
-  //     std::cout << "B" << std::endl;
-  //     return false;
-  //   }
-  // }
-  // check if the edge ends in a inner polygon's vertex
-  // for (const auto &inner_ring : _scaled_map.inners()) {
-  //   for (const auto &point : inner_ring) {
-  //     if (abs(vertex0.x() / scale_factor - point.x()) < 0.2 &&
-  //         abs(vertex0.y() / scale_factor - point.y()) < 0.2) {
-  //       std::cout << "D" << std::endl;
-
-  //       return false;
-  //     }
-  //     if (abs(vertex1.x() / scale_factor - point.x()) < 0.2 &&
-  //         abs(vertex1.y() / scale_factor - point.y()) < 0.2) {
-  //       std::cout << "E" << std::endl;
-
-  //       return false;
-  //     }
-  //   }
-  // }
   return true;
 }
 

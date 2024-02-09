@@ -11,7 +11,8 @@
 
 using namespace std;
 
-void print_path_on_file(std::vector<KDPoint> path) {
+void print_path_on_file(std::vector<KDPoint> path)
+{
   std::string file_path =
       ament_index_cpp::get_package_share_directory("planner") +
       "/data/final_path.txt";
@@ -19,14 +20,16 @@ void print_path_on_file(std::vector<KDPoint> path) {
   std::ofstream fout;
   fout.open(file_path, std::ios::app);
   // fout << std::endl;
-  for (size_t i = 0; i < path.size(); i++) {
+  for (size_t i = 0; i < path.size(); i++)
+  {
     fout << path[i][0] << ", " << path[i][1] << std::endl;
   }
   // close
   fout.close();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   rclcpp::init(argc, argv);
 
   std::string file_path =
@@ -44,7 +47,8 @@ int main(int argc, char **argv) {
   RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
   while (!m->start_received_ || !m->obstacles_received_ ||
          !m->borders_received_ || !m->gates_received_ ||
-         !m->victims_received_) {
+         !m->victims_received_)
+  {
     // RCLCPP_INFO(m->get_logger(), "Map received: %d, Border: %d, Gates: %d",
     // m->obstacles_received_, m->borders_received_, m->gates_received_);
     rclcpp::spin_some(m->get_node_base_interface());
@@ -68,35 +72,33 @@ int main(int argc, char **argv) {
   rclcpp::sleep_for(std::chrono::milliseconds(2000));
 
   VoronoiPlan plan(m);
-  plan.GenerateVoronoi();
+  cout << "Planner started!" << endl;
+  auto time_start = rclcpp::Clock().now();
+  std::pair<std::vector<KDPoint>, double> path = plan.GetPlan();
+  std::vector<KDPoint> dubinised_final_path =
+      dubinise_path(path.first, m->dubins_radius, 0.1);
+  auto time_end = rclcpp::Clock().now();
+  auto time_diff = time_end - time_start;
+  cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
+
+  // Check path validity
+  cout << "IS PATH VALID?: " << (m->Collision(dubinised_final_path) ? "NO" : "YES")
+       << endl;
+
+  //   // Output path for python visualisation
+  print_path_on_file(dubinised_final_path);
+  m->set_final_path(path.first);
   rclcpp::sleep_for(std::chrono::milliseconds(2000));
+  // m->set_final_path(dubinised_final_path);
 
+  int i = 0;
+  while (i < 100)
+  {
+    m->publish_path(dubinised_final_path);
+    rclcpp::sleep_for(std::chrono::milliseconds(10));
+    i++;
+  }
 
-//   cout << "Planner started!" << endl;
-//   auto time_start = rclcpp::Clock().now();
-//   std::tuple<std::vector<KDPoint>,double> final_path_cost = plan.run();
-//   std::vector<KDPoint> final_path = std::get<0>(final_path_cost);
-//   auto time_end = rclcpp::Clock().now();
-//   auto time_diff = time_end - time_start;
-//   cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
-
-//   m->set_final_path(final_path);
-//   // Check path validity
-//   cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
-//        << endl;
-
-//   // Output path for python visualisation
-//   print_path_on_file(final_path);
-
-//   int i = 0;
-//   while (i < 100) {
-//     m->publish_path(final_path);
-//     rclcpp::sleep_for(std::chrono::milliseconds(10));
-//     i++;
-//   }
-//   std::cout << "Path published" << std::endl;
-
-//   rclcpp::shutdown();
-//   cout << "Done!" << endl;
+  rclcpp::shutdown();
   return 0;
 }
