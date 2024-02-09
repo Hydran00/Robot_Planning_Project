@@ -89,6 +89,16 @@ bool VoronoiBuilder::is_edge_valid(
   if (!boost::geometry::within(l,_map)) {
     return false;
   }
+  // check if the vertexes are near map exterior ring
+  for(auto &point : boost::geometry::exterior_ring(_map)){
+    if (boost::geometry::distance(point, vertex0) < 0.05) {
+      return false;
+    }
+    if (boost::geometry::distance(point, vertex1) < 0.05) {
+      return false;
+    }
+  }
+
   return true;
 }
 
