@@ -167,7 +167,6 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points)
   // fill the msg with the map
 
   // Offsetting strategies and parameters
-  // TODO check if the map_offset is correct
   boost::geometry::strategy::buffer::distance_symmetric<double>
       offsetting_distance_strategy(-map_offset);
   boost::geometry::model::multi_polygon<polygon> result;
@@ -468,7 +467,6 @@ void MapInfo::set_final_path(std::vector<KDPoint> &path)
     p_.z = 0.2 + inc;
     // avoid glitches
     inc += 0.01;
-    std::cout << "Plotting path: " << p[0] << " " << p[1] << std::endl;
     _m_path.points.push_back(p_);
   }
   _marker_pub->publish(_m_path);
@@ -612,11 +610,11 @@ bool MapInfo::Collision(std::vector<KDPoint> &path)
 
 void MapInfo::publish_path(std::vector<KDPoint> final_path)
 {
-  // create path message
+  // creates path message
   nav_msgs::msg::Path nav_final_path;
   nav_final_path.header.frame_id = "map";
   nav_final_path.header.stamp = now();
-  // convert final_path (KDPoint vector) to nav_final_path (PoseStamped array
+  // converts final_path (KDPoint vector) to nav_final_path (PoseStamped array
   // message)
   auto compute_yaw = [](KDPoint &p1, KDPoint &p2)
   {
@@ -628,7 +626,7 @@ void MapInfo::publish_path(std::vector<KDPoint> final_path)
   geometry_msgs::msg::PoseStamped point_pose_msg;
   for (size_t i = 0; i < final_path.size(); ++i)
   {
-    // create point message
+    // creates point message
     point_pose_msg.header.frame_id = "map";
     // point_pose_msg.header.stamp = now();
     // populate point message with position
@@ -644,12 +642,12 @@ void MapInfo::publish_path(std::vector<KDPoint> final_path)
       yaw = compute_yaw(final_path[i], final_path[i + 1]);
     }
     quat.setRPY(0, 0, yaw);
-    // populate point message with orientation
+    // populates point message with orientation
     point_pose_msg.pose.orientation.x = quat.getX();
     point_pose_msg.pose.orientation.y = quat.getY();
     point_pose_msg.pose.orientation.z = quat.getZ();
     point_pose_msg.pose.orientation.w = quat.getW();
-    // insert point message into path message
+    // inserts point message into path message
     nav_final_path.poses.push_back(point_pose_msg);
   }
   _final_path_pub->publish(nav_final_path);

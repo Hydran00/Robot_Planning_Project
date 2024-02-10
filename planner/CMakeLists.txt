@@ -79,9 +79,6 @@ add_executable(rrt_star
   ${RRT_FOLDER}/utils/rrt.cpp 
   src/map_info_node.cpp 
   src/dubins/dubins.cpp
-  # ${RRT_FOLDER}/utils/rrt_dubins.cpp 
-  # ${RRT_FOLDER}/planners/rrt_star_dubins_plan.cpp
-  # src/dubins/dubins.cpp 
 )
 
 ament_target_dependencies(rrt_star
@@ -97,9 +94,9 @@ target_link_libraries(rrt_star Boost::headers)
 target_include_directories(rrt_star PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
+
 # RRT* Dubins
 
-# RRT
 add_executable(rrt_star_dubins
   ${RRT_FOLDER}/main_rrt_star_dubins.cpp
   src/map_info_node.cpp 
@@ -127,7 +124,6 @@ target_include_directories(rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 
 # RRT* Dubins (Multithread)
 
-# RRT
 add_executable(multithread_rrt_star_dubins
   ${RRT_FOLDER}/main_multithreaded.cpp
   # ${RRT_FOLDER}/threaded_planner.cpp
@@ -155,7 +151,7 @@ target_include_directories(multithread_rrt_star_dubins PUBLIC ${CMAKE_CURRENT_SO
 
 #############################################################################
 
-# Path Planner
+# Navigator
 
 add_executable(nav2_client
 src/nav2_client.cpp
@@ -172,7 +168,6 @@ ament_target_dependencies(nav2_client
   tf2_ros
   nav2_msgs
 )
-# target_include_directories(path_planner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #############################################################################
 
@@ -195,11 +190,9 @@ install(DIRECTORY
 
 install(TARGETS
   voronoi_planner
-  # wkt_generator
   rrt_star
   rrt_star_dubins
   multithread_rrt_star_dubins
-  # dubins
   nav2_client
   DESTINATION lib/${PROJECT_NAME})
 
@@ -209,8 +202,6 @@ install(TARGETS
 
 ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
-  scripts/plot.py
-  scripts/map_publisher.py
   scripts/visualise_dubins.py
   scripts/visualise_voronoi.py
   DESTINATION lib/${PROJECT_NAME}

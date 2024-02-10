@@ -66,19 +66,18 @@ std::tuple<std::vector<KDPoint>, double> RRTStarPlan::run(void) {
   int iter = 0;
   auto startTime = std::chrono::high_resolution_clock::now();
   while (true) {
-    // handle timeout returning empty path and infinite cost
-    // if (std::chrono::high_resolution_clock::now() - startTime >
-    //     std::chrono::milliseconds(1000 *
-    //                               (int)MotionPlanning::_map_info->_timeout))
-    //                               {
-    //   std::cout << "\033[0;31mTimeout\033[0m" << std::endl;
-    //   std::vector<KDPoint> empty;
-    //   return std::make_tuple(empty, std::numeric_limits<double>::infinity());
-    // }
+    // handles timeout returning empty path and infinite cost
+    if (std::chrono::high_resolution_clock::now() - startTime >
+        std::chrono::milliseconds(1000 *
+                                  (int)MotionPlanning::_map_info->_timeout))
+                                  {
+      std::cout << "\033[0;31mTimeout\033[0m" << std::endl;
+      std::vector<KDPoint> empty;
+      return std::make_tuple(empty, std::numeric_limits<double>::infinity());
+    }
 
     KDPoint q_rand = _GenerateRandPoint(iter);
     KDPoint q_near = _rrt.SearchNearestVertex(q_rand, iter);
-    // std::cout << "Adding " << q_rand[0] << ", " << q_rand[1] << std::endl;
     KDPoint q_new = _rrt.CalcNewPoint(q_near, q_rand);
     if (MotionPlanning::_map_info->Collision(q_new)) {
       continue;
@@ -110,7 +109,6 @@ std::tuple<std::vector<KDPoint>, double> RRTStarPlan::run(void) {
     if (MotionPlanning::_display) {
       MotionPlanning::_map_info->set_rrt(_rrt, 0, q_rand);
     }
-    // std::cout << "Convergence condition" << std::endl;
     // convergence condition
     if (Distance(q_new, MotionPlanning::_pt_end) < 0.1) {
       // the last point is not the end point -> we need to add it
@@ -134,7 +132,6 @@ std::tuple<std::vector<KDPoint>, double> RRTStarPlan::run(void) {
                           _rrt.Cost((MotionPlanning::_pt_end), true));
       return final_path_cost;
     }
-    // std::cout << "iter -------------" << iter << std::endl;
     iter++;
   }
 }

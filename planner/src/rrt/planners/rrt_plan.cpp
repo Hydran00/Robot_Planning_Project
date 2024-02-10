@@ -42,7 +42,9 @@ std::vector<KDPoint> RRTPlan::_ReconstrucPath(void) {
   path.push_back(p);
   return path;
 }
-
+// this is the standard implementation of rrt, which is left as default for a
+// comparison with our implementation. We implemented our ideas for rrt* and
+// rrt* dubins
 std::tuple<std::vector<KDPoint>, double> RRTPlan::run(void) {
   int iter = 0;
   while (true) {
@@ -62,8 +64,9 @@ std::tuple<std::vector<KDPoint>, double> RRTPlan::run(void) {
       if (q_new != MotionPlanning::_pt_end) {
         _rrt.Add(MotionPlanning::_pt_end, q_new);
       }
-      std::tuple<std::vector<KDPoint>, double> final_path_cost = std::make_tuple(
-          _ReconstrucPath(), _rrt.Cost((MotionPlanning::_pt_end), true));
+      std::tuple<std::vector<KDPoint>, double> final_path_cost =
+          std::make_tuple(_ReconstrucPath(),
+                          _rrt.Cost((MotionPlanning::_pt_end), true));
       return final_path_cost;
     }
     iter++;

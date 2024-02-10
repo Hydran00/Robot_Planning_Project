@@ -53,8 +53,8 @@ class PathPublisher : public rclcpp::Node {
     if (waypoints_received) {
       return;
     }
-    std::cout << "Storing path" << std::endl;
     full_path = msg;
+    std::cout << "Path stored!" << std::endl;
     waypoints_received = true;
     return;
   }

@@ -1,2 +1,0 @@
-Use RRT* for computing the first solution and then use it as euristic for online RTAA* for collision avoidance in 
-evacuation scenario

@@ -8,7 +8,7 @@
 DubinsPath::DubinsPath(std::vector<double> start, std::vector<double> end,
                        double r)
     : _s({start}), _e({end}), _r(r) {}
-
+// discretises the path
 std::tuple<std::vector<double>, std::vector<double>> gen_path(
     const std::vector<double> &s, const std::vector<std::vector<double>> &path,
     double r = 1.0, double step = 0.1) {
@@ -71,7 +71,7 @@ std::tuple<std::vector<double>, std::vector<double>> gen_path(
   }
   return {r_x, r_y};
 }
-
+// computes the six possible dubins paths
 std::vector<std::vector<std::vector<double>>> DubinsPath::calc_paths() {
   auto le = calc_end();
   auto types = {
@@ -86,10 +86,9 @@ std::vector<std::vector<std::vector<double>>> DubinsPath::calc_paths() {
   }
   return _paths;
 }
-
+// returns the best dubins among the six
 std::tuple<std::vector<std::vector<double>>, double>
 DubinsPath::get_shortest_path_cost() {
-  // FULL_PATH, TOTAL COST, SYMBOLIC PATHS
   std::tuple<std::vector<std::vector<double>>, double> shortest_path_cost;
   std::get<1>(shortest_path_cost) = std::numeric_limits<double>::infinity();
   for (auto &path : _paths) {
@@ -217,7 +216,8 @@ std::vector<std::vector<double>> DubinsPath::calc_rlr_from_origin(
   return path;
 }
 
-// RETURNS KDPoint, Cost, SYMBOLIC PATHS
+// Computes the best dubins path and the relative cost between two ponints 
+// given the radius and the step discretisation size(returns KDPoint, Cost, symbolic paths)
 std::tuple<std::vector<KDPoint>, double, std::vector<std::vector<double>>>
 get_dubins_best_path_and_cost(std::vector<double> q_near,
                               std::vector<double> q_rand, double _radius,
@@ -244,6 +244,7 @@ get_dubins_best_path_and_cost(std::vector<double> q_near,
   return best_path_and_cost;
 }
 
+// creates a point to point dubins path
 std::vector<KDPoint> dubinise_path(std::vector<KDPoint> &waypoints, double r,
                                    double step) {
   std::cout << "\033[1;33mDubinising path...\033[0m" << std::endl;
@@ -261,9 +262,6 @@ std::vector<KDPoint> dubinise_path(std::vector<KDPoint> &waypoints, double r,
       p1.push_back(compute_yaw(waypoints[i], waypoints[i + 1]));
       p2.push_back(compute_yaw(waypoints[i + 1], waypoints[i + 2]));
     }
-    // std::cout << "Creating dubins from (" << p1[0] << ", " << p1[1] << ", "
-    //           << p1[2] << ") to (" << p2[0] << ", " << p2[1] << ", " << p2[2]
-    //           << ")" << std::endl;
     auto best_path_and_cost = get_dubins_best_path_and_cost(p1, p2, r, step);
     path.insert(path.end(), std::get<0>(best_path_and_cost).begin(),
                 std::get<0>(best_path_and_cost).end());
@@ -271,6 +269,7 @@ std::vector<KDPoint> dubinise_path(std::vector<KDPoint> &waypoints, double r,
   return path;
 }
 
+// functions used just for testing purposes
 std::vector<KDPoint> test_dubins(std::vector<double> start,
                                  std::vector<double> end) {
   std::tuple<std::vector<KDPoint>, double, std::vector<std::vector<double>>> p =

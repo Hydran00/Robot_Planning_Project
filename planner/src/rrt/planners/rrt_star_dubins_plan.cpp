@@ -51,7 +51,6 @@ KDPoint RRTStarDubinsPlan::_GenerateRandPoint(int iter) {
 }
 
 std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath() {
-  std::cout << "ENTERING RECONSTRUCT PATH" << std::endl;
   KDPoint p = MotionPlanning::_pt_end;
   std::vector<KDPoint> path;
   auto last_path = _rrt.GetPointPath(p);
@@ -59,7 +58,6 @@ std::vector<KDPoint> RRTStarDubinsPlan::_ReconstrucPath() {
   while (MotionPlanning::_pt_start != p) {
     auto parent = _rrt.GetParent(p);
     std::vector<KDPoint> parent_path = std::get<3>(parent);
-    // std::vector<KDPoint> parent_path = _rrt.GetPointPath(p);
     path.insert(path.begin(), parent_path.begin(), parent_path.end());
     p = std::get<0>(parent);
   }
@@ -98,8 +96,6 @@ std::tuple<std::vector<KDPoint>, double> RRTStarDubinsPlan::run(void) {
       p = std::get<0>(_rrt.GetParent(p));
     }
     if (already_visited) {
-      // std::cout << "Already visited" << std::endl;
-      // std::cout << "---------------------" << std::endl;
       continue;
     }
 
@@ -134,7 +130,6 @@ std::tuple<std::vector<KDPoint>, double> RRTStarDubinsPlan::run(void) {
              pow(q_rand[1] - MotionPlanning::_pt_end[1], 2)) < 0.2) {
       // the last point is not the end point -> we need to add it
       if (q_rand != MotionPlanning::_pt_end) {
-        std::cout << "Node extracted is not pt_end" << std::endl;
         // rename for clarity
         q_near = q_rand;
         // generate last dubins path

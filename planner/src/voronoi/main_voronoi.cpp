@@ -41,7 +41,6 @@ int main(int argc, char **argv)
       ament_index_cpp::get_package_share_directory("planner") + "/data/map.txt";
   std::remove(file_path.c_str());
 
-  // Monitor execution time
   auto m = std::make_shared<MapInfo>();
 
   RCLCPP_INFO(m->get_logger(), "Waiting for obstacles, borders and gates...");
@@ -49,8 +48,6 @@ int main(int argc, char **argv)
          !m->borders_received_ || !m->gates_received_ ||
          !m->victims_received_)
   {
-    // RCLCPP_INFO(m->get_logger(), "Map received: %d, Border: %d, Gates: %d",
-    // m->obstacles_received_, m->borders_received_, m->gates_received_);
     rclcpp::spin_some(m->get_node_base_interface());
     rclcpp::sleep_for(std::chrono::milliseconds(100));
   }
@@ -73,6 +70,7 @@ int main(int argc, char **argv)
 
   VoronoiPlan plan(m);
   cout << "Planner started!" << endl;
+  // Monitor execution time
   auto time_start = rclcpp::Clock().now();
   std::pair<std::vector<KDPoint>, double> path = plan.GetPlan();
   std::vector<KDPoint> dubinised_final_path =

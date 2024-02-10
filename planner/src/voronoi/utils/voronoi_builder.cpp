@@ -5,7 +5,7 @@ void VoronoiBuilder::create_voronoi() {
   std::vector<Point> points;
   std::vector<Segment> segments;
 
-  // scales the polygon (1000) to avoid numerical issues
+  // scales the polygon to avoid numerical issues
   polygon _scaled_map;
   // Apply scale transformation
   boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(
@@ -37,7 +37,6 @@ void VoronoiBuilder::create_voronoi() {
   construct_voronoi(points.begin(), points.end(), segments.begin(),
                     segments.end(), &voronoi_diagram_);
   std::cout << "Voronoi diagram created!" << std::endl;
-  // _map = map_copy;
 }
 
 std::vector<std::pair<KDPoint, KDPoint>> VoronoiBuilder::get_voronoi_edges() {
@@ -53,27 +52,6 @@ std::vector<std::pair<KDPoint, KDPoint>> VoronoiBuilder::get_voronoi_edges() {
     }
   }
   return voronoi_edges;
-  // return
-}
-
-void VoronoiBuilder::correct_geometry(
-    boost::geometry::validity_failure_type &failure) {
-  bool could_be_fixed = (failure == boost::geometry::failure_not_closed ||
-                         failure == boost::geometry::failure_wrong_orientation);
-
-  std::cout << "can boost::geometry::correct remedy invalidity? "
-            << (could_be_fixed ? "possibly yes" : "no") << std::endl;
-  if (could_be_fixed) {
-    boost::geometry::correct(_map);
-    std::cout << "after correction: "
-              << (boost::geometry::is_valid(_map) ? "valid" : "still invalid")
-              << std::endl;
-    std::cout << "corrected geometry: " << boost::geometry::dsv(_map)
-              << std::endl;
-  } else {
-    std::cout << "cannot be fixed" << std::endl;
-  }
-  return;
 }
 
 bool VoronoiBuilder::is_edge_valid(

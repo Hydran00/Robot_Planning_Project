@@ -79,17 +79,14 @@ class RRTDubins {
     iterator(const DubinsTree::iterator begin, int pos)
         : _it_begin(begin), _pos(pos) {}
     inline bool operator!=(iterator &it) {
-      std::cout << "!= called: " << _pos << std::endl;
       return (_pos != it._pos);
     }
     inline KDPoint operator*() {
       // return (_it_begin + _pos)->first;
-      std::cout << "* called: " << _pos << std::endl;
       return std::get<0>(*(_it_begin + _pos));
     }
     inline iterator &operator++() {
       ++_pos;
-      std::cout << "pos called: " << _pos << std::endl;
       return *this;
     }
   };

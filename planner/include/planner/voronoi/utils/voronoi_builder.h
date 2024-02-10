@@ -90,7 +90,6 @@ class VoronoiBuilder {
   std::vector<std::pair<KDPoint,KDPoint>> get_voronoi_edges();
   VoronoiBuilder(polygon &map) : _map(map) {}
  private:
-  void correct_geometry(boost::geometry::validity_failure_type &failure);
   bool is_edge_valid(voronoi_diagram<double>::const_edge_iterator edge);
 };
 #endif
