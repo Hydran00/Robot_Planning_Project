@@ -29,6 +29,7 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
     return std::sqrt(std::pow(a[0] - b[0], 2) + std::pow(a[1] - b[1], 2));
   };
 
+  
   ////////////////////////////////////////////////////////////////////////////
   /////////////////// VORONOI AUGMENTATION ///////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -90,7 +91,7 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
       }
     }
   }
-  std::cout << "Printing voronoi on file" << std::endl;
+  // std::cout << "Printing voronoi on file" << std::endl;
   for (auto &edge : edges) {
     file << edge.first[0] << " " << edge.first[1] << " " << edge.second[0]
          << " " << edge.second[1] << std::endl;

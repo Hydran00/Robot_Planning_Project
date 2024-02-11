@@ -76,7 +76,17 @@ bool VoronoiBuilder::is_edge_valid(
       return false;
     }
   }
-
+  // check if the vertexes are near map interior rings
+  for(auto &interior_ring : boost::geometry::interior_rings(_map)){
+    for(auto &point : interior_ring){
+      if (boost::geometry::distance(point, vertex0) < 0.05) {
+        return false;
+      }
+      if (boost::geometry::distance(point, vertex1) < 0.05) {
+        return false;
+      }
+    }
+  }
   return true;
 }
 

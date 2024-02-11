@@ -39,11 +39,11 @@ def plot_map(data1,data2):
     y2 = data[:,3]
     plt.plot([x1, x2], [y1, y2], 'k-')
     
-    # # plot voronoi
-    x = data2[:,0]
-    y = data2[:,1]
+    # plot path
+    # x = data2[:,0]
+    # y = data2[:,1]
 
-    plt.plot(x, y, 'r--')
+    # plt.plot(x, y, 'r--')
     plt.show()
     
 if __name__ == "__main__":
