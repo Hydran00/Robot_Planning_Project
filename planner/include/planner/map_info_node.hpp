@@ -67,7 +67,8 @@ class MapInfo : public rclcpp::Node {
     _id_rand_point = 9,
     _id_rrt = 10,
     _id_victims = 11,
-    _id_victims_cost_text = 12
+    _id_victims_cost_text = 12,
+    _id_voronoi = 13
   };
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
   // rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
@@ -152,12 +153,14 @@ class MapInfo : public rclcpp::Node {
   void set_start(KDPoint &point);
   void set_end(KDPoint &point);
   void set_final_path(std::vector<KDPoint> &path);
+
   //   void set_dubins_path(std::vector<KDPoint> &path);
   //   void set_openlist(std::vector<KDPoint> &points);
   //   void set_closelist(std::vector<KDPoint> &points);
   //   void set_rand_points(std::vector<KDPoint> &points);
   //   void set_roadmap(
   //       std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
+  void set_voronoi(std::vector<std::pair<KDPoint, KDPoint>> &edges);
   void set_rrt(RRT &rrt, int n, KDPoint &rand);
   void set_rrt_dubins(RRTDubins &rrt_dubins);
   bool Collision(KDPoint &point);

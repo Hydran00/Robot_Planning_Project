@@ -15,7 +15,6 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
   file.open(file_path);
   // iteraint vertices
   auto edges = _voronoi_builder.get_voronoi_edges();
-
   // creates set for extracting unique vertices
   std::set<KDPoint> vertices;
 
@@ -91,7 +90,10 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
       }
     }
   }
-  // std::cout << "Printing voronoi on file" << std::endl;
+  // show voronoi on the map
+  _map_info->set_voronoi(edges);
+
+  std::cout << "Printing voronoi on file" << std::endl;
   for (auto &edge : edges) {
     file << edge.first[0] << " " << edge.first[1] << " " << edge.second[0]
          << " " << edge.second[1] << std::endl;

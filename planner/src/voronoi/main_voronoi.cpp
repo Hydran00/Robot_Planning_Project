@@ -85,9 +85,9 @@ int main(int argc, char **argv)
 
   //   // Output path for python visualisation
   print_path_on_file(dubinised_final_path);
-  m->set_final_path(path.first);
+  // m->set_final_path(path.first);
   rclcpp::sleep_for(std::chrono::milliseconds(2000));
-  // m->set_final_path(dubinised_final_path);
+  m->set_final_path(dubinised_final_path);
 
   int i = 0;
   while (i < 100)
