@@ -28,7 +28,6 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
     return std::sqrt(std::pow(a[0] - b[0], 2) + std::pow(a[1] - b[1], 2));
   };
 
-  
   ////////////////////////////////////////////////////////////////////////////
   /////////////////// VORONOI AUGMENTATION ///////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -105,7 +104,6 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
   for (auto v : _map_info->_victims) {
     vertices.insert(std::get<0>(v));
   }
-  std::cout << "A"<< std::endl;
   // labelling vertices
   std::vector<std::pair<KDPoint, int>> point_index;
   int index = 0;
@@ -114,7 +112,6 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
     point_index.push_back(make_pair(vertex, index));
     index++;
   }
-  std::cout << "B"<< std::endl;
 
   // create edge array
   std::vector<VEdge> edge_array;
@@ -142,17 +139,19 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
     edge_array.push_back(e1);
     edge_array.push_back(e2);
   }
-  std::cout << "C"<< std::endl;
-
-  std::cout << "C2"<< std::endl;
   Dijkstra dijkstra(edge_array);
   // gets start vertex index
-  std::cout << "C3"<< std::endl;
-  
+
   int start =
       std::find_if(point_index.begin(), point_index.end(),
                    [&](const std::pair<KDPoint, int> &p) {
                      return distance(p.first, _map_info->pt_start) < 1.0e-6;
+                   })
+          ->second;
+  int gate =
+      std::find_if(point_index.begin(), point_index.end(),
+                   [&](const std::pair<KDPoint, int> &p) {
+                     return distance(p.first, _map_info->pt_end) < 1.0e-6;
                    })
           ->second;
   ////////////////////////////////////////////////////////////////////////////
@@ -161,27 +160,39 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
 
   // generates all possible combinations of the victims (FACTORIAL TIME
   // COMPLEXITY)
-  std::cout << "C3"<<std::endl;
-
   typedef std::tuple<KDPoint, double> Victim;
   typedef std::vector<Victim> victim_combination;
   std::vector<victim_combination> all_combinations;
   std::vector<int> indices(_map_info->_victims.size());
-  std::cout << "C4"<<std::endl;
   std::iota(indices.begin(), indices.end(), 0);
-   std::vector<std::vector<int>> combinations = all_permutations_with_subsets(indices);
-  // auto combinations = all_permutations_with_subsets(indices);
+  std::vector<std::vector<int>> combinations;
+
+  auto victims_list = _map_info->_victims;
+
+  if (_map_info->_exploration_method == "brute_force") {
+    combinations = all_permutations_with_subsets(indices);
+  } else {
+    // heuristic
+    std::cout << "USING HEURISTIC" << std::endl;
+    combinations = all_combinations_with_subsets(indices);
+    // sorting in descending order since the sign is inverted later
+    std::sort(victims_list.begin(), victims_list.end(), [](Victim a, Victim b) {
+      return std::get<1>(a) > std::get<1>(b);
+    });
+    for (auto v : victims_list) {
+      std::cout << "cost: " << -std::get<1>(v) << std::endl;
+    }
+  }
+
+  // retrieves the victims combination starting from indices
   for (auto &combination : combinations) {
     victim_combination vc;
     for (auto &i : combination) {
-      vc.push_back(_map_info->_victims[i]);
-      std::cout <<"C5"<<std::endl;
+      vc.push_back(victims_list[i]);
     }
-      std::cout <<"C6"<<std::endl;
 
     all_combinations.push_back(vc);
   }
-  std::cout << "D"<< std::endl;
 
   // for each combination of victims finds the shortest path
   std::vector<std::pair<std::vector<KDPoint>, double>> paths;
@@ -196,46 +207,52 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
                          return distance(p.first, std::get<0>(v)) < 1.0e-6;
                        })
               ->second;
-      std::vector<int> p = dijkstra.get_shortest_path(current_vertex, end);
+      std::pair<std::vector<int>, double> path_cost =
+          dijkstra.get_shortest_path(current_vertex, end);
       // no path found
-      if (p.size() == 0) {
+      if (path_cost.first.size() == 0) {
         cost = std::numeric_limits<double>::max();
         break;
       }
       // insert path into the vector excluding the last vertex
-      for (size_t i = 0; i < p.size() - 1; i++) {
-        path.push_back(point_index[p[i]].first);
+      for (size_t i = 0; i < path_cost.first.size() - 1; i++) {
+        path.push_back(point_index[path_cost.first[i]].first);
       }
-      // cost considers also victims value
-      cost += dijkstra.kD[start] - std::get<1>(v);
+      // cost travel distance and victims value
+      cost += path_cost.second - std::get<1>(v);
       current_vertex = end;
     }
     // inserts path to gate
-    int end =
-        std::find_if(point_index.begin(), point_index.end(),
-                     [&](const std::pair<KDPoint, int> &p) {
-                       return distance(p.first, _map_info->pt_end) < 1.0e-6;
-                     })
-            ->second;
-    std::vector<int> p = dijkstra.get_shortest_path(current_vertex, end);
-    if (p.size() == 0) {
+    std::pair<std::vector<int>, double> last_path_cost =
+        dijkstra.get_shortest_path(current_vertex, gate);
+    if (last_path_cost.first.size() == 0) {
       cost += std::numeric_limits<double>::max();
       break;
     }
-    for (size_t i = 0; i < p.size(); i++) {
-      path.push_back(point_index[p[i]].first);
+    for (size_t i = 0; i < last_path_cost.first.size(); i++) {
+      path.push_back(point_index[last_path_cost.first[i]].first);
     }
-
+    cost += last_path_cost.second;
     paths.push_back(std::make_pair(path, cost));
   }
 
+  std::cout << "START IS " << start << std::endl;
+  // check if every path's cost is infinite
+  if (std::all_of(paths.begin(), paths.end(),
+                  [](std::pair<std::vector<KDPoint>, double> p) {
+                    return p.second == std::numeric_limits<double>::max();
+                  })) {
+    std::cout << "NO PATH FOUND" << std::endl;
+    return std::make_pair(std::vector<KDPoint>(), std::numeric_limits<double>::max());
+  }
   auto best_path =
       std::min_element(paths.begin(), paths.end(),
                        [](const std::pair<std::vector<KDPoint>, double> &p1,
                           const std::pair<std::vector<KDPoint>, double> &p2) {
                          return p1.second < p2.second;
                        });
-
+  // print total cost
+  std::cout << "TOTAL COST: " << best_path->second << std::endl;
   std::ofstream file2;
   string path2 = ament_index_cpp::get_package_share_directory("planner") +
                  "/data/best_path_voronoi.txt";

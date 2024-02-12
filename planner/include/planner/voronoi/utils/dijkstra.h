@@ -26,15 +26,13 @@ class Dijkstra {
   Dijkstra(std::vector<VEdge>);
   ~Dijkstra() {}
 
-  std::vector<int> get_shortest_path(int start, int end);
+  std::pair<std::vector<int>, double> get_shortest_path(int start, int end);
 
   void print_path();
   void generate_dot_file();
-  std::vector<double> kD;
 
  private:
   graph_t kGraph;
-  std::vector<vertex_descriptor> kP;
 };
 
 using namespace std;

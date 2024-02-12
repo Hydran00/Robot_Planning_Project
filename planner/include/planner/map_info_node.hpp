@@ -122,7 +122,7 @@ class MapInfo : public rclcpp::Node {
   double _timeout;
   double _num_threads;
   std::string _planner_type;
-
+  std::string _exploration_method;
   polygon _map;
   bool start_received_;
   bool obstacles_received_;

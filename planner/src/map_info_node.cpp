@@ -17,11 +17,17 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   this->declare_parameter("dubins_radius", 0.5);
   this->dubins_radius = this->get_parameter("dubins_radius").as_double();
 
+  // just for rrt methods
   this->declare_parameter("num_threads", 4);
   this->_num_threads = this->get_parameter("num_threads").as_int();
 
   this->declare_parameter("timeout", 10.0);
   this->_timeout = this->get_parameter("timeout").as_double();
+
+  // just for voronoi method
+  this->declare_parameter("exploration_method", "brute_force");
+  this->_exploration_method =
+      this->get_parameter("exploration_method").as_string();
 
   RCLCPP_INFO(this->get_logger(), "show_graphics: %s",
               this->_show_graphics ? "true" : "false");
@@ -33,8 +39,8 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   victims_received_ = false;
 
   if (_planner_type != "rrt_star_dubins") {
-    obstacle_offset = 0;//OFFSET + 2 * dubins_radius;
-    map_offset = 0;// OFFSET;
+    obstacle_offset = OFFSET + 2 * dubins_radius;
+    map_offset = OFFSET;
   } else {
     obstacle_offset = OFFSET;
     map_offset = OFFSET;
@@ -448,6 +454,8 @@ void ::MapInfo::set_voronoi(std::vector<std::pair<KDPoint, KDPoint>> &edges) {
   m_voronoi.id = _id_voronoi + 30;
   m_voronoi.type = visualization_msgs::msg::Marker::LINE_LIST;
   m_voronoi.pose.orientation.w = 1.0;
+  m_voronoi.pose.position.x = 0.0;
+  m_voronoi.pose.position.y = 0.0;
   m_voronoi.pose.position.z = 0.1;
   m_voronoi.scale.x = 0.1;
   m_voronoi.scale.y = 0.1;
@@ -459,11 +467,11 @@ void ::MapInfo::set_voronoi(std::vector<std::pair<KDPoint, KDPoint>> &edges) {
 
   geometry_msgs::msg::Point p1, p2;
   for (auto edge : edges) {
-    p1.x = (double)edge.first[0];
-    p1.y = (double)edge.first[1];
+    p1.x = edge.first[0];
+    p1.y = edge.first[1];
     p1.z = 0.01;
-    p2.x = (double)edge.second[0];
-    p2.y = (double)edge.second[1];
+    p2.x = edge.second[0];
+    p2.y = edge.second[1];
     p2.z = 0.01;
     m_voronoi.points.push_back(p1);
     m_voronoi.points.push_back(p2);

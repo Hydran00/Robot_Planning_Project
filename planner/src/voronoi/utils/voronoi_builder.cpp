@@ -56,6 +56,11 @@ std::vector<std::pair<KDPoint, KDPoint>> VoronoiBuilder::get_voronoi_edges() {
 
 bool VoronoiBuilder::is_edge_valid(
     voronoi_diagram<double>::const_edge_iterator edge) {
+  // check if vertex are nan
+  if (std::isnan(edge->vertex0()->x()) || std::isnan(edge->vertex0()->y()) ||
+      std::isnan(edge->vertex1()->x()) || std::isnan(edge->vertex1()->y())) {
+    return false;
+  }
   // check if the edge ends in the map
   point_xy vertex0 = point_xy(edge->vertex0()->x() / scale_factor,
                               edge->vertex0()->y() / scale_factor);
@@ -75,7 +80,7 @@ bool VoronoiBuilder::is_edge_valid(
     if (boost::geometry::distance(point, vertex1) < 0.05) {
       return false;
     }
-  }
+  } 
   // check if the vertexes are near map interior rings
   for(auto &interior_ring : boost::geometry::interior_rings(_map)){
     for(auto &point : interior_ring){

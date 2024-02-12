@@ -14,7 +14,8 @@ def generate_launch_description():
         [
             launch.actions.DeclareLaunchArgument("show_graphics", default_value="true"),
             launch.actions.DeclareLaunchArgument("dubins_radius", default_value="0.5"),
-            
+            launch.actions.DeclareLaunchArgument('exploration_method', default_value="brute_force"),
+             # brute_force or heuristic
             # Node(
             #     package="planner",
             #     executable="nav2_client",
@@ -30,18 +31,9 @@ def generate_launch_description():
                     {
                         "show_graphics": launch.substitutions.LaunchConfiguration('show_graphics'),
                         "dubins_radius": launch.substitutions.LaunchConfiguration('dubins_radius'),
+                        "exploration_method" : launch.substitutions.LaunchConfiguration('exploration_method')
                     }
                 ],
             ),
-            # Node(
-            #     package="rviz2",
-            #     executable="rviz2",
-            #     name="rviz",
-            #     output="log",
-            #     # condition=IfCondition(
-            #     #     PythonExpression(["'", launch.substitutions.LaunchConfiguration("show_graphics"), "' == 'true'"])
-            #     # ),
-            #     arguments=["-d", rviz_config_dir],
-            # ),
         ],
     )
