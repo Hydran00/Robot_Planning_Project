@@ -45,7 +45,7 @@ add_executable(voronoi_planner
   ${VORONOI_FOLDER}/main_voronoi.cpp
   ${VORONOI_FOLDER}/utils/dijkstra.cpp
   ${VORONOI_FOLDER}/utils/voronoi_builder.cpp
-  ${VORONOI_FOLDER}/utils/combinations.cpp
+  # ${VORONOI_FOLDER}/utils/combinations.cpp
   ${VORONOI_FOLDER}/planners/voronoi_plan.cpp
   src/map_info_node.cpp 
   src/dubins/dubins.cpp

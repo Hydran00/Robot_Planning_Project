@@ -33,8 +33,8 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   victims_received_ = false;
 
   if (_planner_type != "rrt_star_dubins") {
-    obstacle_offset = OFFSET;// + dubins_radius;
-    map_offset = OFFSET;
+    obstacle_offset = 0;//OFFSET + 2 * dubins_radius;
+    map_offset = 0;// OFFSET;
   } else {
     obstacle_offset = OFFSET;
     map_offset = OFFSET;
@@ -457,23 +457,19 @@ void ::MapInfo::set_voronoi(std::vector<std::pair<KDPoint, KDPoint>> &edges) {
   m_voronoi.color.a = 1.0;
   m_voronoi.points.clear();
 
+  geometry_msgs::msg::Point p1, p2;
   for (auto edge : edges) {
-    geometry_msgs::msg::Point p1, p2;
     p1.x = (double)edge.first[0];
     p1.y = (double)edge.first[1];
-    p1.z = 0.0;
+    p1.z = 0.01;
     p2.x = (double)edge.second[0];
     p2.y = (double)edge.second[1];
-    p2.z = 0.0;
-    std::cout << "Adding " << p1.x << " " << p1.y << " - " << p2.x << " "
-              << p2.y << std::endl;
+    p2.z = 0.01;
     m_voronoi.points.push_back(p1);
     m_voronoi.points.push_back(p2);
   }
-  std::cout << "Publishing voronoi edges" << std::endl;
-  _marker_pub->publish(m_voronoi);
-  std::cout << "Published voronoi edges" << std::endl;
 
+  _marker_pub->publish(m_voronoi);
 }
 
 void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
@@ -520,10 +516,6 @@ void MapInfo::set_rrt(RRT &rrt, int n, KDPoint &rand) {
   }
   _marker_pub->publish(_m_rrt);
   _marker_pub->publish(_m_rand_point);
-  _pub_i = (_pub_i + 1) % 10;
-  if (_pub_i == 0) {
-    return;
-  }
 }
 
 void MapInfo::set_rrt_dubins(RRTDubins &rrt_dubins) {

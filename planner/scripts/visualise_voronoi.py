@@ -40,10 +40,10 @@ def plot_map(data1,data2):
     plt.plot([x1, x2], [y1, y2], 'k-')
     
     # plot path
-    # x = data2[:,0]
-    # y = data2[:,1]
+    x = data2[:,0]
+    y = data2[:,1]
 
-    # plt.plot(x, y, 'r--')
+    plt.plot(x, y, 'r--')
     plt.show()
     
 if __name__ == "__main__":

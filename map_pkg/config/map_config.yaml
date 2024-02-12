@@ -15,7 +15,7 @@
 
 /**/send_victims:
   ros__parameters:
-    n_victims: 3
+    n_victims: 7
     min_weight: 10
     max_weight: 500
 

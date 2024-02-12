@@ -87,15 +87,15 @@ int main(int argc, char **argv)
   print_path_on_file(dubinised_final_path);
   // m->set_final_path(path.first);
   rclcpp::sleep_for(std::chrono::milliseconds(2000));
-  m->set_final_path(dubinised_final_path);
+  // m->set_final_path(dubinised_final_path);
 
-  int i = 0;
-  while (i < 100)
-  {
-    m->publish_path(dubinised_final_path);
-    rclcpp::sleep_for(std::chrono::milliseconds(10));
-    i++;
-  }
+  // int i = 0;
+  // while (i < 100)
+  // {
+  //   m->publish_path(dubinised_final_path);
+  //   rclcpp::sleep_for(std::chrono::milliseconds(10));
+  //   i++;
+  // }
 
   rclcpp::shutdown();
   return 0;

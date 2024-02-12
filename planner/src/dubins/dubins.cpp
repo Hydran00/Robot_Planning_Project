@@ -247,7 +247,7 @@ get_dubins_best_path_and_cost(std::vector<double> q_near,
 // creates a point to point dubins path
 std::vector<KDPoint> dubinise_path(std::vector<KDPoint> &waypoints, double r,
                                    double step) {
-  std::cout << "\033[1;33mDubinising path...\033[0m" << std::endl;
+  std::cout << "\033[1;32mDubinising path...\033[0m" << std::endl;
   std::vector<KDPoint> path;
   auto compute_yaw = [](KDPoint &p1, KDPoint &p2) {
     return atan2(p2[1] - p1[1], p2[0] - p1[0]);

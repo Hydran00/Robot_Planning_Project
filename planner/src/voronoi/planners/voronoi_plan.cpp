@@ -105,7 +105,7 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
   for (auto v : _map_info->_victims) {
     vertices.insert(std::get<0>(v));
   }
-
+  std::cout << "A"<< std::endl;
   // labelling vertices
   std::vector<std::pair<KDPoint, int>> point_index;
   int index = 0;
@@ -114,6 +114,7 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
     point_index.push_back(make_pair(vertex, index));
     index++;
   }
+  std::cout << "B"<< std::endl;
 
   // create edge array
   std::vector<VEdge> edge_array;
@@ -141,8 +142,13 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
     edge_array.push_back(e1);
     edge_array.push_back(e2);
   }
+  std::cout << "C"<< std::endl;
+
+  std::cout << "C2"<< std::endl;
   Dijkstra dijkstra(edge_array);
   // gets start vertex index
+  std::cout << "C3"<< std::endl;
+  
   int start =
       std::find_if(point_index.begin(), point_index.end(),
                    [&](const std::pair<KDPoint, int> &p) {
@@ -155,19 +161,28 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
 
   // generates all possible combinations of the victims (FACTORIAL TIME
   // COMPLEXITY)
+  std::cout << "C3"<<std::endl;
+
   typedef std::tuple<KDPoint, double> Victim;
   typedef std::vector<Victim> victim_combination;
   std::vector<victim_combination> all_combinations;
   std::vector<int> indices(_map_info->_victims.size());
+  std::cout << "C4"<<std::endl;
   std::iota(indices.begin(), indices.end(), 0);
-  std::vector<std::vector<int>> combinations = generate_subsets(indices);
+   std::vector<std::vector<int>> combinations = all_permutations_with_subsets(indices);
+  // auto combinations = all_permutations_with_subsets(indices);
   for (auto &combination : combinations) {
     victim_combination vc;
     for (auto &i : combination) {
       vc.push_back(_map_info->_victims[i]);
+      std::cout <<"C5"<<std::endl;
     }
+      std::cout <<"C6"<<std::endl;
+
     all_combinations.push_back(vc);
   }
+  std::cout << "D"<< std::endl;
+
   // for each combination of victims finds the shortest path
   std::vector<std::pair<std::vector<KDPoint>, double>> paths;
   for (auto &combination : all_combinations) {
