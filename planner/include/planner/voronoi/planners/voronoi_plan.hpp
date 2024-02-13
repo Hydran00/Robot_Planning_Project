@@ -20,6 +20,7 @@ class VoronoiPlan {
  public:
   std::shared_ptr<MapInfo> _map_info;
   std::pair<std::vector<KDPoint>, double> GetPlan(void);
+  std::vector<KDPoint> OptimisePath(std::vector<KDPoint> &path);
   VoronoiPlan(std::shared_ptr<MapInfo> &map_info);
   // radius in which we connect landmarks (start,end,victims) to the voronoi
   const double conn_radius = 5.0;

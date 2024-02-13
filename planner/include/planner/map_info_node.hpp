@@ -20,14 +20,14 @@
 
 #include "geometry_msgs/msg/polygon_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
-#include "planner/rrt/utils/kdtree.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "nav_msgs/msg/path.hpp"
 #include "obstacles_msgs/msg/obstacle_array_msg.hpp"
 #include "obstacles_msgs/msg/obstacle_msg.hpp"
-#include "rclcpp/rclcpp.hpp"
+#include "planner/rrt/utils/kdtree.hpp"
 #include "planner/rrt/utils/rrt.hpp"
 #include "planner/rrt/utils/rrt_dubins.hpp"
+#include "rclcpp/rclcpp.hpp"
 #include "tf2/exceptions.h"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
@@ -71,7 +71,6 @@ class MapInfo : public rclcpp::Node {
     _id_voronoi = 13
   };
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr _marker_pub;
-  // rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
   // _markerarray_pub;
 
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_start_;
@@ -84,8 +83,6 @@ class MapInfo : public rclcpp::Node {
   rclcpp::Subscription<obstacles_msgs::msg::ObstacleArrayMsg>::SharedPtr
       subscription_victims_;
 
-  // geometry_msgs::msg::PolygonStamped borders_;
-  // obstacles_msgs::msg::ObstacleArrayMsg obstacles_;
   // Dubins path publisher
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr _final_path_pub;
 
@@ -152,23 +149,16 @@ class MapInfo : public rclcpp::Node {
   void set_victims();
   void set_start(KDPoint &point);
   void set_end(KDPoint &point);
-  void set_final_path(std::vector<KDPoint> &path);
-
-  //   void set_dubins_path(std::vector<KDPoint> &path);
-  //   void set_openlist(std::vector<KDPoint> &points);
-  //   void set_closelist(std::vector<KDPoint> &points);
-  //   void set_rand_points(std::vector<KDPoint> &points);
-  //   void set_roadmap(
-  //       std::vector<std::pair<KDPoint, std::vector<KDPoint>>> &road_map);
+  void set_final_path(std::vector<KDPoint> &path, std::string color = "r",
+                      int n = 0);
+  bool Collision(KDPoint &point);
+  bool Collision(std::vector<KDPoint> &path);
+  void ShowMap(void);
+  // voronoi
   void set_voronoi(std::vector<std::pair<KDPoint, KDPoint>> &edges);
+  // rrt
   void set_rrt(RRT &rrt, int n, KDPoint &rand);
   void set_rrt_dubins(RRTDubins &rrt_dubins);
-  bool Collision(KDPoint &point);
-  //   bool Collision(KDPoint &p1, KDPoint &p2);
-  bool Collision(std::vector<KDPoint> &path);
-  //   bool DubinsCollision(
-  //   std::vector<KDPoint> &path);
-  void ShowMap(void);
 
   // Publish final path
   void publish_path(std::vector<KDPoint> final_path);

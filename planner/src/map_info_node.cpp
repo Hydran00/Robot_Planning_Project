@@ -416,12 +416,13 @@ void MapInfo::set_end(KDPoint &point) {
   _m_end.points.push_back(p);
 }
 
-void MapInfo::set_final_path(std::vector<KDPoint> &path) {
+void MapInfo::set_final_path(std::vector<KDPoint> &path,
+                             std::string color /*= "r"*/, int n /*= 0*/) {
   _m_path.header.frame_id = "map";
   _m_path.header.stamp = now();
   _m_path.action = visualization_msgs::msg::Marker::ADD;
   _m_path.ns = "map";
-  _m_path.id = _id_path;
+  _m_path.id = _id_path + n;
   _m_path.type = visualization_msgs::msg::Marker::LINE_STRIP;
   _m_path.pose.orientation.w = 1.0;
   // show path map on top (avoid graphical glitches)
@@ -429,7 +430,20 @@ void MapInfo::set_final_path(std::vector<KDPoint> &path) {
   _m_path.scale.x = 0.1;
   _m_path.scale.y = 0.1;
   _m_path.scale.z = 0.01;
-  _m_path.color.r = 1.0;
+  if (color == "r") {
+    _m_path.color.r = 1.0;
+    _m_path.color.g = 0.0;
+    _m_path.color.b = 0.0;
+  } else if (color == "g") {
+    _m_path.color.r = 0.0;
+    _m_path.color.g = 1.0;
+    _m_path.color.b = 0.0;
+  } else if (color == "b") {
+    _m_path.color.r = 0.0;
+    _m_path.color.g = 0.0;
+    _m_path.color.b = 1.0;
+  }
+  // _m_path.color.r = 1.0;
   _m_path.color.a = 1.0;
 
   _m_path.points.clear();
@@ -443,6 +457,7 @@ void MapInfo::set_final_path(std::vector<KDPoint> &path) {
     inc += 0.01;
     _m_path.points.push_back(p_);
   }
+  // change id for voronoi or rrt* (so we can visualise both paths at the same)
   _marker_pub->publish(_m_path);
 }
 void ::MapInfo::set_voronoi(std::vector<std::pair<KDPoint, KDPoint>> &edges) {

@@ -43,7 +43,7 @@ def plot_map(data1,data2):
     x = data2[:,0]
     y = data2[:,1]
 
-    plt.plot(x, y, 'r--')
+    plt.plot(x, y, 'ro--')
     plt.show()
     
 if __name__ == "__main__":

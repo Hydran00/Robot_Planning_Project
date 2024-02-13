@@ -1,5 +1,4 @@
 #include "planner/voronoi/planners/voronoi_plan.hpp"
-
 VoronoiPlan::VoronoiPlan(std::shared_ptr<MapInfo> &map_info)
     : _voronoi_builder(map_info->_map) {
   _map_info = map_info;
@@ -243,7 +242,8 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
                     return p.second == std::numeric_limits<double>::max();
                   })) {
     std::cout << "NO PATH FOUND" << std::endl;
-    return std::make_pair(std::vector<KDPoint>(), std::numeric_limits<double>::max());
+    return std::make_pair(std::vector<KDPoint>(),
+                          std::numeric_limits<double>::max());
   }
   auto best_path =
       std::min_element(paths.begin(), paths.end(),
@@ -262,5 +262,50 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
     file2 << p[0] << " " << p[1] << std::endl;
   }
   file2.close();
+
   return *best_path;
+}
+
+std::vector<KDPoint> VoronoiPlan::OptimisePath(std::vector<KDPoint> &path) {
+  std::vector<KDPoint> optimised_path = path;
+  bool is_path_improved = true;
+  while (is_path_improved) {
+    is_path_improved = false;
+    if (optimised_path.size() < 3) {
+      std::cout << "SIZE < 3 ->Path optimisation done!" << std::endl;
+      return optimised_path;
+    }
+    // Node we start looking from
+    KDPoint current_node = optimised_path.rbegin()[1];
+    // Node we want to reduce the cost
+    KDPoint node_to_opt = optimised_path.back();
+
+    // iterates from gate to start
+    while (current_node != _map_info->pt_start) {
+      int current_idx =
+          std::find_if(optimised_path.begin(), optimised_path.end(),
+                       [&](KDPoint &p) { return p == current_node; }) -
+          optimised_path.begin();
+      // get parent of the current node
+      KDPoint node_parent = optimised_path[current_idx - 1];
+      // checks if node_to_opt is a victim
+      auto it =
+          std::find_if(_map_info->_victims.begin(), _map_info->_victims.end(),
+                       [&](std::tuple<KDPoint, double> &victim) {
+                         return (std::get<0>(victim) == current_node);
+                       });
+      std::vector<KDPoint> segment = {node_parent, node_to_opt};
+      if (!_map_info->Collision(segment) && it == _map_info->_victims.end()) {
+        optimised_path.erase(optimised_path.begin() + current_idx);
+
+        is_path_improved = true;
+      } else {
+        node_to_opt = current_node;
+      }
+      current_node = node_parent;
+    }
+  }
+  std::cout << "Path optimisation done!" << std::endl;
+
+  return optimised_path;
 }
