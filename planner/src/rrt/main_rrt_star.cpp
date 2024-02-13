@@ -3,10 +3,10 @@
 #include <fstream>
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
+#include "planner/map_info_node.hpp"
 #include "planner/rrt/planners/rrt_plan.hpp"
 #include "planner/rrt/planners/rrt_star_plan.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
-#include "planner/map_info_node.hpp"
 #include "planner/rrt/utils/rrt.hpp"
 // #include "planner/dubins/dubins.h"
 using namespace std;
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
   std::cout << "\033[1;32mSeed is " << plan.seed << "\033[0m" << std::endl;
 
   std::tuple<std::vector<KDPoint>, double> final_path_cost = plan.run();
-  
+
   std::vector<KDPoint> final_path = std::get<0>(final_path_cost);
   std::vector<KDPoint> dubinised_final_path =
       dubinise_path(final_path, m->dubins_radius, 0.1);
@@ -92,13 +92,18 @@ int main(int argc, char **argv) {
   m->set_final_path(dubinised_final_path);
 
   //   // Check path validity
-  cout << "IS PATH VALID?: " << (m->Collision(dubinised_final_path) ? "NO" : "YES")
-       << endl;
+  cout << "IS PATH VALID?: "
+       << (m->Collision(dubinised_final_path) ? "NO" : "YES") << endl;
 
   print_path_on_file(dubinised_final_path);
   //   // Output path for python visualisation
 
-  m->publish_path(dubinised_final_path);
+  int i = 0;
+  while (i < 100) {
+    m->publish_path(dubinised_final_path);
+    rclcpp::sleep_for(std::chrono::milliseconds(10));
+    i++;
+  }
   cout << "Planning time: " << time_diff.seconds() << " seconds" << endl;
   rclcpp::shutdown();
   cout << "Done!" << endl;

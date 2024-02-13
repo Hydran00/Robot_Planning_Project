@@ -1,6 +1,6 @@
 #include "planner/rrt/utils/rrt.hpp"
-
 #include <unistd.h>
+
 #define VELOCITY 0.2
 #define TIME_LIMIT 5000.0
 
@@ -236,6 +236,7 @@ bool RRT::PathOptimisation(
           });
 
       std::get<1>(*it_node_to_opt) = idx;
+      // sleep(3);      
       is_path_improved = true;
     } else {
       std::cout << "\033[1;33mOptimisation not found!\033[0m" << std::endl;

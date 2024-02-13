@@ -157,6 +157,11 @@ std::tuple<std::vector<KDPoint>, double> RRTStarDubinsPlan::run(void) {
           break;
         }
       };
+      // show path optimisation
+      if (MotionPlanning::_display) {
+        std::vector<KDPoint> optimised_path = _ReconstrucPath();
+        MotionPlanning::_map_info->set_final_path(optimised_path, "b", 11);
+      }
       std::cout << "\n\nFinal cost of node " << std::get<0>(new_node)[0] << ", "
                 << std::get<0>(new_node)[1] << " is " << cost1 << std::endl;
       std::cout << "Final cost after optimisation of node "

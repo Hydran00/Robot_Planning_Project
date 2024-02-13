@@ -297,7 +297,6 @@ std::vector<KDPoint> VoronoiPlan::OptimisePath(std::vector<KDPoint> &path) {
       std::vector<KDPoint> segment = {node_parent, node_to_opt};
       if (!_map_info->Collision(segment) && it == _map_info->_victims.end()) {
         optimised_path.erase(optimised_path.begin() + current_idx);
-
         is_path_improved = true;
       } else {
         node_to_opt = current_node;
