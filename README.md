@@ -1,6 +1,6 @@
 # Robot Planning Projects
 We implemented various variants of RRT and the Voronoi shortest path for
-the victim rescuing.
+the victim rescuing. The repository available on [github](https://github.com/Hydran00/Robot_Planning_Project/tree/main)
 
 ### How to test it
 ```
