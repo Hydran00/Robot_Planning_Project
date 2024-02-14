@@ -261,12 +261,13 @@ std::tuple<std::vector<KDPoint>, double> VoronoiPlan::run(void) {
   std::cout << "TOTAL COST: " << std::get<1>(*best_path_it) << std::endl;
   std::ofstream file2;
   string path2 = ament_index_cpp::get_package_share_directory("planner") +
-                 "/data/best_path_voronoi.txt";
+                 "/data/voronoi_path.txt";
   std::remove(path2.c_str());
+
   file2.open(path2);
-  // for (auto &p : std::get<0>(best_path_it)) {
-  //   file2 << p[0] << " " << p[1] << std::endl;
-  // }
+  for (auto &p : std::get<0>(*best_path_it)) {
+    file2 << p[0] << " " << p[1] << std::endl;
+  }
   file2.close();
 
   return *best_path_it;

@@ -1,7 +1,5 @@
 #include "planner/map_info_node.hpp"
 
-#include <unistd.h>
-
 #include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
 
 MapInfo::MapInfo() : Node("map"), _pub_i(0) {
@@ -40,7 +38,7 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
 
   if (_planner_type != "rrt_star_dubins") {
     obstacle_offset = OFFSET + dubins_radius;
-    map_offset = OFFSET;// + dubins_radius;
+    map_offset = OFFSET;  // + dubins_radius;
   } else {
     obstacle_offset = OFFSET;
     map_offset = OFFSET;
@@ -151,7 +149,7 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
   _line_boundary.action = visualization_msgs::msg::Marker::ADD;
   _line_boundary.ns = "map";
   _line_boundary.id = _id_boundary;
-  _line_boundary.type = visualization_msgs::msg::Marker::LINE_STRIP;
+  _line_boundary.type = visualization_msgs::msg::Marker::LINE_LIST;
   _line_boundary.pose.orientation.w = 1.0;
   _line_boundary.scale.x = 0.5;
   // _line_boundary.scale.y = 0.1;
@@ -175,13 +173,19 @@ void MapInfo::set_boundary(std::vector<KDPoint> &points) {
                           side_strategy_, offsetting_join_strategy_,
                           end_strategy_, offsetting_point_strategy_);
 
-  geometry_msgs::msg::Point p_ros;
-  for (auto p : result[0].outer()) {
-    _map.outer().push_back(point_xy(p.x(), p.y()));
-    p_ros.x = p.x();
-    p_ros.y = p.y();
-    p_ros.z = 0;
-    _line_boundary.points.push_back(p_ros);
+  geometry_msgs::msg::Point p_source, p_target;
+  // for (auto p : result[0].outer()) {
+  for (size_t i = 0; i < result[0].outer().size() - 1; i++) {
+    _map.outer().push_back(
+        point_xy(result[0].outer()[i].x(), result[0].outer()[i].y()));
+    p_source.x = result[0].outer()[i].x();
+    p_source.y = result[0].outer()[i].y();
+    p_source.z = 0;
+    p_target.x = result[0].outer()[i + 1].x();
+    p_target.y = result[0].outer()[i + 1].y();
+    p_target.z = 0;
+    _line_boundary.points.push_back(p_source);
+    _line_boundary.points.push_back(p_target);
   }
   // close ring
   _map.outer().push_back(_map.outer().front());
@@ -423,8 +427,11 @@ void MapInfo::set_final_path(std::vector<KDPoint> &path,
   _m_path.action = visualization_msgs::msg::Marker::ADD;
   _m_path.ns = "map";
   _m_path.id = _id_path + n;
-  _m_path.type = visualization_msgs::msg::Marker::LINE_STRIP;
+  _m_path.type = visualization_msgs::msg::Marker::LINE_LIST;
   _m_path.pose.orientation.w = 1.0;
+  _m_path.pose.orientation.x = 0.0;
+  _m_path.pose.orientation.y = 0.0;
+  _m_path.pose.orientation.z = 0.0;
   // show path map on top (avoid graphical glitches)
   _m_path.pose.position.z = 0.05;
   _m_path.scale.x = 0.1;
@@ -434,28 +441,33 @@ void MapInfo::set_final_path(std::vector<KDPoint> &path,
     _m_path.color.r = 1.0;
     _m_path.color.g = 0.0;
     _m_path.color.b = 0.0;
+    _m_path.pose.position.z = 0.06;
   } else if (color == "g") {
     _m_path.color.r = 0.0;
     _m_path.color.g = 1.0;
     _m_path.color.b = 0.0;
+    _m_path.pose.position.z = 0.04;
   } else if (color == "b") {
     _m_path.color.r = 0.0;
     _m_path.color.g = 0.0;
     _m_path.color.b = 1.0;
+    _m_path.pose.position.z = 0.05;
   }
   // _m_path.color.r = 1.0;
   _m_path.color.a = 1.0;
 
   _m_path.points.clear();
-  float inc = 0.001;
-  for (auto p : path) {
-    geometry_msgs::msg::Point p_;
-    p_.x = p[0];
-    p_.y = p[1];
-    p_.z = 0.2 + inc;
-    // avoid glitches
-    inc += 0.01;
-    _m_path.points.push_back(p_);
+
+  for (size_t i = 0; i < path.size() - 1; i++) {
+    geometry_msgs::msg::Point p_source, p_target;
+    p_source.x = path[i][0];
+    p_source.y = path[i][1];
+    p_source.z = 0.2;
+    p_target.x = path[i + 1][0];
+    p_target.y = path[i + 1][1];
+    p_target.z = 0.2;
+    _m_path.points.push_back(p_source);
+    _m_path.points.push_back(p_target);
   }
   // change id for voronoi or rrt* (so we can visualise both paths at the same)
   _marker_pub->publish(_m_path);

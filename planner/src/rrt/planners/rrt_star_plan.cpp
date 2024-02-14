@@ -69,8 +69,7 @@ std::tuple<std::vector<KDPoint>, double> RRTStarPlan::run(void) {
     // handles timeout returning empty path and infinite cost
     if (std::chrono::high_resolution_clock::now() - startTime >
         std::chrono::milliseconds(1000 *
-                                  (int)MotionPlanning::_map_info->_timeout))
-                                  {
+                                  (int)MotionPlanning::_map_info->_timeout)) {
       std::cout << "\033[0;31mTimeout\033[0m" << std::endl;
       std::vector<KDPoint> empty;
       return std::make_tuple(empty, std::numeric_limits<double>::infinity());
@@ -114,6 +113,10 @@ std::tuple<std::vector<KDPoint>, double> RRTStarPlan::run(void) {
       // the last point is not the end point -> we need to add it
       if (q_new != MotionPlanning::_pt_end) {
         _rrt.Add(MotionPlanning::_pt_end, q_new);
+      }
+      if (MotionPlanning::_display) {
+        std::vector<KDPoint> final_path = _ReconstrucPath();
+        MotionPlanning::_map_info->set_final_path(final_path, "g", 10);
       }
       while (true) {
         auto parent = _rrt.GetParent(MotionPlanning::_pt_end);

@@ -216,12 +216,12 @@ bool RRT::PathOptimisation(
     if (it != victims.end()) {
       new_cost -= std::get<1>(*it);
     }
-    // std::cout << "Trying to skip node " << current_node[0] << " , "
-    //           << current_node[1] << " and connect " << node_parent[0] << " "
-    //           << node_parent[1] << " to " << node_to_opt[0] << " "
-    //           << node_to_opt[1] << std::endl;
+    std::cout << "Trying to skip node " << current_node[0] << " , "
+              << current_node[1] << " and connect " << node_parent[0] << " "
+              << node_parent[1] << " to " << node_to_opt[0] << " "
+              << node_to_opt[1] << std::endl;
     std::vector<KDPoint> new_path = {node_parent, node_to_opt};
-    if (new_cost < Cost(node_to_opt, true) && !Collision(new_path) - 0.1) {
+    if (new_cost < Cost(node_to_opt, true) && !Collision(new_path)) {
       // if the Dubins is collision free, we can optimise the path
       std::cout << "\033[1;32mOptimisation found!\033[0m" << std::endl;
 
@@ -234,9 +234,7 @@ bool RRT::PathOptimisation(
           _rrt.begin(), _rrt.end(), [&](std::pair<KDPoint, int> &pair) {
             return (std::get<0>(pair) == node_to_opt);
           });
-
       std::get<1>(*it_node_to_opt) = idx;
-      // sleep(3);      
       is_path_improved = true;
     } else {
       std::cout << "\033[1;33mOptimisation not found!\033[0m" << std::endl;
