@@ -18,5 +18,5 @@ Available planners are:
   - RRT (``rrt``)
   - RRT* with our victim rescuing algorithm (``rrt_star``)
   - RRT* Dubins with our victim rescuing algorithm  (``rrt_star_dubins``)
-  - Multithreaded version of rrt* and rrt*_dubins (``multithread_planner.launch``)
-  - Voronoi with TSP brute force solution (``voronoi_planner``)
+  - Multithreaded version of rrt* and rrt*_dubins (``multithread_planner``)
+  - Voronoi with TSP brute force solution or heuristic (``voronoi_planner``) -> change params in the launch file  
