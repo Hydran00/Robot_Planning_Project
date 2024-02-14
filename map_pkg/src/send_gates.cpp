@@ -129,13 +129,14 @@ void GatesPublisher::rand_hexagon_gate(){
   obstacle obs {0.0, 0.0, 0.0, 1.0, 1.0, obstacle_type::BOX};
 
   obs.y = sqrt(3)/2.0*this->data.dx - 0.5-0.0001;
-  obs.y = obs.y * (dis_left_right(gen) == 0 ? 1 : -1);
+  int sign = dis_left_right(gen) == 0 ? 1 : -1;
+  obs.y = (obs.y - 0.8) * sign;
   double th = obs.y > 0 ? M_PI/2.0 : -M_PI/2.0;
   do {
     obs.x = dis_x(gen);
   } while(!is_inside_map(obs, "hexagon", this->data.dx, this->data.dy));
   
-  this->spawn_gates(obs.x, obs.y, th);
+  this->spawn_gates(obs.x, obs.y + 0.8*sign, th);
 }
 
 void GatesPublisher::rand_rectangle_gate(){

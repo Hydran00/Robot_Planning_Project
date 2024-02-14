@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "planner/rrt/utils/kdtree.hpp"
-#include "planner/rrt/utils/motionplanning.hpp"
+#include "planner/motionplanning.hpp"
 #include "planner/rrt/utils/rrt.hpp"
 
 class RRTPlan : public MotionPlanning {

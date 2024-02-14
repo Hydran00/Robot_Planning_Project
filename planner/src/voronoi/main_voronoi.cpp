@@ -72,8 +72,8 @@ int main(int argc, char **argv)
   cout << "Planner started!" << endl;
   // Monitor execution time
   auto time_start = rclcpp::Clock().now();
-  std::pair<std::vector<KDPoint>, double> path = plan.GetPlan();
-  std::vector<KDPoint> optimised_path = plan.OptimisePath(path.first);
+  std::tuple<std::vector<KDPoint>, double> path = plan.run();
+  std::vector<KDPoint> optimised_path = plan.OptimisePath(std::get<0>(path));
   std::vector<KDPoint> dubinised_final_path =
       dubinise_path(optimised_path, m->dubins_radius, 0.1);
   auto time_end = rclcpp::Clock().now();
@@ -82,11 +82,11 @@ int main(int argc, char **argv)
 
   //   // Output path for python visualisation
   print_path_on_file(dubinised_final_path);
-  m->set_final_path(path.first, "g", 10);
+  m->set_final_path(std::get<0>(path), "g", 10);
   m->set_final_path(optimised_path, "b", 11);
   m->set_final_path(dubinised_final_path);
-  for(size_t i=0;i<path.first.size();i++){
-    cout << path.first[i][0] << ", " << path.first[i][1] << endl;
+  for(size_t i=0;i<std::get<0>(path).size();i++){
+    cout << std::get<0>(path)[i][0] << ", " << std::get<0>(path)[i][1] << endl;
   }
 
   int i = 0;

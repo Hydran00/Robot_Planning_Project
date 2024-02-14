@@ -1,10 +1,16 @@
 #include "planner/voronoi/planners/voronoi_plan.hpp"
 VoronoiPlan::VoronoiPlan(std::shared_ptr<MapInfo> &map_info)
-    : _voronoi_builder(map_info->_map) {
-  _map_info = map_info;
-}
+    : MotionPlanning(map_info), _voronoi_builder(map_info->_map) {}
 
-std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
+// RRTPlan::RRTPlan(std::shared_ptr<MapInfo> &map_info)
+//     : MotionPlanning(map_info), _rrt(map_info->_victims, this->seed) {
+//   _display = map_info->_show_graphics;
+//   // call rrt constructor
+//   _rrt.set_root(MotionPlanning::_pt_start);
+// }
+
+
+std::tuple<std::vector<KDPoint>, double> VoronoiPlan::run(void) {
   _voronoi_builder.create_voronoi();
 
   std::ofstream file;
@@ -194,7 +200,7 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
   }
 
   // for each combination of victims finds the shortest path
-  std::vector<std::pair<std::vector<KDPoint>, double>> paths;
+  std::vector<std::tuple<std::vector<KDPoint>, double>> paths;
   for (auto &combination : all_combinations) {
     std::vector<KDPoint> path;
     double cost = 0;
@@ -232,38 +238,38 @@ std::pair<std::vector<KDPoint>, double> VoronoiPlan::GetPlan(void) {
       path.push_back(point_index[last_path_cost.first[i]].first);
     }
     cost += last_path_cost.second;
-    paths.push_back(std::make_pair(path, cost));
+    paths.push_back(std::make_tuple(path, cost));
   }
 
   std::cout << "START IS " << start << std::endl;
   // check if every path's cost is infinite
   if (std::all_of(paths.begin(), paths.end(),
-                  [](std::pair<std::vector<KDPoint>, double> p) {
-                    return p.second == std::numeric_limits<double>::max();
+                  [](std::tuple<std::vector<KDPoint>, double> p) {
+                    return std::get<1>(p) == std::numeric_limits<double>::max();
                   })) {
     std::cout << "NO PATH FOUND" << std::endl;
     return std::make_pair(std::vector<KDPoint>(),
                           std::numeric_limits<double>::max());
   }
-  auto best_path =
+  auto best_path_it =
       std::min_element(paths.begin(), paths.end(),
-                       [](const std::pair<std::vector<KDPoint>, double> &p1,
-                          const std::pair<std::vector<KDPoint>, double> &p2) {
-                         return p1.second < p2.second;
+                       [](const std::tuple<std::vector<KDPoint>, double> &p1,
+                          const std::tuple<std::vector<KDPoint>, double> &p2) {
+                         return std::get<1>(p1) < std::get<1>(p2);
                        });
   // print total cost
-  std::cout << "TOTAL COST: " << best_path->second << std::endl;
+  std::cout << "TOTAL COST: " << std::get<1>(*best_path_it) << std::endl;
   std::ofstream file2;
   string path2 = ament_index_cpp::get_package_share_directory("planner") +
                  "/data/best_path_voronoi.txt";
   std::remove(path2.c_str());
   file2.open(path2);
-  for (auto &p : best_path->first) {
-    file2 << p[0] << " " << p[1] << std::endl;
-  }
+  // for (auto &p : std::get<0>(best_path_it)) {
+  //   file2 << p[0] << " " << p[1] << std::endl;
+  // }
   file2.close();
 
-  return *best_path;
+  return *best_path_it;
 }
 
 std::vector<KDPoint> VoronoiPlan::OptimisePath(std::vector<KDPoint> &path) {

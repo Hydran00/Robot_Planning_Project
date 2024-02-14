@@ -4,7 +4,7 @@
 #include <vector>
 #include <random>
 #include <chrono>
-#include "planner/rrt/utils/motionplanning.hpp"
+#include "planner/motionplanning.hpp"
 #include "planner/rrt/utils/kdtree.hpp"
 #include "planner/rrt/utils/rrt_dubins.hpp"
 
