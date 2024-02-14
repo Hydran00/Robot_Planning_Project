@@ -9,7 +9,6 @@ VoronoiPlan::VoronoiPlan(std::shared_ptr<MapInfo> &map_info)
 //   _rrt.set_root(MotionPlanning::_pt_start);
 // }
 
-
 std::tuple<std::vector<KDPoint>, double> VoronoiPlan::run(void) {
   _voronoi_builder.create_voronoi();
 
@@ -257,8 +256,30 @@ std::tuple<std::vector<KDPoint>, double> VoronoiPlan::run(void) {
                           const std::tuple<std::vector<KDPoint>, double> &p2) {
                          return std::get<1>(p1) < std::get<1>(p2);
                        });
+
+  // compute real total cost
+  double final_cost = 0.0;
+  auto victim_cpy = _map_info->_victims;
+  for (size_t i = 0; i < std::get<0>(*best_path_it).size(); i++) {
+    // check if p is a victim
+    auto it = std::find_if(
+        victim_cpy.begin(), victim_cpy.end(),
+        [&](std::tuple<KDPoint, double> &victim) {
+          return (std::get<0>(victim) == std::get<0>(*best_path_it)[i]);
+        });
+    if (it != victim_cpy.end()) {
+      final_cost += -std::get<1>(*it);
+    // avoid double counting 
+     victim_cpy.erase(it);
+    }
+    // add distance
+    if (std::get<0>(*best_path_it).size() > i + 1) {
+      final_cost += distance(std::get<0>(*best_path_it)[i],
+                             std::get<0>(*best_path_it)[i + 1]);
+    }
+  }
   // print total cost
-  std::cout << "TOTAL COST: " << std::get<1>(*best_path_it) << std::endl;
+  std::cout << "TOTAL COST: " << final_cost << std::endl;
   std::ofstream file2;
   string path2 = ament_index_cpp::get_package_share_directory("planner") +
                  "/data/voronoi_path.txt";

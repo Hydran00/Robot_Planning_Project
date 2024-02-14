@@ -1,6 +1,6 @@
 /**/send_obstacles:
   ros__parameters:
-    n_obstacles: 9
+    n_obstacles: 6
     no_cylinders: false
     no_boxes: false
     max_size: 1.0
@@ -15,7 +15,7 @@
 
 /**/send_victims:
   ros__parameters:
-    n_victims: 5
+    n_victims: 4
     min_weight: 10
     max_weight: 500
 
