@@ -32,7 +32,7 @@ def generate_launch_description():
                         "planner_type": launch.substitutions.LaunchConfiguration("planner_type"),
                         "show_graphics": launch.substitutions.LaunchConfiguration('show_graphics'),
                         "num_threads": 8,
-                        "timeout": 10.0, # seconds
+                        "timeout": 8.0, # seconds
                         "dubins_radius": launch.substitutions.LaunchConfiguration('dubins_radius'),
 
                     }

@@ -17,7 +17,7 @@ template <class PlannerType>
 class ThreadedPlanner
 {
 private:
-  std::vector<KDPoint> _choose_path()
+  std::pair<std::vector<KDPoint>,double> _choose_path()
   {
     int idx = std::min_element(cost_list.begin(), cost_list.end()) -
               cost_list.begin();
@@ -37,10 +37,10 @@ private:
     if (are_all_inf)
     {
       std::cout << "All paths are inf" << std::endl;
-      return path_list[0];
+      return std::make_pair(path_list[0], cost_list[0]);
     }
-    std::cout << "Returning best path-> index: " << idx << std::endl;
-    return path_list[idx];
+    std::cout << "Best path has cost "<< cost_list[idx] << std::endl;
+    return std::make_pair(path_list[idx], cost_list[idx]);
   }
   void _run_wrapper()
   {
@@ -65,7 +65,7 @@ public:
     this->thread_number = thread_number;
     this->map_info = map_info;
   }
-  std::vector<KDPoint> execute_plans()
+  std::pair<std::vector<KDPoint>,double> execute_plans()
   {
     std::vector<std::thread> threads;
 

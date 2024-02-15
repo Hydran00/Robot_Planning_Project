@@ -6,13 +6,13 @@
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "planner/dubins/dubins.h"
-#include "planner/rrt/planners/rrt_plan.hpp"
-#include "planner/rrt/planners/rrt_star_plan.hpp"
-#include "planner/rrt/planners/rrt_star_dubins_plan.hpp"
-#include "planner/rrt/utils/kdtree.hpp"
 #include "planner/map_info_node.hpp"
-#include "planner/rrt/utils/rrt.hpp"
+#include "planner/rrt/planners/rrt_plan.hpp"
+#include "planner/rrt/planners/rrt_star_dubins_plan.hpp"
+#include "planner/rrt/planners/rrt_star_plan.hpp"
 #include "planner/rrt/planners/threaded_planner.hpp"
+#include "planner/rrt/utils/kdtree.hpp"
+#include "planner/rrt/utils/rrt.hpp"
 
 using namespace std;
 
@@ -69,12 +69,20 @@ int main(int argc, char **argv) {
 
   // ThreadedPlanner<RRTStarPlan> threaded_planner(m->_num_threads, m);
   ThreadedPlanner<RRTStarDubinsPlan> threaded_planner(m->_num_threads, m);
-  std::vector<KDPoint> final_path = threaded_planner.execute_plans();
+  std::vector<KDPoint> final_path;
+  // double mean_cost = 0;
+  // for (int i = 0; i < 50; i++) {
+  std::pair<std::vector<KDPoint>, double> final_path_cost =
+      threaded_planner.execute_plans();
+  final_path = final_path_cost.first;
+  m->set_final_path(final_path_cost.first);
+  // mean_cost += final_path_cost.second;
   std::cout << "Plan completed!" << std::endl;
-  m->set_final_path(final_path);
+  // }
+  // std::cout << "Mean cost: " << mean_cost/50 << std::endl;
   // Check path validity
-  cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
-       << endl;
+  // cout << "IS PATH VALID?: " << (m->Collision(final_path) ? "NO" : "YES")
+  //      << endl;
 
   // Output path for python visualisation
   print_path_on_file(final_path);

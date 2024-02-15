@@ -72,7 +72,7 @@ std::tuple<std::vector<KDPoint>, double> RRTStarDubinsPlan::run(void) {
     if (std::chrono::high_resolution_clock::now() - startTime >
         std::chrono::milliseconds(1000 *
                                   (int)MotionPlanning::_map_info->_timeout)) {
-      std::cout << "\033[0;31mTimeout\033[0m" << std::endl;
+      // std::cout << "\033[0;31mTimeout\033[0m" << std::endl;
       std::vector<KDPoint> empty;
       // return empy path and infinite cost
       return std::make_tuple(empty, std::numeric_limits<double>::infinity());
@@ -162,11 +162,11 @@ std::tuple<std::vector<KDPoint>, double> RRTStarDubinsPlan::run(void) {
         }
       };
 
-      std::cout << "\n\nFinal cost of node " << std::get<0>(new_node)[0] << ", "
-                << std::get<0>(new_node)[1] << " is " << cost1 << std::endl;
-      std::cout << "Final cost after optimisation of node "
-                << std::get<0>(new_node)[0] << ", " << std::get<0>(new_node)[1]
-                << " is " << _rrt.Cost(new_node, _radius, false) << std::endl;
+      // std::cout << "\n\nFinal cost of node " << std::get<0>(new_node)[0] << ", "
+      //           << std::get<0>(new_node)[1] << " is " << cost1 << std::endl;
+      // std::cout << "Final cost after optimisation of node "
+      //           << std::get<0>(new_node)[0] << ", " << std::get<0>(new_node)[1]
+      //           << " is " << _rrt.Cost(new_node, _radius, false) << std::endl;
       std::tuple<std::vector<KDPoint>, double> final_path_cost =
           std::make_tuple(_ReconstrucPath(),
                           _rrt.Cost(new_node, _radius, true));
