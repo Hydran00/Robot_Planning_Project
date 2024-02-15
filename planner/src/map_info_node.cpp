@@ -37,7 +37,7 @@ MapInfo::MapInfo() : Node("map"), _pub_i(0) {
   victims_received_ = false;
 
   if (_planner_type != "rrt_star_dubins") {
-    obstacle_offset = OFFSET + dubins_radius;
+    obstacle_offset = OFFSET + 2*dubins_radius;
     map_offset = OFFSET;  // + dubins_radius;
   } else {
     obstacle_offset = OFFSET;
