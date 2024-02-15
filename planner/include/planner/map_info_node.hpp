@@ -35,7 +35,7 @@
 #include "visualization_msgs/msg/marker_array.hpp"
 
 // Offsetting parameters and utils
-#define OFFSET 0.25 + 0.10  // half-shelfino width + epsilon
+#define OFFSET 0.25 + 0.2  // half-shelfino width + epsilon
 
 typedef boost::geometry::model::d2::point_xy<double> point_xy;
 typedef boost::geometry::model::linestring<point_xy> Linestring;

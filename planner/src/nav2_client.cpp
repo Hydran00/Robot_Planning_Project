@@ -85,6 +85,9 @@ int main(int argc, char* argv[]) {
       }
       goal_msg.controller_id = "FollowPath";
       node->client_ptr_->async_send_goal(goal_msg);
+      rclcpp::sleep_for(std::chrono::milliseconds(500));
+      // ensure that the path is sent
+      node->client_ptr_->async_send_goal(goal_msg);
       node->waypoints_received = false;
     }
     rclcpp::spin_some(node);
